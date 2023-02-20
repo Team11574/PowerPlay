@@ -225,6 +225,10 @@ public class TrajectorySequenceRunner {
         packet.put("yError", getLastPoseError().getY());
         packet.put("headingError (deg)", Math.toDegrees(getLastPoseError().getHeading()));
 
+        packet.put("xDesired", targetPose.getX());
+        packet.put("yDesired", targetPose.getY());
+        packet.put("headingDesired", Math.toDegrees(targetPose.getHeading()));
+
         draw(fieldOverlay, currentTrajectorySequence, currentSegment, targetPose, poseEstimate);
 
         dashboard.sendTelemetryPacket(packet);

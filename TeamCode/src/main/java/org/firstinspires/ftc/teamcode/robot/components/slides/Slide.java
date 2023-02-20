@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.slides;
+package org.firstinspires.ftc.teamcode.robot.components.slides;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -13,6 +13,7 @@ class Slide {
     int[] setPositions;
 
     DcMotor[] motors;
+
 
     public Slide(DcMotor slideMotor) {}
     public Slide(DcMotor slideMotor, double maxHeight, double minEncoderPosition, double maxEncoderPosition) {}

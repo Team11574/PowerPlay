@@ -1,25 +1,49 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <Robot type="FirstInspires-FTC">
+    <!--
+    In general, hardware component names are formatted
+    using the notation SUBSYSTEMPREFIX_componentName_COMPONENTTYPEINITIAL.
+
+    For example, the front right motor on the drive train would be written:
+    DT_frontRight_M.
+
+    Subsystem prefixes:
+        - DT (drivetrain)
+        - VS (vertical slide)
+        - HS (horizontal slide)
+
+    Component type initials:
+        - M (motor)
+        - S (servo)
+        - D (digital device)
+     -->
+
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
-            <goBILDA5202SeriesMotor name="rightMotor" port="0" />
-            <goBILDA5202SeriesMotor name="leftMotor" port="1" />
-            <RevRoboticsCoreHexMotor name="turretMotor" port="2" />
-            <goBILDA5202SeriesMotor name="horiMotor" port="3" />
-            <Servo name="arm_claw" port="0" />
-            <Servo name="lever" port="1" />
-            <Servo name="turretServo" port="2" />
-            <DigitalDevice name="vertSlideLimitSwitch" port="0" />
+            <goBILDA5202SeriesMotor name="VS_slideRight_M" port="0" />
+            <goBILDA5202SeriesMotor name="VS_slideLeft_M" port="1" />
+            <RevRoboticsCoreHexMotor name="HS_turret_M" port="2" />
+            <goBILDA5202SeriesMotor name="HS_slide_M" port="3" />
+            <Servo name="HS_claw_S" port="0" />
+            <Servo name="HS_lever_S" port="1" />
+            <Servo name="HS_hinge_S" port="2" />
+            <DigitalDevice name="VS_limitSwitch_D" port="0" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
-            <NeveRest40Gearmotor name="frMotor" port="0" />
-            <NeveRest40Gearmotor name="brMotor" port="1" />
-            <NeveRest40Gearmotor name="blMotor" port="2" />
-            <NeveRest40Gearmotor name="flMotor" port="3" />
-            <Servo name="clawFlip" port="0" />
-            <Servo name="claw" port="1" />
+            <!-- Drive Train Motors -->
+            <NeveRest40Gearmotor name="DT_frontRight_M" port="0" />
+            <NeveRest40Gearmotor name="DT_backRight_M" port="1" />
+            <NeveRest40Gearmotor name="DT_backLeft_M" port="2" />
+            <NeveRest40Gearmotor name="DT_frontLeft_M" port="3" />
+
+            <!-- Vertical Slide  -->
+            <Servo name="VS_flip_S" port="0" />
+            <Servo name="VS_claw_S" port="1" />
+
+            <!-- IMU  -->
             <ControlHubImuBHI260AP name="imu" port="0" bus="0" />
         </LynxModule>
     </LynxUsbDevice>
+
     <Webcam name="camera" serialNumber="75264A40" />
 </Robot>
