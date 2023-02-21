@@ -9,9 +9,11 @@ import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionExcep
 import java.util.ArrayList;
 
 class Slide {
-    double MAX_LENGTH;
+    double MAX_POWER;
     double MIN_ENCODER_POSITION;
     double MAX_ENCODER_POSITION;
+    double TICKS_PER_INCH;
+    double RUN_TO_POSITION_POWER;
 
     ArrayList<Integer> setPositions;
 
@@ -20,11 +22,17 @@ class Slide {
     public Slide(DcMotorEx slideMotor) {
         this(new DcMotorEx[]{slideMotor});
     }
-    public Slide(DcMotorEx slideMotor, double maxLength, double minEncoderPosition, double maxEncoderPosition) {
-        this(new DcMotorEx[]{slideMotor}, maxLength, minEncoderPosition, maxEncoderPosition);
+    public Slide(DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition) {
+        this(new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition);
     }
     public Slide(DcMotorEx[] slideMotors) {
+        this(slideMotors, 0, Double.POSITIVE_INFINITY);
+
+    }
+    public Slide(DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition) {
         this.motors = slideMotors;
+        this.MIN_ENCODER_POSITION = minEncoderPosition;
+        this.MAX_ENCODER_POSITION = maxEncoderPosition;
 
         for (DcMotorEx motor : motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -33,22 +41,25 @@ class Slide {
             motor.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pid);
         }
     }
-    public Slide(DcMotorEx[] slideMotors, double maxHeight, double minEncoderPosition, double maxEncoderPosition) {
-        this(slideMotors);
-        this.MAX_LENGTH = maxHeight;
-        this.MIN_ENCODER_POSITION = minEncoderPosition;
-        this.MAX_ENCODER_POSITION = maxEncoderPosition;
-    }
 
     public void setPower(double power) {
         for (DcMotorEx motor : motors) {
+        if (power > MAX_POWER)
+            power = MAX_POWER;
+        for (DcMotorEx motor : motors) {
             motor.setPower(power);
+            motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         }
     }
 
     public void setTargetPosition(int position) {
-        for (DcMotorEx motor : motors) {
+        // Run to position needs some power value to run at, default is 1
+        RUN_TO_POSITION_POWER = Math.min(MAX_POWER, RUN_TO_POSITION_POWER);
+
+        for (DcMotor motor : motors) {
+            motor.setPower(RUN_TO_POSITION_POWER);
             motor.setTargetPosition(position);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
     }
 
@@ -56,9 +67,7 @@ class Slide {
         if (setPosition > setPositions.size()) {
             throw new UndefinedSetPositionException();
         }
-        for (DcMotorEx motor : motors) {
-            motor.setTargetPosition(setPositions.get(setPosition));
-        }
+        setTargetPosition(setPositions.get(setPosition));
     }
 
     public void cancelSetPosition() {
@@ -86,6 +95,6 @@ class Slide {
     }
 
     public void goToLength(double length) {
-        this.setTargetPosition((int) (length/MAX_LENGTH * (MAX_ENCODER_POSITION - MIN_ENCODER_POSITION) + MIN_ENCODER_POSITION));
+        setTargetPosition((int) (MIN_ENCODER_POSITION + TICKS_PER_INCH * length));
     }
 }
