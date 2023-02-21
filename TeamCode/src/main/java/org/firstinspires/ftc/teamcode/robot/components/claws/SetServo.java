@@ -8,27 +8,31 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.components.HardwareComponent;
 
 public class SetServo extends HardwareComponent {
+    private Servo servo;
     private double[] positions;
     private int currentPositionIndex;
-    private Servo servo;
 
-    public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
+    public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
                     double position) {
-        this(hardwareMap, telemetry, crServo, new double[]{position});
+        this(hardwareMap, telemetry, clawServo, new double[]{position});
     }
 
-    public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
+    public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
                 double firstPos, double secondPos) {
-        this(hardwareMap, telemetry, crServo, new double[]{firstPos, secondPos});
+        this(hardwareMap, telemetry, clawServo, new double[]{firstPos, secondPos});
     }
 
-    public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
+    public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
                     double[] setPositions) {
         super(hardwareMap, telemetry);
         positions = setPositions;
-        servo = crServo;
+        servo = clawServo;
         goToSetPosition(0);
         initializeHardware();
+    }
+
+    public Servo getServo() {
+        return servo;
     }
 
     public void goToSetPosition(int index) {

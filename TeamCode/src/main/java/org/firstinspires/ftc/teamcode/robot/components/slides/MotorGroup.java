@@ -5,38 +5,36 @@ import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConsta
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.components.Component;
 import org.firstinspires.ftc.teamcode.robot.components.HardwareComponent;
 import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
 
 import java.util.ArrayList;
 
-public class Slide extends HardwareComponent {
-    double MAX_POWER;
+public class MotorGroup extends HardwareComponent {
     double MIN_ENCODER_POSITION;
     double MAX_ENCODER_POSITION;
     double TICKS_PER_INCH;
     double RUN_TO_POSITION_POWER;
 
     ArrayList<Integer> setPositions;
+    double maxPower = 1;
 
     DcMotorEx[] motors;
 
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double ticksPerInch) {
-        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, ticksPerInch);
+    public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx motor, double ticksPerInch) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{motor}, ticksPerInch);
     }
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
-        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition, ticksPerInch);
+    public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx motor, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{motor}, minEncoderPosition, maxEncoderPosition, ticksPerInch);
     }
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double ticksPerInch) {
-        this(hardwareMap, telemetry, slideMotors, 0, Double.POSITIVE_INFINITY, ticksPerInch);
+    public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] motors, double ticksPerInch) {
+        this(hardwareMap, telemetry, motors, 0, Double.POSITIVE_INFINITY, ticksPerInch);
     }
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
+    public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] motors, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
         super(hardwareMap, telemetry);
-        this.motors = slideMotors;
+        this.motors = motors;
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
         this.TICKS_PER_INCH = ticksPerInch;
@@ -51,12 +49,15 @@ public class Slide extends HardwareComponent {
         }
     }
 
+    public void setMaxPower(double newPower) {
+        maxPower = newPower;
+    }
+
     public void setPower(double power) {
         if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
             return;
         }
-        if (power > MAX_POWER)
-            power = MAX_POWER;
+        power = Math.min(power * maxPower, maxPower);
         for (DcMotorEx motor : motors) {
             motor.setPower(power);
             motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -76,7 +77,7 @@ public class Slide extends HardwareComponent {
 
     public void setTargetPosition(int position) {
         // Run to position needs some power value to run at, default is 1
-        RUN_TO_POSITION_POWER = Math.min(MAX_POWER, RUN_TO_POSITION_POWER);
+        RUN_TO_POSITION_POWER = Math.min(RUN_TO_POSITION_POWER * maxPower, maxPower);
 
         for (DcMotor motor : motors) {
             motor.setPower(RUN_TO_POSITION_POWER);
@@ -137,7 +138,7 @@ public class Slide extends HardwareComponent {
         for (DcMotorEx motor : motors) {
             totalCount += motor.getCurrentPosition();
         }
-        return totalCount/motors.length;
+        return totalCount / motors.length;
     }
 
     public void goToLength(double length) {
