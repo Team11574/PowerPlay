@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.components.slides;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class HorizontalSlide extends Slide {
+    // TODO: Include max speed constructors
     public HorizontalSlide(DcMotor slideMotor) {
         super(slideMotor);
     }
