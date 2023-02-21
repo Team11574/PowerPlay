@@ -16,7 +16,8 @@ public class MeepMeepTesting {
                 .setDimensions(16.5, 17)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(36, -61.5, Math.toRadians(90)))
-                                .forward(51.5)
+                                .forward(54.5)
+                                .back(3)
                                 .strafeLeft(12)
                                 .addDisplacementMarker(() -> {
                                     // Raise slides, flip claw, drop cone, etc

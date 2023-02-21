@@ -48,34 +48,25 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
         TrajectorySequence cone = drivetrain.trajectorySequenceBuilder(startPos)
                 //new Pose2d(36, -61.5, Math.toRadians(90)))
-                .forward(53.5)
+                .forward(56.5)
+                .back(3)
                 .strafeLeft(12.5)
-                .addDisplacementMarker(() -> {
-                    // Raise slides, flip claw, drop cone, etc
-
-                    try {
-                        robot.getVerticalSlide().goToSetPosition(VerticalSlide.SetPosition.HIGH);
-                    } catch (UndefinedSetPositionException e) {
-                        e.printStackTrace();
-                    }
-
-                    telemetry.addLine("Yippee!");
-                    telemetry.update();
-                })
-                .back(2.5)
                 .build();
 
         spot1 = drivetrain.trajectorySequenceBuilder(cone.end())
+                .back(2.5)
                 .strafeLeft(12.5)
                 .back(23)
                 .build();
 
         spot2 = drivetrain.trajectorySequenceBuilder(cone.end())
+                .back(2.5)
                 .strafeRight(11.5)
                 .back(23)
                 .build();
 
         spot3 = drivetrain.trajectorySequenceBuilder(cone.end())
+                .back(2.5)
                 .strafeRight(35)
                 .back(23)
                 .build();
@@ -87,6 +78,15 @@ public class AutoConeLeft extends RobotLinearOpMode {
         int parkingSpot = robot.getParkingSpot();
 
         drivetrain.followTrajectorySequence(cone);
+
+        robot.getVerticalSlide().goToSetPosition(VerticalSlide.SetPosition.HIGH);
+
+        while (!robot.getVerticalSlide().atSetPosition()) {
+
+        }
+
+        telemetry.addLine("Yippee!");
+        telemetry.update();
 
         park(parkingSpot);
 

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class SlideConstants {
     /* == Vertical Slide == */
     public static final double VS_TICKS_PER_REV = 384.5;
-    public static final double VS_GEAR_RATIO = 16/19;
+    public static final double VS_GEAR_RATIO = ((double) 16)/19;
     public static final double VS_PULLEY_CIRCUMFERENCE = 4.409; // in
 
     public static final double VS_TICKS_PER_IN = VS_TICKS_PER_REV * VS_GEAR_RATIO / VS_PULLEY_CIRCUMFERENCE;
@@ -21,7 +21,7 @@ public class SlideConstants {
     /* == Horizontal Slide == */
     // TODO: Insert correct values for horizontal slide
     public static final double HS_TICKS_PER_REV = 384.5;
-    public static final double HS_GEAR_RATIO = 16/19;
+    public static final double HS_GEAR_RATIO = 1;
     public static final double HS_PULLEY_CIRCUMFERENCE = 4.409; // in
 
     public static final double HS_TICKS_PER_IN = HS_TICKS_PER_REV * HS_GEAR_RATIO / HS_PULLEY_CIRCUMFERENCE;
@@ -31,4 +31,6 @@ public class SlideConstants {
     public static double HS_SP_LOW = 10;
     public static double HS_SP_MEDIUM = 15;
     public static double HS_SP_HIGH = 20;
+
+    public static double SET_POSITION_THRESHOLD = 5;
 }

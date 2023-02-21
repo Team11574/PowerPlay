@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.components.slides;
 
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.SET_POSITION_THRESHOLD;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -50,12 +52,26 @@ public class Slide extends HardwareComponent {
     }
 
     public void setPower(double power) {
+        if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            return;
+        }
         if (power > MAX_POWER)
             power = MAX_POWER;
         for (DcMotorEx motor : motors) {
             motor.setPower(power);
             motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         }
+    }
+
+    public boolean atSetPosition() { return atSetPosition(SET_POSITION_THRESHOLD); }
+
+    public boolean atSetPosition(double threshold) {
+        double sum = 0;
+        for (DcMotorEx motor : motors) {
+            sum += motor.getCurrentPosition();
+        }
+        sum /= motors.length;
+        return Math.abs(sum - motors[0].getTargetPosition()) <= threshold;
     }
 
     public void setTargetPosition(int position) {
@@ -69,14 +85,14 @@ public class Slide extends HardwareComponent {
         }
     }
 
-    public void goToSetPosition(int setPosition) throws UndefinedSetPositionException {
+    public void goToSetPosition(int setPosition) {
         if (setPosition > setPositions.size()) {
-            throw new UndefinedSetPositionException();
+            telemetry.addLine("Undefined set position!");
         }
         setTargetPosition(setPositions.get(setPosition));
     }
 
-    public void cancelSetPosition() {
+    public void hardReset() {
         for (DcMotorEx motor : motors) {
             motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         }

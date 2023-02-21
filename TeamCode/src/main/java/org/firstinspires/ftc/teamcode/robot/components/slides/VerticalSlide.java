@@ -44,7 +44,7 @@ public class VerticalSlide extends Slide {
         }
     }
 
-    public void goToSetPosition(SetPosition setPosition) throws UndefinedSetPositionException {
+    public void goToSetPosition(SetPosition setPosition) {
         goToSetPosition(setPosition.ordinal());
     }
 
