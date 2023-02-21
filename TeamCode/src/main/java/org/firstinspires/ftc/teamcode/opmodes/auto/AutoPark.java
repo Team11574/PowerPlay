@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.opmodes.Auto;
+package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.opmodes.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -19,7 +19,8 @@ public class AutoPark extends RobotLinearOpMode {
 
     @Override
     public void runOpMode() {
-        //super.runOpMode();
+        super.runOpMode();
+
         this.robot = new Robot(hardwareMap, telemetry, true);
 
         drivetrain = robot.getDrivetrain();

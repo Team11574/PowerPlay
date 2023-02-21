@@ -128,4 +128,18 @@ public class Slide extends HardwareComponent {
         setTargetPosition((int) (MIN_ENCODER_POSITION + TICKS_PER_INCH * length));
     }
 
+    public double getVelocity() {
+        double totalVel = 0;
+        for (DcMotorEx motor : motors) {
+            totalVel += motor.getVelocity();
+        }
+        return totalVel / motors.length;
+    }
+
+    public void stop() {
+        for (DcMotorEx motor : motors) {
+            motor.setPower(0);
+        }
+    }
+
 }

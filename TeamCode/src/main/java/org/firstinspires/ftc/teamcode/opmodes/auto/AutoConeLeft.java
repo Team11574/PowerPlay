@@ -1,11 +1,10 @@
-package org.firstinspires.ftc.teamcode.opmodes.Auto;
+package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.opmodes.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.components.slides.Slide;
 import org.firstinspires.ftc.teamcode.robot.components.slides.VerticalSlide;
 import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
