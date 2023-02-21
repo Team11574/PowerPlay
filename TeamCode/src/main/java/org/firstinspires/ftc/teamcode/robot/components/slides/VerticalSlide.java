@@ -1,21 +1,21 @@
 package org.firstinspires.ftc.teamcode.robot.components.slides;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class VerticalSlide extends Slide {
-    public VerticalSlide(DcMotor slideMotor) {
+    public VerticalSlide(DcMotorEx slideMotor) {
         super(slideMotor);
     }
 
-    public VerticalSlide(DcMotor slideMotor, double maxHeight, double minEncoderPosition, double maxEncoderPosition) {
+    public VerticalSlide(DcMotorEx slideMotor, double maxHeight, double minEncoderPosition, double maxEncoderPosition) {
         super(slideMotor, maxHeight, minEncoderPosition, maxEncoderPosition);
     }
 
-    public VerticalSlide(DcMotor[] slideMotors) {
+    public VerticalSlide(DcMotorEx[] slideMotors) {
         super(slideMotors);
     }
 
-    public VerticalSlide(DcMotor[] slideMotors, double maxHeight, double minEncoderPosition,
+    public VerticalSlide(DcMotorEx[] slideMotors, double maxHeight, double minEncoderPosition,
             double maxEncoderPosition) {
         super(slideMotors, maxHeight, minEncoderPosition, maxEncoderPosition);
     }
