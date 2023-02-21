@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_CLAW_CLOSED;
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_CLAW_CLOSED;
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_HIGH;
 import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_LOW;
 import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_MEDIUM;
@@ -7,11 +11,13 @@ import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConsta
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.components.Component;
 import org.firstinspires.ftc.teamcode.robot.components.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.components.camera.Camera;
+import org.firstinspires.ftc.teamcode.robot.components.claws.Claw;
 import org.firstinspires.ftc.teamcode.robot.components.slides.HorizontalSlide;
 import org.firstinspires.ftc.teamcode.robot.components.slides.Slide;
 import org.firstinspires.ftc.teamcode.robot.components.slides.VerticalSlide;
@@ -28,6 +34,8 @@ public class Robot extends Component {
     // -- Components --
     private Drivetrain drivetrain;
     private Camera camera;
+    private Claw verticalClaw;
+    private Claw horizontalClaw;
     private VerticalSlide verticalSlide;
     private HorizontalSlide horizontalSlide;
 
@@ -42,6 +50,16 @@ public class Robot extends Component {
         this.cameraEnabled = cameraEnabled;
         if (cameraEnabled)
             camera = new Camera(hardwareMap, telemetry);
+
+        horizontalClaw = new Claw(hardwareMap, telemetry, hardwareMap.get(Servo.class, "VS_claw_S"),
+                HS_CLAW_OPEN, HS_CLAW_CLOSED);
+        horizontalClaw.close();
+
+        verticalClaw = new Claw(hardwareMap, telemetry, hardwareMap.get(Servo.class, "VS_claw_S"),
+                VS_CLAW_OPEN, VS_CLAW_CLOSED);
+        verticalClaw.close();
+
+
         configureDrivetrain();
         configureHorizontalSlide();
         configureVerticalSlide();

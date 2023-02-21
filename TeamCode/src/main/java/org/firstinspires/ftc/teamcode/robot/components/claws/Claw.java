@@ -1,18 +1,21 @@
 package org.firstinspires.ftc.teamcode.robot.components.claws;
 
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.components.HardwareComponent;
 
-public class Claw extends HardwareComponent {
-    public Claw(HardwareMap hardwareMap, Telemetry telemetry, CRServo servo) {
-        super(hardwareMap, telemetry);
-        initializeHardware();
+public class Claw extends SetServo {
+    public Claw(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
+         double openPos, double closedPos) {
+        super(hardwareMap, telemetry, crServo, openPos, closedPos);
     }
 
-    protected void initializeHardware() {
+    public void open() {
+        goToSetPosition(0);
+    }
 
+    public void close() {
+        goToSetPosition(1);
     }
 }

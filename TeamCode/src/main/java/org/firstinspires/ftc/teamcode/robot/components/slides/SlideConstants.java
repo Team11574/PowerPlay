@@ -18,6 +18,9 @@ public class SlideConstants {
     public static double VS_SP_MEDIUM = 15;
     public static double VS_SP_HIGH = 20;
 
+    public static double VS_CLAW_OPEN = 0.7;
+    public static double VS_CLAW_CLOSED = 0.5;
+
     /* == Horizontal Slide == */
     // TODO: Insert correct values for horizontal slide
     public static final double HS_TICKS_PER_REV = 384.5;
@@ -31,6 +34,11 @@ public class SlideConstants {
     public static double HS_SP_LOW = 10;
     public static double HS_SP_MEDIUM = 15;
     public static double HS_SP_HIGH = 20;
+
+    public static double HS_CLAW_OPEN = 0.5;
+    public static double HS_CLAW_CLOSED = 0.8;
+
+    /* == General == */
 
     public static double SET_POSITION_THRESHOLD = 5;
 }
