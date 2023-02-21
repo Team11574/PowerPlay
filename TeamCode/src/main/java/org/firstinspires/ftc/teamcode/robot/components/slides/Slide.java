@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionExcep
 
 import java.util.ArrayList;
 
-class Slide extends HardwareComponent {
+public class Slide extends HardwareComponent {
     double MAX_POWER;
     double MIN_ENCODER_POSITION;
     double MAX_ENCODER_POSITION;
@@ -23,20 +23,21 @@ class Slide extends HardwareComponent {
 
     DcMotorEx[] motors;
 
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor) {
-        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor});
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double ticksPerInch) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, ticksPerInch);
     }
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition) {
-        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition);
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition, ticksPerInch);
     }
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors) {
-        this(hardwareMap, telemetry, slideMotors, 0, Double.POSITIVE_INFINITY);
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double ticksPerInch) {
+        this(hardwareMap, telemetry, slideMotors, 0, Double.POSITIVE_INFINITY, ticksPerInch);
     }
-    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition) {
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
         super(hardwareMap, telemetry);
         this.motors = slideMotors;
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
+        this.TICKS_PER_INCH = ticksPerInch;
 
         initializeHardware();
     }
@@ -45,8 +46,6 @@ class Slide extends HardwareComponent {
         for (DcMotorEx motor : motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            PIDFCoefficients pid = new PIDFCoefficients(0,0,0,5);
-            motor.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pid);
         }
     }
 
@@ -87,10 +86,34 @@ class Slide extends HardwareComponent {
         setPositions.add(position);
     }
 
+    public void addSetPositionLength(double length) {
+        addSetPosition((int) (length * TICKS_PER_INCH));
+    }
+
     public void addSetPositions(int[] positions) {
         for (int position : positions) {
-            setPositions.add(position);
+            addSetPosition(position);
         }
+    }
+
+    public void addSetPositionLengths(double[] lengths) {
+        for (double length : lengths) {
+            addSetPositionLength(length);
+        }
+    }
+
+
+    public void setSetPosition(int positionIndex, int positionValue) throws UndefinedSetPositionException {
+        if (positionIndex > setPositions.size()) {
+            throw new UndefinedSetPositionException();
+        }
+        setPositions.set(positionIndex, positionValue);
+    }
+
+
+
+    public void setSetPositionLength(int positionIndex, double positionValue) throws UndefinedSetPositionException {
+        setSetPosition(positionIndex, (int) (positionValue * TICKS_PER_INCH));
     }
 
     public int getPosition() {
@@ -104,4 +127,5 @@ class Slide extends HardwareComponent {
     public void goToLength(double length) {
         setTargetPosition((int) (MIN_ENCODER_POSITION + TICKS_PER_INCH * length));
     }
+
 }

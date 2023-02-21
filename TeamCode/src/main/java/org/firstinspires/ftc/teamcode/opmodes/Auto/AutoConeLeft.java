@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.components.slides.Slide;
+import org.firstinspires.ftc.teamcode.robot.components.slides.VerticalSlide;
+import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name = "AUTO Cone Left", group = "auto", preselectTeleOp = "Tele")
@@ -50,6 +53,13 @@ public class AutoConeLeft extends RobotLinearOpMode {
                 .strafeLeft(12.5)
                 .addDisplacementMarker(() -> {
                     // Raise slides, flip claw, drop cone, etc
+
+                    try {
+                        robot.getVerticalSlide().goToSetPosition(VerticalSlide.SetPosition.HIGH);
+                    } catch (UndefinedSetPositionException e) {
+                        e.printStackTrace();
+                    }
+
                     telemetry.addLine("Yippee!");
                     telemetry.update();
                 })

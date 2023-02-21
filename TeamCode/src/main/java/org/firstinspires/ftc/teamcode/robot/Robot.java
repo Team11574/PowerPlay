@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_HIGH;
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_LOW;
+import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_MEDIUM;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -8,6 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.components.Component;
 import org.firstinspires.ftc.teamcode.robot.components.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.components.camera.Camera;
 import org.firstinspires.ftc.teamcode.robot.components.slides.HorizontalSlide;
+import org.firstinspires.ftc.teamcode.robot.components.slides.Slide;
 import org.firstinspires.ftc.teamcode.robot.components.slides.VerticalSlide;
 
 public class Robot extends Component {
@@ -58,6 +63,8 @@ public class Robot extends Component {
         DcMotorEx VS_slideRight_M = hardwareMap.get(DcMotorEx.class, "HS_slideRight_M");
         DcMotorEx VS_slideLeft_M = hardwareMap.get(DcMotorEx.class, "HS_slideLeft_M");
         verticalSlide = new VerticalSlide(hardwareMap, telemetry, new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M});
+
+        verticalSlide.addSetPositionLengths(new double[]{VS_SP_LOW, VS_SP_MEDIUM, VS_SP_HIGH});
     }
 
     public Drivetrain getDrivetrain() {
