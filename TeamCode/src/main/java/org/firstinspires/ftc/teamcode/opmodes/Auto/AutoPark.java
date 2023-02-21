@@ -1,16 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes.Auto;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.components.Drivetrain;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name = "AUTO Left Park", group = "auto", preselectTeleOp = "Tele")
-public class Auto extends RobotLinearOpMode {
+@Autonomous(name = "AUTO Park", group = "auto", preselectTeleOp = "Tele")
+public class AutoPark extends RobotLinearOpMode {
     // Instance variables
     TrajectorySequence spot1;
     TrajectorySequence spot2;
