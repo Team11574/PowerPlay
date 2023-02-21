@@ -3,12 +3,15 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.components.Drivetrain;
 
 public abstract class RobotLinearOpMode extends LinearOpMode {
     // Instance Variables
     protected Robot robot;
+    protected Drivetrain drivetrain;
 
-    public RobotLinearOpMode() {
+    @Override
+    public void runOpMode() {
         this.robot = new Robot(hardwareMap, telemetry);
     }
 }

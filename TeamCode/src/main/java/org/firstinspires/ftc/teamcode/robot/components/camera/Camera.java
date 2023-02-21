@@ -16,6 +16,9 @@ public class Camera extends HardwareComponent {
 
     public Camera(HardwareMap hardwareMap, Telemetry telemetry) {
         super(hardwareMap, telemetry);
+        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+        initializeHardware();
     }
 
     protected void initializeHardware(){

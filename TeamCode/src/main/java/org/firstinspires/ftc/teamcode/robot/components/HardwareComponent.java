@@ -7,7 +7,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public abstract class HardwareComponent extends Component {
     public HardwareComponent(HardwareMap hardwareMap, Telemetry telemetry) {
         super(hardwareMap, telemetry);
-        initializeHardware();
+        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
     }
 
     /**

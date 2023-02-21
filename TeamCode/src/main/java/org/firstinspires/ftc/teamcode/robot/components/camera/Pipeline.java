@@ -83,7 +83,7 @@ public class Pipeline extends OpenCvPipeline {
         colorRanges.add(Arrays.asList(greenLow, greenHigh));
 
         // Zone to search for cones
-        searchZone = new Rect(70, 70, 240, 160); // Creates a region in the middle of the frame to look
+        searchZone = new Rect(180, 40, 140, 180); // Creates a region in the middle of the frame to look
         // for cone
 
         // Store verbose option

@@ -56,8 +56,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2, 0, 0);// ORIGINAL: all zeros
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(20, 0, 0); // ORIGINAL: all zeros
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(9, 0.1, 1);// ORIGINAL: all zeros
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0.2, 0.6); // ORIGINAL: all zeros
 
     public static double LATERAL_MULTIPLIER = 1.2;
 
@@ -85,10 +85,19 @@ public class SampleMecanumDrive extends MecanumDrive {
     private Telemetry telemetry;
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
-        this(hardwareMap, null);
+        this(hardwareMap, null,
+                hardwareMap.get(DcMotorEx.class, "DT_frontRight_M"),
+                hardwareMap.get(DcMotorEx.class, "DT_backRight_M"),
+                hardwareMap.get(DcMotorEx.class, "DT_frontLeft_M"),
+                hardwareMap.get(DcMotorEx.class, "DT_backLeft_M")
+        );
     }
 
-    public SampleMecanumDrive(HardwareMap hardwareMap, Telemetry telemetry) {
+    public SampleMecanumDrive(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] motors) {
+        this(hardwareMap, telemetry, motors[0], motors[1], motors[2], motors[3]);
+    }
+
+    public SampleMecanumDrive(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx frontRight, DcMotorEx backRight, DcMotorEx frontLeft, DcMotorEx backleft) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         this.hardwareMap = hardwareMap;
@@ -112,11 +121,10 @@ public class SampleMecanumDrive extends MecanumDrive {
                 DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
         imu.initialize(parameters);
 
-        DT_frontRight_M = hardwareMap.get(DcMotorEx.class, "DT_frontRight_M");
-        DT_backRight_M = hardwareMap.get(DcMotorEx.class, "DT_backRight_M");
-        DT_frontLeft_M = hardwareMap.get(DcMotorEx.class, "DT_frontLeft_M");
-        DT_backLeft_M = hardwareMap.get(DcMotorEx.class, "DT_backLeft_M");
-
+        this.DT_frontRight_M = frontRight;
+        this.DT_backRight_M = backRight;
+        this.DT_frontLeft_M = frontLeft;
+        this.DT_backLeft_M = backleft;
 
         motors = Arrays.asList(DT_frontLeft_M, DT_backLeft_M, DT_backRight_M, DT_frontRight_M);
 

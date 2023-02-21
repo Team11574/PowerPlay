@@ -11,8 +11,5 @@ public abstract class Component {
     protected HardwareMap hardwareMap;
     protected Telemetry telemetry;
 
-    public Component(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.hardwareMap = hardwareMap;
-        this.telemetry = telemetry;
-    }
+    public Component(HardwareMap hardwareMap, Telemetry telemetry){};
 }
