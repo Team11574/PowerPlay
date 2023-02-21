@@ -2,13 +2,17 @@ package org.firstinspires.ftc.teamcode.robot.components.slides;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.components.Component;
+import org.firstinspires.ftc.teamcode.robot.components.HardwareComponent;
 import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
 
 import java.util.ArrayList;
 
-class Slide {
+class Slide extends HardwareComponent {
     double MAX_POWER;
     double MIN_ENCODER_POSITION;
     double MAX_ENCODER_POSITION;
@@ -19,21 +23,25 @@ class Slide {
 
     DcMotorEx[] motors;
 
-    public Slide(DcMotorEx slideMotor) {
-        this(new DcMotorEx[]{slideMotor});
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor});
     }
-    public Slide(DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition) {
-        this(new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition);
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition);
     }
-    public Slide(DcMotorEx[] slideMotors) {
-        this(slideMotors, 0, Double.POSITIVE_INFINITY);
-
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors) {
+        this(hardwareMap, telemetry, slideMotors, 0, Double.POSITIVE_INFINITY);
     }
-    public Slide(DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition) {
+    public Slide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition) {
+        super(hardwareMap, telemetry);
         this.motors = slideMotors;
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
 
+        initializeHardware();
+    }
+
+    protected void initializeHardware() {
         for (DcMotorEx motor : motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
@@ -43,7 +51,6 @@ class Slide {
     }
 
     public void setPower(double power) {
-        for (DcMotorEx motor : motors) {
         if (power > MAX_POWER)
             power = MAX_POWER;
         for (DcMotorEx motor : motors) {

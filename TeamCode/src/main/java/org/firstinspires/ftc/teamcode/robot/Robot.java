@@ -51,19 +51,20 @@ public class Robot extends Component {
 
     public void configureHorizontalSlide() {
         DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
-        horizontalSlide = new HorizontalSlide(HS_slide_M);
+        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M);
     }
 
     public void configureVerticalSlide() {
         DcMotorEx VS_slideRight_M = hardwareMap.get(DcMotorEx.class, "HS_slideRight_M");
         DcMotorEx VS_slideLeft_M = hardwareMap.get(DcMotorEx.class, "HS_slideLeft_M");
-        verticalSlide = new VerticalSlide(new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M});
+        verticalSlide = new VerticalSlide(hardwareMap, telemetry, new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M});
     }
-
 
     public Drivetrain getDrivetrain() {
         return drivetrain;
     }
+    public HorizontalSlide getHorizontalSlide() { return horizontalSlide; };
+    public VerticalSlide getVerticalSlide() { return verticalSlide; };
 
     public int getParkingSpot() {
         if (cameraEnabled)

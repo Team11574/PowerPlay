@@ -1,50 +1,26 @@
 package org.firstinspires.ftc.teamcode.robot.components.slides;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class VerticalSlide extends Slide {
-    public VerticalSlide(DcMotorEx slideMotor) {
-    // TODO: Include max speed constructors
-    public VerticalSlide(DcMotorEx slideMotor) {
-        super(slideMotor);
+    public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor});
     }
-
-    public VerticalSlide(DcMotorEx slideMotor, double maxHeight, double minEncoderPosition, double maxEncoderPosition) {
-        super(slideMotor, maxHeight, minEncoderPosition, maxEncoderPosition);
-    public VerticalSlide(DcMotorEx slideMotor, double maxPower) {
-        super(slideMotor, maxPower);
+    public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition) {
+        this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition);
     }
-
-    public VerticalSlide(DcMotorEx[] slideMotors) {
-        super(slideMotors);
+    public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors) {
+        this(hardwareMap, telemetry, slideMotors, 0, Double.POSITIVE_INFINITY);
     }
+    public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition) {
+        super(hardwareMap, telemetry, slideMotors, minEncoderPosition, maxEncoderPosition);
+        this.motors = slideMotors;
+        this.MIN_ENCODER_POSITION = minEncoderPosition;
+        this.MAX_ENCODER_POSITION = maxEncoderPosition;
 
-    public VerticalSlide(DcMotorEx[] slideMotors, double maxHeight, double minEncoderPosition,
-            double maxEncoderPosition) {
-        super(slideMotors, maxHeight, minEncoderPosition, maxEncoderPosition);
-    public VerticalSlide(DcMotorEx[] slideMotors, double maxPower) {
-        super(slideMotors, maxPower);
-    }
-
-    public VerticalSlide(DcMotorEx slideMotor, double minEncoderPosition,
-                         double maxEncoderPosition) {
-        super(slideMotor, minEncoderPosition, maxEncoderPosition);
-    }
-
-
-    public VerticalSlide(DcMotor[] slideMotors, double minEncoderPosition,
-                         double maxEncoderPosition) {
-        super(slideMotors, minEncoderPosition, maxEncoderPosition);
-    }
-
-    public VerticalSlide(DcMotor slideMotor, double minEncoderPosition,
-                         double maxEncoderPosition, double maxPower) {
-        super(slideMotor, minEncoderPosition, maxEncoderPosition, maxPower);
-    }
-
-
-    public VerticalSlide(DcMotor[] slideMotors, double minEncoderPosition,
-                         double maxEncoderPosition, double maxPower) {
-        super(slideMotors, minEncoderPosition, maxEncoderPosition, maxPower);
+        initializeHardware();
     }
 }
