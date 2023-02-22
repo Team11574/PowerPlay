@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.robot.components.camera.Pipeline;
+import org.firstinspires.ftc.teamcode.robot.component.camera.AutoPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -30,7 +30,7 @@ public class RobotOLD {
 
     BHI260IMU imu = null;
 
-    Pipeline pipeline;
+    AutoPipeline pipeline;
     OpenCvCamera camera;
 
     // Motor Directions
@@ -136,7 +136,7 @@ public class RobotOLD {
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "camera");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
-        pipeline = new Pipeline(telemetry, VERBOSE);
+        pipeline = new AutoPipeline(telemetry, VERBOSE);
 
 
         camera.setPipeline(pipeline);

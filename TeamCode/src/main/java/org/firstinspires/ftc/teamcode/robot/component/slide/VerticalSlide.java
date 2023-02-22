@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.robot.components.slides;
+package org.firstinspires.ftc.teamcode.robot.component.slide;
 
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_ENCODER_CENTER;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_PIDF;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_TICKS_PER_IN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_ENCODER_CENTER;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_PIDF;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_TICKS_PER_IN;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

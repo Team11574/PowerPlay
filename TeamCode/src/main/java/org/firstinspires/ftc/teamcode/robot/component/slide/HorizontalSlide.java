@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.robot.components.slides;
+package org.firstinspires.ftc.teamcode.robot.component.slide;
 
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_PIDF;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_TICKS_PER_IN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_PIDF;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TICKS_PER_IN;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

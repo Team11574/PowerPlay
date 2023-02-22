@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.robot.components.claws;
+package org.firstinspires.ftc.teamcode.robot.component.servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.components.HardwareComponent;
+import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 
 public class ContinuousServo extends HardwareComponent {
     private Servo servo;

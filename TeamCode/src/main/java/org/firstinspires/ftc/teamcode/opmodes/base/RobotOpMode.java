@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.base;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.components.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
 
 
 public class RobotOpMode extends OpMode {
@@ -14,7 +14,7 @@ public class RobotOpMode extends OpMode {
     @Override
     public void init() {
         this.robot = new Robot(hardwareMap, telemetry);
-        drivetrain = robot.getDrivetrain();
+        drivetrain = robot.drivetrain;
     }
 
     @Override

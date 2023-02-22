@@ -1,23 +1,21 @@
-package org.firstinspires.ftc.teamcode.robot.components.camera;
+package org.firstinspires.ftc.teamcode.robot.component.camera;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.robot.components.HardwareComponent;
+import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-public class Camera extends HardwareComponent {
+public class TeleCamera extends CameraSuper {
     // Instance Variables
-    Pipeline pipeline;
+    TelePipeline pipeline;
     OpenCvCamera cvCamera;
 
-    public Camera(HardwareMap hardwareMap, Telemetry telemetry) {
+    public TeleCamera(HardwareMap hardwareMap, Telemetry telemetry) {
         super(hardwareMap, telemetry);
-        this.hardwareMap = hardwareMap;
-        this.telemetry = telemetry;
         initializeHardware();
     }
 
@@ -27,7 +25,7 @@ public class Camera extends HardwareComponent {
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "camera");
         cvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
-        pipeline = new Pipeline(telemetry, true);
+        pipeline = new TelePipeline(telemetry, true);
 
         cvCamera.setPipeline(pipeline);
 
@@ -46,18 +44,10 @@ public class Camera extends HardwareComponent {
     }
 
     /**
-     * Terminate Camera stream to save resources.
+     * Determine whether the camera can see a pole
+     * @return nearPole, a boolean
      */
-    public void terminateCamera(){
-        cvCamera.stopStreaming();
-        pipeline.stop();
-    }
-
-    /**
-     * Get parking spot returned by pipeline
-     * @return Parking spot, an integer 1-3
-     */
-    public int getParkingSpot() {
-        return pipeline.getParkingSpot();
+    public boolean isNearPole() {
+        return pipeline.nearPole();
     }
 }

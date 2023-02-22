@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes.tele;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.components.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
 
 @TeleOp(name = "Tele", group = "tele")
 public class Tele extends RobotOpMode {

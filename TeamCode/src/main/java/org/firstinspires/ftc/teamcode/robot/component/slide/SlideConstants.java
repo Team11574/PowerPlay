@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.components.slides;
+package org.firstinspires.ftc.teamcode.robot.component.slide;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;

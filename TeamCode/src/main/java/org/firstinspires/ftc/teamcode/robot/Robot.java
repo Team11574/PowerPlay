@@ -1,18 +1,18 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_CLAW_CLOSED;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_HINGE_START;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_LEVER_IN;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_LEVER_OUT;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.HS_TURRET_START;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_CLAW_CLOSED;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_FLIP_DOWN;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_FLIP_UP;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_HIGH;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_LOW;
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.VS_SP_MEDIUM;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_CLOSED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_START;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_START;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_CLOSED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_DOWN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_UP;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_HIGH;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_LOW;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_MEDIUM;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -20,15 +20,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.components.Component;
-import org.firstinspires.ftc.teamcode.robot.components.Drivetrain;
-import org.firstinspires.ftc.teamcode.robot.components.camera.Camera;
-import org.firstinspires.ftc.teamcode.robot.components.claws.Claw;
-import org.firstinspires.ftc.teamcode.robot.components.claws.ContinuousServo;
-import org.firstinspires.ftc.teamcode.robot.components.claws.SetServo;
-import org.firstinspires.ftc.teamcode.robot.components.slides.HorizontalSlide;
-import org.firstinspires.ftc.teamcode.robot.components.slides.MotorGroup;
-import org.firstinspires.ftc.teamcode.robot.components.slides.VerticalSlide;
+import org.firstinspires.ftc.teamcode.robot.component.Component;
+import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.component.camera.AutoCamera;
+import org.firstinspires.ftc.teamcode.robot.component.claw.Claw;
+import org.firstinspires.ftc.teamcode.robot.component.servo.ContinuousServo;
+import org.firstinspires.ftc.teamcode.robot.component.servo.SetServo;
+import org.firstinspires.ftc.teamcode.robot.component.slide.HorizontalSlide;
+import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 
 public class Robot extends Component {
     // ===== Instance Variables =====
@@ -40,7 +39,7 @@ public class Robot extends Component {
     Telemetry telemetry;
 
     // -- Components --
-    private Camera camera;
+    private AutoCamera autoCamera;
     public Drivetrain drivetrain;
     public VerticalSlide verticalSlide;
     public HorizontalSlide horizontalSlide;
@@ -63,7 +62,7 @@ public class Robot extends Component {
         this.cameraEnabled = cameraEnabled;
 
         if (cameraEnabled)
-            camera = new Camera(hardwareMap, telemetry);
+            autoCamera = new AutoCamera(hardwareMap, telemetry);
 
         configureDrivetrain();
         configureHorizontalSlide();
@@ -72,7 +71,7 @@ public class Robot extends Component {
         configureArm();
     }
 
-    public void configureDrivetrain() {
+    private void configureDrivetrain() {
         DcMotorEx DT_frontRight_M = hardwareMap.get(DcMotorEx.class, "DT_frontRight_M");
         DcMotorEx DT_backRight_M = hardwareMap.get(DcMotorEx.class, "DT_backRight_M");
         DcMotorEx DT_frontLeft_M = hardwareMap.get(DcMotorEx.class, "DT_frontLeft_M");
@@ -80,12 +79,12 @@ public class Robot extends Component {
         drivetrain = new Drivetrain(hardwareMap, telemetry, DT_frontRight_M, DT_backRight_M, DT_frontLeft_M, DT_backLeft_M);
     }
 
-    public void configureHorizontalSlide() {
+    private void configureHorizontalSlide() {
         DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
         horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M);
     }
 
-    public void configureVerticalSlide() {
+    private void configureVerticalSlide() {
         DcMotorEx VS_slideRight_M = hardwareMap.get(DcMotorEx.class, "HS_slideRight_M");
         DcMotorEx VS_slideLeft_M = hardwareMap.get(DcMotorEx.class, "HS_slideLeft_M");
         DigitalChannel VS_limitSwitch_D = hardwareMap.get(DigitalChannel.class, "VS_limitSwitch_D");
@@ -93,7 +92,7 @@ public class Robot extends Component {
         verticalSlide.addSetPositionLengths(new double[]{ VS_SP_LOW, VS_SP_MEDIUM, VS_SP_HIGH });
     }
 
-    public void configureClaws() {
+    private void configureClaws() {
         Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
         horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, HS_CLAW_OPEN, HS_CLAW_CLOSED);
         horizontalClaw.open();
@@ -107,7 +106,7 @@ public class Robot extends Component {
         verticalFlip.goToSetPosition(1);
     }
 
-    public void configureArm() {
+    private void configureArm() {
         Servo HS_turret_S = hardwareMap.get(Servo.class, "HS_turret_S");
         turret = new ContinuousServo(hardwareMap, telemetry, HS_turret_S, HS_TURRET_START);
         turret.setOffsetFactor(0.01);
@@ -128,7 +127,7 @@ public class Robot extends Component {
 
     public int getParkingSpot() {
         if (cameraEnabled)
-            return camera.getParkingSpot();
+            return autoCamera.getParkingSpot();
         // Default spot is 2
         return 2;
     }

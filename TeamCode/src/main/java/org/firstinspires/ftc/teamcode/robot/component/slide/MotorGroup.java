@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.robot.components.slides;
+package org.firstinspires.ftc.teamcode.robot.component.slide;
 
-import static org.firstinspires.ftc.teamcode.robot.components.slides.SlideConstants.SET_POSITION_THRESHOLD;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.components.HardwareComponent;
+import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.components.camera;
+package org.firstinspires.ftc.teamcode.robot.component.camera;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -14,77 +14,51 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Pipeline extends OpenCvPipeline {
+public class TelePipeline extends OpenCvPipeline {
     Telemetry telemetry;
 
     Scalar orangeLow;
     Scalar orangeHigh;
 
-    Scalar purpleLow;
-    Scalar purpleHigh;
-
-    Scalar greenLow;
-    Scalar greenHigh;
-
-    ArrayList<List<Scalar>> colorRanges;
-
-    Mat output;
     Mat hierarchy;
     Mat val;
     ArrayList<Mat> channels;
     Rect searchZone;
 
-    ArrayList<Integer> parkingList = new ArrayList<Integer>();
-
     boolean verbose;
     boolean stopped = false;
 
-    List<MatOfPoint> contours;
+    MatOfPoint contour;
     Mat mask;
-    MatOfPoint maxContour;
 
-    // Number of frames to include in parking decision
-    final int SAMPLES = 10;
+    boolean nearPole;
+    // TODO: Find actual minimum important pole contour area
+    double MIN_POLE_AREA = 5000;
 
     // Default constructor
-    public Pipeline(Telemetry telem) {
+    public TelePipeline(Telemetry telem) {
         this(telem, false);
     }
 
     // Constructor with verbose option
-    public Pipeline(Telemetry telem, boolean verbose) {
+    public TelePipeline(Telemetry telem, boolean verbose) {
         telemetry = telem; // Get telemetry object
 
-        contours = new ArrayList<MatOfPoint>();
+        contour = new MatOfPoint();
         mask = new Mat();
-        maxContour = new MatOfPoint();
 
         // === Color Thresholds ===
         orangeLow = new Scalar(20, 40, 0); // Orange min HSV
         orangeHigh = new Scalar(30, 255, 255); // Orange max HSV
-
-        purpleLow = new Scalar(130, 40, 0);
-        purpleHigh = new Scalar(150, 255, 255);
-
-        greenLow = new Scalar(40, 40, 0);
-        greenHigh = new Scalar(70, 225, 225);
 
         // Extra hierarchy thing for contours
         hierarchy = new Mat();
         channels = new ArrayList<Mat>(3); // Channels for HSV image
         val = new Mat();
 
-        // List of color ranges for easier iteration
-        colorRanges = new ArrayList<List<Scalar>>();
-
-        // Add color ranges to colorRanges
-        colorRanges.add(Arrays.asList(orangeLow, orangeHigh));
-        colorRanges.add(Arrays.asList(purpleLow, purpleHigh));
-        colorRanges.add(Arrays.asList(greenLow, greenHigh));
-
-        // Zone to search for cones
-        searchZone = new Rect(180, 40, 140, 180); // Creates a region in the middle of the frame to look
-        // for cone
+        // Zone to search for poles
+        // TODO: Find real rectangle too look for poles
+        searchZone = new Rect(180, 40, 140, 180);
 
         // Store verbose option
         this.verbose = verbose;
@@ -92,13 +66,14 @@ public class Pipeline extends OpenCvPipeline {
 
     /**
      * Processes the input frame.
-     * Finds area of each color and outputs the largest area.
+     * Search for pole
      *
      * @param input
      * @return Telemetry output stream
      */
     @Override
     public Mat processFrame(Mat input) {
+        nearPole = false;
         if (stopped) {
             return input;
         }
@@ -109,30 +84,17 @@ public class Pipeline extends OpenCvPipeline {
         Mat imageROI = new Mat(procFrame, searchZone); // Creates a region of interest in the middle of the
         // frame
 
-        // === Find largest area ===
-        ArrayList<Double> areas = new ArrayList<Double>(); // List of areas for each color
-        for (List<Scalar> colorRange : colorRanges) {
-            Scalar low = colorRange.get(0);
-            Scalar high = colorRange.get(1);
 
-            double area = getArea(imageROI, low, high);
-            areas.add(area);
+        double area = getArea(imageROI, orangeLow, orangeHigh);
+
+        if (area > MIN_POLE_AREA) {
+            nearPole = true;
         }
 
-        // Find the largest area
-        double maxArea = Collections.max(areas);
-        int maxIndex = areas.indexOf(maxArea);
-
-        // Add the max index to the parking list
-        parkingList.add(maxIndex+1);
 
         // === Output telemetry ===
         if (verbose) {
-            telemetry.addData("Orange Area", areas.get(0));
-            telemetry.addData("Purple Area", areas.get(1));
-            telemetry.addData("Green Area", areas.get(2));
-            telemetry.addData("Max Area", maxArea);
-            telemetry.addData("Max Index+1", maxIndex+1);
+            telemetry.addData("Pole Area", area);
             telemetry.update();
         }
 
@@ -145,7 +107,6 @@ public class Pipeline extends OpenCvPipeline {
 
     public double getArea(Mat input, Scalar low, Scalar high) {
         input = input.clone();
-        double maxArea = 0;
 
         Mat mask = new Mat();
         Core.inRange(input, low, high, mask); // Masks out the pixels that fit
@@ -181,50 +142,20 @@ public class Pipeline extends OpenCvPipeline {
         // using the value channel
         // in an HSV image, we can achieve a similar effect for contour drawing
         //Imgproc.findContours(chs.get(2), contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-        Imgproc.findContours(val, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-
+        Mat temp = new Mat();
+        Imgproc.findContours(val, contours, temp, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
         // Basic loop to find the contour with the largest area
+        double totalArea = 0;
         for (MatOfPoint contour : contours) {
-            double area = Imgproc.contourArea(contour);
-            if (area > maxArea) {
-                maxArea = area;
-                maxContour = contour;
-            }
+            totalArea += Imgproc.contourArea(contour);
         }
 
-        return maxArea;
-    }
-
-    public double getArea_old(Mat input, Scalar low, Scalar high) {
-        channels = new ArrayList<Mat>(3); // Channels for HSV image
-        val = new Mat();
-        Core.inRange(input, low, high, mask); // Creates a mask of the input frame with the color range
-        // specified
-        Core.split(input, channels);
-        Core.bitwise_and(channels.get(2), mask, val);
-        Imgproc.findContours(val, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-        // Finds contours of the mask
-        double maxArea = 0;
-        for (MatOfPoint contour : contours) {
-            double area = Imgproc.contourArea(contour);
-            if (area > maxArea) {
-                maxArea = area;
-                maxContour = contour;
-            }
-        }
-        mask.release();
         val.release();
-        for (Mat chn : channels) {
-            chn.release();
-        }
+        temp.release();
+        mask.release();
 
-        // Attempt to draw the contour
-        // TODO: Fix this, currently doesn't work
-        // since we don't do anything with the output frame.
-        if (verbose)
-            drawContour(input, maxContour, colorRanges.indexOf(Arrays.asList(low, high)));
-        return maxArea;
+        return totalArea;
     }
 
     /**
@@ -251,40 +182,8 @@ public class Pipeline extends OpenCvPipeline {
      *
      * @return parking spot
      */
-    public int getParkingSpot() {
-        if (parkingList.size() > SAMPLES) {
-            return mode(parkingList.subList(Math.max(parkingList.size() - (SAMPLES + 1), 0), parkingList.size()));
-        }
-        else {
-            return mode(parkingList);
-        }
-    }
-
-    /**
-     * Gets the mode of a list
-     *
-     * @param a - list to get mode of
-     * @return mode
-     */
-    static int mode(List<Integer> a) {
-        int output = 2, maxCount = 0;
-        int i;
-        int j;
-
-        for (i = 0; i < a.size(); ++i) {
-            int count = 0;
-            for (j = 0; j < a.size(); ++j) {
-                if (a.get(j) == a.get(i))
-                    ++count;
-            }
-
-            if (count > maxCount) {
-                maxCount = count;
-                output = a.get(i);
-            }
-        }
-
-        return output;
+    public boolean nearPole() {
+        return nearPole;
     }
 
     /**
@@ -293,5 +192,7 @@ public class Pipeline extends OpenCvPipeline {
     public void stop() {
         stopped = true;
     }
+
+    public void unstop() { stopped = false; };
 
 }
