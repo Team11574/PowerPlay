@@ -58,12 +58,10 @@ public class Robot extends Component {
     public SetServo lever;
     
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
         this(hardwareMap, telemetry, false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public Robot(HardwareMap hardwareMap, Telemetry telemetry, boolean cameraEnabled) {
         super(hardwareMap, telemetry);
         this.hardwareMap = hardwareMap;
@@ -72,12 +70,6 @@ public class Robot extends Component {
 
         if (cameraEnabled)
             autoCamera = new AutoCamera(hardwareMap, telemetry);
-
-        Scheduler s = new Scheduler();
-        s.schedule(
-                when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
-                then -> horizontalClaw.open()
-        );
 
         configureDrivetrain();
         configureHorizontalSlide();

@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.util.runnable;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -19,13 +15,26 @@ public class Scheduler {
         thens = new ArrayList<>();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    /*
+    Scheduler Example:
+
+    Scheduler s = new Scheduler();
+    s.schedule(
+            when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
+            then -> horizontalClaw.open()
+    );
+
+     */
+
+    /**
+    Function and Consumer inputs are always null, they simple allow for cleaner
+     syntax by saying "when" and "then" as shown in the example above.
+     */
     public void schedule(Function<Void, Boolean> when, Consumer<Void> then) {
         whens.add(when);
         thens.add(then);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void update() {
         int i = 0;
         while (i < whens.size()) {
