@@ -21,9 +21,28 @@ public class Scheduler {
     Scheduler s = new Scheduler();
     s.schedule(
             when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
-            then -> horizontalClaw.open()
+            then -> {
+                horizontalClaw.open();
+                s.schedule(
+                    when -> lever.atSetPos
+                    then ->
+                    );
     );
 
+    s.schedule(
+            do -> horizontalClaw.open(),
+            until -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
+    );
+
+    robot.liftArm();
+    robot.openClaw();
+
+    aq.add (
+       do -> action1,
+       until/doneCondition -> bool
+
+     aq.add (
+        do -> action2
      */
 
     /**
