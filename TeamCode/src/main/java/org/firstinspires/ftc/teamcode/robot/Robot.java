@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_START;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_DOWN;
@@ -13,6 +14,10 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_HIGH;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_LOW;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_MEDIUM;
+
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -28,6 +33,8 @@ import org.firstinspires.ftc.teamcode.robot.component.servo.ContinuousServo;
 import org.firstinspires.ftc.teamcode.robot.component.servo.SetServo;
 import org.firstinspires.ftc.teamcode.robot.component.slide.HorizontalSlide;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
+import org.firstinspires.ftc.teamcode.util.GamepadPlus;
+import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 public class Robot extends Component {
     // ===== Instance Variables =====
@@ -51,10 +58,12 @@ public class Robot extends Component {
     public SetServo lever;
     
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
         this(hardwareMap, telemetry, false);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public Robot(HardwareMap hardwareMap, Telemetry telemetry, boolean cameraEnabled) {
         super(hardwareMap, telemetry);
         this.hardwareMap = hardwareMap;
@@ -63,6 +72,12 @@ public class Robot extends Component {
 
         if (cameraEnabled)
             autoCamera = new AutoCamera(hardwareMap, telemetry);
+
+        Scheduler s = new Scheduler();
+        s.schedule(
+                when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
+                then -> horizontalClaw.open()
+        );
 
         configureDrivetrain();
         configureHorizontalSlide();
