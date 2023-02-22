@@ -24,7 +24,7 @@ public class AutoConeLeft extends RobotLinearOpMode {
         //super.runOpMode();
         this.robot = new Robot(hardwareMap, telemetry, true);
 
-        drivetrain = robot.getDrivetrain();
+        drivetrain = robot.drivetrain;
 
 
         /*
@@ -79,9 +79,9 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
         drivetrain.followTrajectorySequence(cone);
 
-        robot.getVerticalSlide().goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
 
-        while (!robot.getVerticalSlide().atSetPosition()) {
+        while (!robot.verticalSlide.atSetPosition()) {
 
         }
 

@@ -25,6 +25,9 @@ public class SlideConstants {
     public static double VS_CLAW_OPEN = 0.7;
     public static double VS_CLAW_CLOSED = 0.5;
 
+    public static double VS_FLIP_DOWN = 0;
+    public static double VS_FLIP_UP = 0.625;
+
     // TODO: Find average/center of vertical slide encoder ticks
     public static double VS_ENCODER_CENTER = 1500;
 
@@ -49,6 +52,9 @@ public class SlideConstants {
 
     public static double HS_TURRET_START = 0.78;
     public static double HS_HINGE_START = 0.8;
+    // TODO: Find correct start/end positions for lever servo
+    public static double HS_LEVER_OUT = 0;
+    public static double HS_LEVER_IN = 0.8;
 
     //public static double HS_LEVER_
 

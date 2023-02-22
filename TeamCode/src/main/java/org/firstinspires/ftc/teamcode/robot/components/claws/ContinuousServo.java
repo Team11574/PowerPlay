@@ -42,6 +42,8 @@ public class ContinuousServo extends HardwareComponent {
         offsetFactor = factor;
     }
 
+    public double getOffsetFactor() { return offsetFactor; }
+
     public void offsetPosition(double offset) {
         setPosition(getPosition() + offset * offsetFactor);
     }

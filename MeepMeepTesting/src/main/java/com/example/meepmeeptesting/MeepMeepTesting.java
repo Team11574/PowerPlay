@@ -15,10 +15,23 @@ public class MeepMeepTesting {
                 .setConstraints(26.914317478618088, 26.914317478618088, Math.toRadians(114.10780678008499), Math.toRadians(118.62129230769227), 12.75)
                 .setDimensions(16.5, 17)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(36, -61.5, Math.toRadians(90)))
-                                .forward(54.5)
+                        drive.trajectorySequenceBuilder(new Pose2d(36, -62.5, Math.toRadians(90)))
+                                .forward(56.5)
                                 .back(3)
-                                .strafeLeft(12)
+                                .strafeLeft(12.5)
+                                .addDisplacementMarker(() -> {
+                                    // Raise slides, flip claw, drop cone, etc
+                                })
+                                .back(2.5)
+                                //.strafeLeft(11.5)
+                                //.strafeRight(12.5)
+                                .strafeRight(35)
+                                .back(23)
+                                .build()
+                        /*
+                        .strafeLeft(24)
+                                .forward(51.5)
+                                .strafeRight(12)
                                 .addDisplacementMarker(() -> {
                                     // Raise slides, flip claw, drop cone, etc
                                 })
@@ -26,7 +39,7 @@ public class MeepMeepTesting {
                                 //.strafeLeft(12)
                                 //.strafeRight(12)
                                 .strafeRight(33)
-                                .build()
+                         */
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)

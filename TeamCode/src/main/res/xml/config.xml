@@ -20,13 +20,21 @@
 
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
+            <!-- Vertical Slide Motors -->
             <goBILDA5202SeriesMotor name="VS_slideRight_M" port="0" />
             <goBILDA5202SeriesMotor name="VS_slideLeft_M" port="1" />
+
+            <!-- Horizontal Slide Motors -->
+            <!-- Soon to become a servo HS_lever_S  vvvv  -->
             <RevRoboticsCoreHexMotor name="HS_lever_M" port="2" />
             <goBILDA5202SeriesMotor name="HS_slide_M" port="3" />
+
+            <!-- Horizontal Slide Servos -->
             <Servo name="HS_claw_S" port="0" />
             <Servo name="HS_turret_S" port="1" />
             <Servo name="HS_hinge_S" port="2" />
+
+            <!-- Vertical Slide Limit Switch -->
             <DigitalDevice name="VS_limitSwitch_D" port="0" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
@@ -36,7 +44,7 @@
             <NeveRest40Gearmotor name="DT_backLeft_M" port="2" />
             <NeveRest40Gearmotor name="DT_frontLeft_M" port="3" />
 
-            <!-- Vertical Slide  -->
+            <!-- Vertical Slide Servos -->
             <Servo name="VS_flip_S" port="0" />
             <Servo name="VS_claw_S" port="1" />
 
