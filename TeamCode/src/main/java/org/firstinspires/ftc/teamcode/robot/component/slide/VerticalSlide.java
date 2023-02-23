@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionExcep
 
 public class VerticalSlide extends MotorGroup {
     // Instance Variables
+    double startMaxPower;
     DigitalChannel limitSwitch;
 
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
@@ -31,6 +32,8 @@ public class VerticalSlide extends MotorGroup {
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
         this.limitSwitch = limitSwitch;
+
+        startMaxPower = maxPower;
 
         initializeHardware();
     }
@@ -64,14 +67,20 @@ public class VerticalSlide extends MotorGroup {
         HIGH
     }
 
+    public void setMaxPower(double newPower) {
+        maxPower = newPower;
+        startMaxPower = maxPower;
+    }
+
 
     public void update() {
         if (limitSwitch.getState()) {
             if (getPosition() > VS_ENCODER_CENTER && getVelocity() > 0) {
-                stop();
-            }
-            if (getPosition() <= VS_ENCODER_CENTER && getVelocity() < 0) {
-                stop();
+                setMaxPower(0);
+            } else if (getPosition() <= VS_ENCODER_CENTER && getVelocity() < 0) {
+                setMaxPower(0);
+            } else {
+                setMaxPower(startMaxPower);
             }
         }
     }

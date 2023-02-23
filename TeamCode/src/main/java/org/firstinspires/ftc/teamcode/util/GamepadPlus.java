@@ -60,6 +60,10 @@ public class GamepadPlus {
         return gamepad.right_stick_x;
     }
 
+    public boolean right_trigger_pressed() { return gamepad.right_trigger > 0; };
+
+    public boolean left_trigger_pressed() { return gamepad.left_trigger > 0; };
+
     public boolean dpad_up_pressed() {
         return (gamepad.dpad_up && !last_dpad_up);
     }

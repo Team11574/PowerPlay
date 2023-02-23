@@ -39,7 +39,29 @@ public class Tele extends RobotOpMode {
 
         drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
 
+        // HOLD TRIGGER to flip
+        if (pad2.right_trigger_pressed()) {
+            robot.verticalFlip.flipDown();
+        } else {
+            robot.verticalFlip.flipUp();
+        }
 
+        // TOGGLE X to toggle back claw
+        if (pad2.x_pressed()) {
+            robot.horizontalClaw.toggle();
+        }
+
+        // TOGGLE B to toggle front claw
+        if (pad2.b_pressed()) {
+            robot.horizontalClaw.toggle();
+        }
+
+        // PRESS A to retract
+        if (pad2.a_pressed()) {
+            robot.retractArm();
+        }
+
+        robot.verticalSlide.setPower(pad2.get_partitioned_left_stick_y());
 
     }
 

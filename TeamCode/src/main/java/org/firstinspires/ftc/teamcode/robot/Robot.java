@@ -77,11 +77,6 @@ public class Robot extends Component {
         if (cameraEnabled)
             autoCamera = new AutoCamera(hardwareMap, telemetry);
 
-        Scheduler.linearSchedule(
-                when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
-                then -> horizontalClaw.open()
-        );
-
         configureDrivetrain();
         configureHorizontalSlide();
         configureVerticalSlide();
