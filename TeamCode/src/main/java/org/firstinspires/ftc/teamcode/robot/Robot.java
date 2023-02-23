@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_START;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_MID;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_START;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
@@ -23,6 +24,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.component.Component;
@@ -133,7 +135,7 @@ public class Robot extends Component {
 
         // TODO: HS_lever_S doesn't actually exist, but it will hopefully soon replace HS_lever_M
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
-        lever = new Lever(hardwareMap, telemetry, HS_lever_S, HS_LEVER_IN, HS_LEVER_OUT);
+        lever = new Lever(hardwareMap, telemetry, HS_lever_S, HS_LEVER_IN, HS_LEVER_MID, HS_LEVER_OUT);
         lever.moveIn();
     }
 
@@ -154,6 +156,8 @@ public class Robot extends Component {
             isRetracting = true;
             horizontalSlide.goToSetPosition(0);
             turret.goToStartPosition();
+            lever.moveMid();
+
             /* TODO: Determine if we can find a position where lever is positioned so that
                 the cone rests just above the lip of the enclosure.
                 If we can, this should work alright. It'll simply move the lever arm before
@@ -166,21 +170,25 @@ public class Robot extends Component {
                 servo is in position, since we have no way of actually knowing if the lever
                 servo is in position or not.
              */
-            lever.moveIn();
             Scheduler.linearSchedule(
                     when -> horizontalSlide.atSetPosition(),
-                    then -> {
-                        horizontalClaw.open();
-                        horizontalSlide.goToLastPosition();
-                    }
+                    then -> lever.moveIn()
             );
             Scheduler.linearSchedule(
-                    when -> horizontalSlide.atSetPosition(),
+                    when -> true,
+                    then -> horizontalClaw.open(),
+                    500
+            );
+            Scheduler.linearSchedule(
+                    when -> true,
                     then -> {
+                        horizontalSlide.goToLastPosition();
                         lever.moveOut();
                         isRetracting = false;
-                    }
+                    },
+                    500
             );
+
         } // else, do nothing. We don't want to double schedule movements.
     }
 

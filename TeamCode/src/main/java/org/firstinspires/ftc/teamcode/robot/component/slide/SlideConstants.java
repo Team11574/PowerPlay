@@ -52,8 +52,9 @@ public class SlideConstants {
 
     public static double HS_TURRET_START = 0.78;
     public static double HS_HINGE_START = 0.8;
-    // TODO: Find correct start/end positions for lever servo
+    // TODO: Find correct start/end/mid positions for lever servo
     public static double HS_LEVER_OUT = 0;
+    public static double HS_LEVER_MID = 0.4;
     public static double HS_LEVER_IN = 0.8;
 
     //public static double HS_LEVER_
