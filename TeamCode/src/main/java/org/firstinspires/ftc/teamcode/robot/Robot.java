@@ -29,6 +29,8 @@ import org.firstinspires.ftc.teamcode.robot.component.Component;
 import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.component.camera.AutoCamera;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Claw;
+import org.firstinspires.ftc.teamcode.robot.component.claw.Flipper;
+import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
 import org.firstinspires.ftc.teamcode.robot.component.servo.ContinuousServo;
 import org.firstinspires.ftc.teamcode.robot.component.servo.SetServo;
 import org.firstinspires.ftc.teamcode.robot.component.slide.HorizontalSlide;
@@ -52,10 +54,12 @@ public class Robot extends Component {
     public HorizontalSlide horizontalSlide;
     public Claw verticalClaw;
     public Claw horizontalClaw;
-    public SetServo verticalFlip;
+    public Flipper verticalFlip;
     public ContinuousServo turret;
     public ContinuousServo hinge;
-    public SetServo lever;
+    public Lever lever;
+
+    private boolean isRetracting = false;
     
 
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -70,6 +74,11 @@ public class Robot extends Component {
 
         if (cameraEnabled)
             autoCamera = new AutoCamera(hardwareMap, telemetry);
+
+        Scheduler.linearSchedule(
+                when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
+                then -> horizontalClaw.open()
+        );
 
         configureDrivetrain();
         configureHorizontalSlide();
@@ -89,6 +98,7 @@ public class Robot extends Component {
     private void configureHorizontalSlide() {
         DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
         horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M);
+        horizontalSlide.addSetPosition(0);
     }
 
     private void configureVerticalSlide() {
@@ -109,8 +119,8 @@ public class Robot extends Component {
         verticalClaw.close();
 
         Servo VS_flip_S = hardwareMap.get(Servo.class, "VS_flip_S");
-        verticalFlip = new SetServo(hardwareMap, telemetry, VS_flip_S, VS_FLIP_DOWN, VS_FLIP_UP);
-        verticalFlip.goToSetPosition(1);
+        verticalFlip = new Flipper(hardwareMap, telemetry, VS_flip_S, VS_FLIP_DOWN, VS_FLIP_UP);
+        verticalFlip.flipUp();
     }
 
     private void configureArm() {
@@ -123,14 +133,14 @@ public class Robot extends Component {
 
         // TODO: HS_lever_S doesn't actually exist, but it will hopefully soon replace HS_lever_M
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
-        lever = new SetServo(hardwareMap, telemetry, HS_lever_S, HS_LEVER_IN, HS_LEVER_OUT);
-        lever.goToSetPosition(0);
+        lever = new Lever(hardwareMap, telemetry, HS_lever_S, HS_LEVER_IN, HS_LEVER_OUT);
+        lever.moveIn();
     }
 
     // Turned to public variables
-    //public Drivetrain getDrivetrain() { return drivetrain; }
-    //public HorizontalSlide getHorizontalSlide() { return horizontalSlide; };
-    //public VerticalSlide getVerticalSlide() { return verticalSlide; };
+    // public Drivetrain getDrivetrain() { return drivetrain; }
+    // public HorizontalSlide getHorizontalSlide() { return horizontalSlide; };
+    // public VerticalSlide getVerticalSlide() { return verticalSlide; };
 
     public int getParkingSpot() {
         if (cameraEnabled)
@@ -139,7 +149,43 @@ public class Robot extends Component {
         return 2;
     }
 
+    public void retractArm() {
+        if (!isRetracting) {
+            isRetracting = true;
+            horizontalSlide.goToSetPosition(0);
+            turret.goToStartPosition();
+            /* TODO: Determine if we can find a position where lever is positioned so that
+                the cone rests just above the lip of the enclosure.
+                If we can, this should work alright. It'll simply move the lever arm before
+                retracting the horizontal slides and drop the cone once those horizontal
+                slides reach 0.
+                If we can't then we have problems. Servos don't have
+                getCurrentPosition/getTargetPosition functions, they just have a
+                getPosition which outputs what position the servo should be at. So, we don't
+                have a great way of linearly scheduling the cone to drop once the lever
+                servo is in position, since we have no way of actually knowing if the lever
+                servo is in position or not.
+             */
+            lever.moveIn();
+            Scheduler.linearSchedule(
+                    when -> horizontalSlide.atSetPosition(),
+                    then -> {
+                        horizontalClaw.open();
+                        horizontalSlide.goToLastPosition();
+                    }
+            );
+            Scheduler.linearSchedule(
+                    when -> horizontalSlide.atSetPosition(),
+                    then -> {
+                        lever.moveOut();
+                        isRetracting = false;
+                    }
+            );
+        } // else, do nothing. We don't want to double schedule movements.
+    }
+
     public void update() {
         verticalSlide.update();
+        Scheduler.update();
     }
 }

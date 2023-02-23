@@ -60,5 +60,5 @@ public class SlideConstants {
 
     /* == General == */
 
-    public static double SET_POSITION_THRESHOLD = 5;
+    public static double SET_POSITION_THRESHOLD = 3;
 }

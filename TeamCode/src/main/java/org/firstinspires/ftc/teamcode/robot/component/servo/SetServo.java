@@ -46,9 +46,11 @@ public class SetServo extends HardwareComponent {
         }
     }
 
-    public int getCurrentPosition() {
+    public int getCurrentPositionIndex() {
         return currentPositionIndex;
     }
+
+    public double getCurrentPosition() { return servo.getPosition(); }
 
     public double getSetPositionAtIndex(int index) {
         if (index < 0) {

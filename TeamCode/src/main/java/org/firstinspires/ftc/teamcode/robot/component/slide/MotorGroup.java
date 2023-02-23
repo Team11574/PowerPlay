@@ -19,6 +19,7 @@ public class MotorGroup extends HardwareComponent {
     double RUN_TO_POSITION_POWER;
 
     ArrayList<Integer> setPositions;
+    int lastPosition = 0;
     double maxPower = 1;
 
     DcMotorEx[] motors;
@@ -79,6 +80,8 @@ public class MotorGroup extends HardwareComponent {
         // Run to position needs some power value to run at, default is 1
         RUN_TO_POSITION_POWER = Math.min(RUN_TO_POSITION_POWER * maxPower, maxPower);
 
+        lastPosition = getPosition();
+
         for (DcMotor motor : motors) {
             motor.setPower(RUN_TO_POSITION_POWER);
             motor.setTargetPosition(position);
@@ -91,6 +94,10 @@ public class MotorGroup extends HardwareComponent {
             telemetry.addLine("Undefined set position!");
         }
         setTargetPosition(setPositions.get(setPosition));
+    }
+
+    public void goToLastPosition() {
+        setTargetPosition(lastPosition);
     }
 
     public void hardReset() {

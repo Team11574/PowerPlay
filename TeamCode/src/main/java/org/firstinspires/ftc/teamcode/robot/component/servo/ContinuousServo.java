@@ -13,21 +13,27 @@ public class ContinuousServo extends HardwareComponent {
     private double upperBound;
     private double offsetFactor;
 
-    public ContinuousServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo, double startPos) {
-        this(hardwareMap, telemetry, clawServo, startPos, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+    public ContinuousServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo, double startPos) {
+        this(hardwareMap, telemetry, crServo, startPos, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
-    public ContinuousServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
+    public ContinuousServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
                            double startPos, double lowBound, double upBound) {
         super(hardwareMap, telemetry);
+        servo = crServo;
         startPosition = startPos;
         lowerBound = lowBound;
         upperBound = upBound;
         initializeHardware();
+        goToStartPosition();
     }
 
     public Servo getServo() {
         return servo;
+    }
+
+    public void goToStartPosition() {
+        servo.setPosition(startPosition);
     }
 
     public double getPosition() {
