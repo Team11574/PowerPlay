@@ -43,6 +43,8 @@ public class AutoPipeline extends OpenCvPipeline {
     Mat mask;
     MatOfPoint maxContour;
 
+    Mat imageROI;
+
     // Number of frames to include in parking decision
     final int SAMPLES = 10;
 
@@ -103,11 +105,10 @@ public class AutoPipeline extends OpenCvPipeline {
             return input;
         }
 
-        Mat procFrame = input.clone(); // Create a copy of the input frame for processing
-        Imgproc.cvtColor(procFrame, procFrame, Imgproc.COLOR_RGB2HSV); // Makes input to HSV from
-        // RGB image
-        Mat imageROI = new Mat(procFrame, searchZone); // Creates a region of interest in the middle of the
-        // frame
+        imageROI = input.clone(); // Create a copy of the input frame for processing
+        imageROI.adjustROI(searchZone.y, searchZone.y + searchZone.height, searchZone.x, searchZone.x + searchZone.width); // Adjust search zone
+        Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV); // Makes input to HSV from RGB image
+
 
         // === Find largest area ===
         ArrayList<Double> areas = new ArrayList<Double>(); // List of areas for each color
@@ -137,17 +138,16 @@ public class AutoPipeline extends OpenCvPipeline {
         }
 
         // Release the processed frame
-        procFrame.release();
+        imageROI.release();
 
         // Return the input frame
         return imageROI;
     }
 
     public double getArea(Mat input, Scalar low, Scalar high) {
-        input = input.clone();
         double maxArea = 0;
 
-        Mat mask = new Mat();
+        mask = new Mat();
         Core.inRange(input, low, high, mask); // Masks out the pixels that fit
         // within the
         // color range, so if a color is in the range, it becomes white (1) if not it is
@@ -159,7 +159,7 @@ public class AutoPipeline extends OpenCvPipeline {
         //Mat val;
         //hue = new Mat(); // New matrix for each hue, saturation and value matrix
         //sat = new Mat();
-        val = new Mat();
+        //val = new Mat();
 
         //Core.bitwise_and(channels.get(0), mask, hue); // Apply the mask (thresh) found earlier to each channel
         //Core.bitwise_and(channels.get(1), mask, sat);// this was the only real way we could mask out the whole
@@ -174,7 +174,7 @@ public class AutoPipeline extends OpenCvPipeline {
 
         Core.merge(chs, input); // Combines the masked out h,s,v matrices to make one big HSV image
         */
-        ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        contours = new ArrayList<MatOfPoint>();
 
 
         // We can only search for contours on a grayscale image, and we say that by
