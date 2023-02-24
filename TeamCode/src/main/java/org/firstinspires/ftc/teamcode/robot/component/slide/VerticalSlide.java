@@ -16,6 +16,8 @@ public class VerticalSlide extends MotorGroup {
     // Instance Variables
     DigitalChannel limitSwitch;
 
+    double stopDirection = 0;
+
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, limitSwitch);
     }
@@ -31,7 +33,7 @@ public class VerticalSlide extends MotorGroup {
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
         this.limitSwitch = limitSwitch;
-        goToSetPosition(0);
+        setTargetPosition(0);
         initializeHardware();
     }
 
@@ -64,25 +66,51 @@ public class VerticalSlide extends MotorGroup {
         HIGH
     }
 
-    public void setMaxPower(double newPower) {
-        maxPower = newPower;
-        startMaxPower = maxPower;
+    public boolean getLimitState() {
+        return !limitSwitch.getState();
+    }
+
+    public void setPower(double power) {
+        if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            return;
+        }
+        lastPower = power;
+        if (stopDirection == 1 && power > 0) {
+            power = 0;
+        } else if (stopDirection == -1 && power < 0) {
+            power = 0;
+        } else {
+            stopDirection = 0;
+        }
+        double realPower = Math.min(power * maxPower, maxPower);
+        for (DcMotorEx motor : motors) {
+            motor.setPower(realPower);
+            motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        }
     }
 
 
     public void update() {
         // If switch is pressed
-        if (limitSwitch.getState()) {
+        if (getLimitState()) {
             // If going upwards and at the top, stop
-            if (getPosition() > VS_ENCODER_CENTER && getVelocity() > 0) {
-                stop();
+            if (getPosition() > VS_ENCODER_CENTER ) {// && getDirection() > 0) {
+                stopDirection = 1;
+                // stop()
             // If going downwards and at the bottom, stop
-            } else if (getPosition() <= VS_ENCODER_CENTER && getVelocity() < 0) {
-                stop();
+            } else if (getPosition() <= VS_ENCODER_CENTER) { // && getDirection() < 0) {
+                hardReset();
+                stopDirection = -1;
+                // stop();
             // Else, continue fine
-            } else {
-                refresh();
+            } /*else {
+                //refresh();
+                stopDirection = 0;
             }
+        } else {
+            //refresh();
+            stopDirection = 0;
+            */
         }
     }
 }

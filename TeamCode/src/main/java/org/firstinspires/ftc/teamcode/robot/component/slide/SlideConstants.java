@@ -29,7 +29,7 @@ public class SlideConstants {
     public static double VS_FLIP_UP = 0.625;
 
     // TODO: Find average/center of vertical slide encoder ticks
-    public static double VS_ENCODER_CENTER = 1500;
+    public static double VS_ENCODER_CENTER = 1000;
 
     /* == Horizontal Slide == */
     // TODO: Insert correct values for horizontal slide
@@ -38,6 +38,11 @@ public class SlideConstants {
     public static final double HS_PULLEY_CIRCUMFERENCE = 4.409; // in
 
     public static final double HS_TICKS_PER_IN = HS_TICKS_PER_REV * HS_GEAR_RATIO / HS_PULLEY_CIRCUMFERENCE;
+
+    public static double HS_MIN_ENCODER = 0;
+    public static double HS_MAX_ENCODER = 2100;
+
+    public static double HS_BRAKE_THRESHOLD = 75;
 
     // TODO: Tune horizontal slide
     public static PIDFCoefficients HS_PIDF = new PIDFCoefficients(0,0,0,0);

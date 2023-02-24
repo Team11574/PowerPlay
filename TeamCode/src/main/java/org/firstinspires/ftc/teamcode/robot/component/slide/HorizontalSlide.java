@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.component.slide;
 
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_BRAKE_THRESHOLD;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_PIDF;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TICKS_PER_IN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
@@ -11,6 +12,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class HorizontalSlide extends MotorGroup {
+
+    public double stopDirection = 0;
     public HorizontalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor});
     }
@@ -25,7 +28,7 @@ public class HorizontalSlide extends MotorGroup {
         this.motors = slideMotors;
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
-        goToSetPosition(0);
+        setTargetPosition(0);
         initializeHardware();
     }
 
@@ -37,13 +40,30 @@ public class HorizontalSlide extends MotorGroup {
         }
     }
 
-    public void update() {
-        if (withinThreshold(getPosition(), MAX_ENCODER_POSITION, SET_POSITION_THRESHOLD)) {
-            stop();
-        } else if (withinThreshold(getPosition(), MIN_ENCODER_POSITION, SET_POSITION_THRESHOLD)) {
-            stop();
+    public void setPower(double power) {
+        if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            return;
+        }
+        lastPower = power;
+        if (stopDirection == 1 && power > 0) {
+            power = 0;
+        } else if (stopDirection == -1 && power < 0) {
+            power = 0;
         } else {
-            refresh();
+            stopDirection = 0;
+        }
+        double realPower = Math.min(power * maxPower, maxPower);
+        for (DcMotorEx motor : motors) {
+            motor.setPower(realPower);
+            motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    public void update() {
+        if (getPosition() > MAX_ENCODER_POSITION - HS_BRAKE_THRESHOLD) {
+            stopDirection = 1;
+        } else if (getPosition() < MIN_ENCODER_POSITION + HS_BRAKE_THRESHOLD) {
+            stopDirection = -1;
         }
     }
 }

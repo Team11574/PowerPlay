@@ -14,7 +14,7 @@ public class RobotOpMode extends OpMode {
     @Override
     public void init() {
         this.robot = new Robot(hardwareMap, telemetry);
-        drivetrain = robot.drivetrain;
+        this.drivetrain = robot.drivetrain;
     }
 
     @Override

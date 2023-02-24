@@ -16,12 +16,14 @@ public class MotorGroup extends HardwareComponent {
     double MIN_ENCODER_POSITION;
     double MAX_ENCODER_POSITION;
     double TICKS_PER_INCH;
-    double RUN_TO_POSITION_POWER;
+    double RUN_TO_POSITION_POWER = 1;
 
     ArrayList<Integer> setPositions;
     int lastPosition = 0;
-    double maxPower = 1;
+    public double maxPower = 1;
     double startMaxPower;
+    double lastPower = 0;
+    boolean stopped = false;
 
     DcMotorEx[] motors;
 
@@ -36,14 +38,15 @@ public class MotorGroup extends HardwareComponent {
     }
     public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] motors, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
         super(hardwareMap, telemetry);
+        this.setPositions = new ArrayList<>();
         this.motors = motors;
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
         this.TICKS_PER_INCH = ticksPerInch;
-        goToSetPosition(0);
+        setTargetPosition(0);
         startMaxPower = maxPower;
 
-        initializeHardware();
+        //initializeHardware();
     }
 
     protected void initializeHardware() {
@@ -55,18 +58,38 @@ public class MotorGroup extends HardwareComponent {
 
     public void setMaxPower(double newPower) {
         maxPower = newPower;
-        startMaxPower = maxPower;
+    }
+
+    public double getDirection() {
+        return Math.signum(lastPower);
     }
 
     public void setPower(double power) {
         if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
             return;
         }
-        power = Math.min(power * maxPower, maxPower);
+        lastPower = power;
+        double realPower = Math.min(power * maxPower, maxPower);
         for (DcMotorEx motor : motors) {
-            motor.setPower(power);
+            motor.setPower(realPower);
             motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         }
+    }
+
+    public ArrayList<Double> getPowers() {
+        ArrayList<Double> powers = new ArrayList<>();
+        for (DcMotorEx motor : motors) {
+            powers.add(motor.getPower());
+        }
+        return powers;
+    }
+
+    public double getPower() {
+        double sum = 0;
+        for (DcMotorEx motor : motors) {
+            sum += motor.getPower();
+        }
+        return sum / motors.length;
     }
 
     public static boolean withinThreshold(double currentValue, double targetValue, double threshold) {
@@ -85,6 +108,7 @@ public class MotorGroup extends HardwareComponent {
     }
 
     public void setTargetPosition(int position) {
+//        if (stopped) return;
         // Run to position needs some power value to run at, default is 1
         RUN_TO_POSITION_POWER = Math.min(RUN_TO_POSITION_POWER * maxPower, maxPower);
 
@@ -175,5 +199,4 @@ public class MotorGroup extends HardwareComponent {
     public void refresh() {
         setMaxPower(startMaxPower);
     }
-
 }

@@ -6,6 +6,8 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_MID;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MAX_ENCODER;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MIN_ENCODER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_START;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_CLOSED;
@@ -21,6 +23,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -94,13 +97,14 @@ public class Robot extends Component {
 
     private void configureHorizontalSlide() {
         DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
-        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M);
+        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, HS_MIN_ENCODER, HS_MAX_ENCODER);
         horizontalSlide.addSetPosition(0);
     }
 
     private void configureVerticalSlide() {
-        DcMotorEx VS_slideRight_M = hardwareMap.get(DcMotorEx.class, "HS_slideRight_M");
-        DcMotorEx VS_slideLeft_M = hardwareMap.get(DcMotorEx.class, "HS_slideLeft_M");
+        DcMotorEx VS_slideRight_M = hardwareMap.get(DcMotorEx.class, "VS_slideRight_M");
+        DcMotorEx VS_slideLeft_M = hardwareMap.get(DcMotorEx.class, "VS_slideLeft_M");
+        VS_slideRight_M.setDirection(DcMotorEx.Direction.REVERSE);
         DigitalChannel VS_limitSwitch_D = hardwareMap.get(DigitalChannel.class, "VS_limitSwitch_D");
         verticalSlide = new VerticalSlide(hardwareMap, telemetry, new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M}, VS_limitSwitch_D);
         verticalSlide.addSetPositionLengths(new double[]{ VS_SP_LOW, VS_SP_MEDIUM, VS_SP_HIGH });
@@ -129,9 +133,11 @@ public class Robot extends Component {
         hinge = new ContinuousServo(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
 
         // TODO: HS_lever_S doesn't actually exist, but it will hopefully soon replace HS_lever_M
+        /*
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
         lever = new Lever(hardwareMap, telemetry, HS_lever_S, HS_LEVER_IN, HS_LEVER_MID, HS_LEVER_OUT);
         lever.moveIn();
+         */
     }
 
     // Turned to public variables

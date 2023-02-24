@@ -52,20 +52,21 @@ public class AutoConeLeft extends RobotLinearOpMode {
                 .strafeLeft(12.5)
                 .build();
 
-        spot1 = drivetrain.trajectorySequenceBuilder(cone.end())
+        TrajectorySequence backup = drivetrain.trajectorySequenceBuilder(cone.end())
                 .back(2.5)
+                .build();
+
+        spot1 = drivetrain.trajectorySequenceBuilder(backup.end())
                 .strafeLeft(12.5)
                 .back(23)
                 .build();
 
-        spot2 = drivetrain.trajectorySequenceBuilder(cone.end())
-                .back(2.5)
+        spot2 = drivetrain.trajectorySequenceBuilder(backup.end())
                 .strafeRight(11.5)
                 .back(23)
                 .build();
 
-        spot3 = drivetrain.trajectorySequenceBuilder(cone.end())
-                .back(2.5)
+        spot3 = drivetrain.trajectorySequenceBuilder(backup.end())
                 .strafeRight(35)
                 .back(23)
                 .build();
@@ -83,6 +84,15 @@ public class AutoConeLeft extends RobotLinearOpMode {
         while (!robot.verticalSlide.atSetPosition()) {
 
         }
+
+        // At top, flip + open claw
+        robot.verticalFlip.flipDown();
+        robot.verticalClaw.open();
+
+        drivetrain.followTrajectorySequence(backup);
+
+        robot.verticalSlide.goToSetPosition(0);
+        robot.verticalClaw.close();
 
         telemetry.addLine("Yippee!");
         telemetry.update();
