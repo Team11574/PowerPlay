@@ -16,7 +16,9 @@ public class VerticalSlide extends MotorGroup {
     // Instance Variables
     DigitalChannel limitSwitch;
 
-    double stopDirection = 0;
+    public double stopDirection = 0;
+
+    public DcMotorEx[] motors;
 
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, limitSwitch);

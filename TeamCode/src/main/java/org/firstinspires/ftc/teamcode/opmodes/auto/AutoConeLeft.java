@@ -82,7 +82,14 @@ public class AutoConeLeft extends RobotLinearOpMode {
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
 
         while (!robot.verticalSlide.atSetPosition()) {
-
+            telemetry.addData("Position", robot.verticalSlide.getPosition());
+            telemetry.addData("Max power", robot.verticalSlide.maxPower);
+            telemetry.addData("Target", robot.verticalSlide.motors[0].getTargetPosition());
+            telemetry.addData("Vel", robot.verticalSlide.motors[0].getVelocity());
+            telemetry.addData("Power", robot.verticalSlide.motors[0].getPower());
+            telemetry.addData("Stop dir", robot.verticalSlide.stopDirection);
+            telemetry.addData("Mode", robot.verticalSlide.motors[0].getMode());
+            telemetry.update();
         }
 
         // At top, flip + open claw

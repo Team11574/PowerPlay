@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.util.GamepadPlus;
 
 @TeleOp(name = "Tele", group = "tele")
@@ -69,6 +70,10 @@ public class Tele extends RobotOpMode {
         // PRESS A to retract
         if (pad2.a_pressed) {
             robot.retractArm();
+        }
+
+        if (pad2.y_pressed) {
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.LOW);
         }
 
         robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
