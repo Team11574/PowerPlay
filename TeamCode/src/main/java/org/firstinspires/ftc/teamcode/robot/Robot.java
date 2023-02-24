@@ -189,6 +189,7 @@ public class Robot extends Component {
 
     public void update() {
         verticalSlide.update();
+        horizontalSlide.update();
         Scheduler.update();
     }
 }

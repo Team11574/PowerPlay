@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.tele;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
@@ -14,12 +16,14 @@ public class Tele extends RobotOpMode {
     protected Drivetrain drivetrain;
     GamepadPlus pad1;
     GamepadPlus pad2;
+    MultipleTelemetry multiTelemetry;
 
     @Override
     public void init() {
         super.init();
         pad1 = new GamepadPlus(gamepad1);
         pad2 = new GamepadPlus(gamepad2);
+        multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     @Override
@@ -62,11 +66,18 @@ public class Tele extends RobotOpMode {
         }
 
         robot.verticalSlide.setPower(pad2.get_partitioned_left_stick_y());
+        robot.horizontalSlide.setPower(pad2.get_partitioned_left_stick_x());
 
+        fullTelemetry();
     }
 
     public void update() {
         pad1.update();
         pad2.update();
+    }
+
+    public void fullTelemetry() {
+        multiTelemetry.addData("Horizontal motor encoder", robot.horizontalSlide.getPosition());
+        multiTelemetry.addData("Vertical motor encoder", robot.verticalSlide.getPosition());
     }
 }

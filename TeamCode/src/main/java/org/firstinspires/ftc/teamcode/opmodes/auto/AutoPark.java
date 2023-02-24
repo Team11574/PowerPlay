@@ -23,7 +23,7 @@ public class AutoPark extends RobotLinearOpMode {
 
         this.robot = new Robot(hardwareMap, telemetry, true);
 
-        drivetrain = robot.getDrivetrain();
+        drivetrain = robot.drivetrain;
 
         Pose2d startPos = new Pose2d(0,0,0);
         spot1 = drivetrain.trajectorySequenceBuilder(startPos)

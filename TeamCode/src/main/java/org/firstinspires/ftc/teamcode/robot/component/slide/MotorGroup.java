@@ -21,6 +21,7 @@ public class MotorGroup extends HardwareComponent {
     ArrayList<Integer> setPositions;
     int lastPosition = 0;
     double maxPower = 1;
+    double startMaxPower;
 
     DcMotorEx[] motors;
 
@@ -39,6 +40,8 @@ public class MotorGroup extends HardwareComponent {
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
         this.TICKS_PER_INCH = ticksPerInch;
+        goToSetPosition(0);
+        startMaxPower = maxPower;
 
         initializeHardware();
     }
@@ -52,6 +55,7 @@ public class MotorGroup extends HardwareComponent {
 
     public void setMaxPower(double newPower) {
         maxPower = newPower;
+        startMaxPower = maxPower;
     }
 
     public void setPower(double power) {
@@ -65,6 +69,10 @@ public class MotorGroup extends HardwareComponent {
         }
     }
 
+    public static boolean withinThreshold(double currentValue, double targetValue, double threshold) {
+        return Math.abs(currentValue - targetValue) <= threshold;
+    }
+
     public boolean atSetPosition() { return atSetPosition(SET_POSITION_THRESHOLD); }
 
     public boolean atSetPosition(double threshold) {
@@ -73,7 +81,7 @@ public class MotorGroup extends HardwareComponent {
             sum += motor.getCurrentPosition();
         }
         sum /= motors.length;
-        return Math.abs(sum - motors[0].getTargetPosition()) <= threshold;
+        return withinThreshold(motors[0].getTargetPosition(), sum, threshold);
     }
 
     public void setTargetPosition(int position) {
@@ -161,9 +169,11 @@ public class MotorGroup extends HardwareComponent {
     }
 
     public void stop() {
-        for (DcMotorEx motor : motors) {
-            motor.setPower(0);
-        }
+        setMaxPower(0);
+    }
+
+    public void refresh() {
+        setMaxPower(startMaxPower);
     }
 
 }
