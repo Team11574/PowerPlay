@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.tele;
 
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,8 +10,8 @@ import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.util.GamepadPlus;
 
-@TeleOp(name = "Tele", group = "tele")
-public class Tele extends RobotOpMode {
+@TeleOp(name = "TeleTesting", group = "tele")
+public class TeleTesting extends RobotOpMode {
     // Instance Variables
     protected Robot robot;
     protected Drivetrain drivetrain;
@@ -63,12 +61,46 @@ public class Tele extends RobotOpMode {
 
         // TOGGLE B to toggle front claw
         if (pad2.b_pressed) {
-            robot.horizontalClaw.toggle();
+            robot.verticalClaw.toggle();
+        }
+
+        if (pad2.y_pressed) {
+            robot.lever.toggle();
         }
 
         // PRESS A to retract
         if (pad2.a_pressed) {
             robot.retractArm();
+        }
+
+        if (pad2.dpad_down_pressed) {
+            multiTelemetry.addLine("Down pressed");
+            robot.verticalSlide.goToSetPosition(0);
+        }
+
+        if (pad2.dpad_left_pressed) {
+            multiTelemetry.addLine("Left pressed");
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.LOW);
+        }
+
+        if (pad2.dpad_up_pressed) {
+            multiTelemetry.addLine("Up pressed");
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.MEDIUM);
+        }
+
+        if (pad2.dpad_right_pressed) {
+            multiTelemetry.addLine("Right pressed");
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        }
+
+        if (pad2.left_bumper_pressed) {
+            multiTelemetry.addLine("RB pressed");
+            robot.horizontalSlide.setTargetPosition(500);
+        }
+
+        if (pad2.right_bumper_pressed) {
+            multiTelemetry.addLine("RB pressed");
+            robot.horizontalSlide.setTargetPosition(0);
         }
 
         robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
@@ -94,6 +126,11 @@ public class Tele extends RobotOpMode {
         multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
         multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
         multiTelemetry.addData("Horizontal stop", robot.horizontalSlide.stopDirection);
+        multiTelemetry.addLine();
+        multiTelemetry.addData("Target", robot.verticalSlide.motors[0].getTargetPosition());
+        multiTelemetry.addData("Vel", robot.verticalSlide.motors[0].getVelocity());
+        multiTelemetry.addData("Power", robot.verticalSlide.motors[0].getPower());
+        multiTelemetry.addData("Mode", robot.verticalSlide.motors[0].getMode());
         multiTelemetry.update();
     }
 }

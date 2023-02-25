@@ -132,12 +132,9 @@ public class Robot extends Component {
         Servo HS_hinge_S = hardwareMap.get(Servo.class, "HS_hinge_S");
         hinge = new ContinuousServo(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
 
-        // TODO: HS_lever_S doesn't actually exist, but it will hopefully soon replace HS_lever_M
-        /*
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
         lever = new Lever(hardwareMap, telemetry, HS_lever_S, HS_LEVER_IN, HS_LEVER_MID, HS_LEVER_OUT);
         lever.moveIn();
-         */
     }
 
     // Turned to public variables

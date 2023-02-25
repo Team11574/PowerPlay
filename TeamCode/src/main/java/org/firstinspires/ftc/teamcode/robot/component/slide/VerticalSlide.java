@@ -105,14 +105,7 @@ public class VerticalSlide extends MotorGroup {
                 stopDirection = -1;
                 // stop();
             // Else, continue fine
-            } /*else {
-                //refresh();
-                stopDirection = 0;
             }
-        } else {
-            //refresh();
-            stopDirection = 0;
-            */
         }
     }
 }

@@ -23,7 +23,6 @@ public class MotorGroup extends HardwareComponent {
     public double maxPower = 1;
     double startMaxPower;
     double lastPower = 0;
-    boolean stopped = false;
 
     DcMotorEx[] motors;
 
@@ -51,7 +50,7 @@ public class MotorGroup extends HardwareComponent {
 
     protected void initializeHardware() {
         for (DcMotorEx motor : motors) {
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         }
     }
@@ -65,7 +64,7 @@ public class MotorGroup extends HardwareComponent {
     }
 
     public void setPower(double power) {
-        if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+        if (power == 0 && motors[0].getMode() == DcMotorEx.RunMode.RUN_TO_POSITION) {
             return;
         }
         lastPower = power;
@@ -108,16 +107,15 @@ public class MotorGroup extends HardwareComponent {
     }
 
     public void setTargetPosition(int position) {
-//        if (stopped) return;
         // Run to position needs some power value to run at, default is 1
         RUN_TO_POSITION_POWER = Math.min(RUN_TO_POSITION_POWER * maxPower, maxPower);
 
         lastPosition = getPosition();
 
-        for (DcMotor motor : motors) {
+        for (DcMotorEx motor : motors) {
             motor.setPower(RUN_TO_POSITION_POWER);
             motor.setTargetPosition(position);
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         }
     }
 
