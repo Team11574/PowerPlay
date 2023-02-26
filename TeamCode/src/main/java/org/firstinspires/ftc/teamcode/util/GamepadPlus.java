@@ -68,7 +68,7 @@ public class GamepadPlus {
 
     public float get_partitioned_right_stick_x() {
         double theta = Math.atan2(gamepad.right_stick_y, gamepad.right_stick_x);
-        if (Math.abs(theta) > Math.PI/3) {
+        if (Math.abs(theta-Math.PI/2) < Math.PI/6) {
             return 0;
         }
         return gamepad.right_stick_x;

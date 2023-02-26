@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_KG;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -7,6 +9,7 @@ import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 @Autonomous(name = "AUTO Cone Left", group = "auto", preselectTeleOp = "Tele")
 public class AutoConeLeft extends RobotLinearOpMode {
@@ -17,6 +20,10 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
     TrajectorySequence[] spots;
 
+    boolean flipping;
+    boolean opening;
+    Scheduler scheduler;
+
 
     @Override
     public void runOpMode() {
@@ -24,6 +31,8 @@ public class AutoConeLeft extends RobotLinearOpMode {
         this.robot = new Robot(hardwareMap, telemetry, true);
 
         drivetrain = robot.drivetrain;
+
+        scheduler = new Scheduler();
 
 
         /*
@@ -44,31 +53,34 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
         drivetrain.setPoseEstimate(startPos);
 
+        double deltaX = 0.5;
 
         TrajectorySequence cone = drivetrain.trajectorySequenceBuilder(startPos)
                 //new Pose2d(36, -61.5, Math.toRadians(90)))
                 .forward(56.5)
-                .back(3)
-                .strafeLeft(12.5)
+                .back(5.5)
+                .strafeLeft(12+deltaX)
                 .build();
 
+        /*
         TrajectorySequence backup = drivetrain.trajectorySequenceBuilder(cone.end())
                 .back(2.5)
                 .build();
+         */
 
-        spot1 = drivetrain.trajectorySequenceBuilder(backup.end())
-                .strafeLeft(12.5)
-                .back(23)
+        spot1 = drivetrain.trajectorySequenceBuilder(cone.end())
+                .strafeLeft(12-deltaX)
+                .back(21.5)
                 .build();
 
-        spot2 = drivetrain.trajectorySequenceBuilder(backup.end())
-                .strafeRight(11.5)
-                .back(23)
+        spot2 = drivetrain.trajectorySequenceBuilder(cone.end())
+                .strafeRight(12-deltaX)
+                .back(21.5)
                 .build();
 
-        spot3 = drivetrain.trajectorySequenceBuilder(backup.end())
-                .strafeRight(35)
-                .back(23)
+        spot3 = drivetrain.trajectorySequenceBuilder(cone.end())
+                .strafeRight(34.5-deltaX)
+                .back(21.5)
                 .build();
 
         spots = new TrajectorySequence[]{spot1, spot2, spot3};
@@ -79,9 +91,9 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
         drivetrain.followTrajectorySequence(cone);
 
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        //robot.verticalSlide.goToTop();
 
-        while (!robot.verticalSlide.atSetPosition()) {
+        while (!robot.verticalSlide.goToPositionConstant(VerticalSlide.SetPosition.AUTO)){ //!robot.verticalSlide.atSetPosition()) {
             telemetry.addData("Position", robot.verticalSlide.getPosition());
             telemetry.addData("Max power", robot.verticalSlide.maxPower);
             telemetry.addData("Target", robot.verticalSlide.motors[0].getTargetPosition());
@@ -91,15 +103,58 @@ public class AutoConeLeft extends RobotLinearOpMode {
             telemetry.addData("Mode", robot.verticalSlide.motors[0].getMode());
             telemetry.update();
         }
+        robot.verticalSlide.setPower(VS_KG);
+
+        /*
+        flipping = true;
+        opening = true;
+        scheduler.linearSchedule(
+                when -> true,
+                then -> {
+                    flipping = false;
+                    robot.verticalClaw.open();
+                },
+                1000
+        );
+        scheduler.linearSchedule(
+                when -> true,
+                then -> {
+                    opening = false;
+                },
+                1000
+        );
+
 
         // At top, flip + open claw
         robot.verticalFlip.flipDown();
-        robot.verticalClaw.open();
 
-        drivetrain.followTrajectorySequence(backup);
-
-        robot.verticalSlide.goToSetPosition(0);
+        while (flipping || opening) {
+            scheduler.update();
+        }
         robot.verticalClaw.close();
+        robot.verticalFlip.flipUp();
+         */
+
+        robot.depositCone();
+        while (robot.verticalScheduler.hasLinearQueries()) {
+            robot.update();
+        }
+
+        //drivetrain.followTrajectorySequence(backup);
+
+        //robot.verticalSlide.goToSetPosition(0);
+
+
+        while (!robot.verticalSlide.goToBottom()){ //!robot.verticalSlide.atSetPosition()) {
+            telemetry.addData("Position", robot.verticalSlide.getPosition());
+            telemetry.addData("Max power", robot.verticalSlide.maxPower);
+            telemetry.addData("Target", robot.verticalSlide.motors[0].getTargetPosition());
+            telemetry.addData("Vel", robot.verticalSlide.motors[0].getVelocity());
+            telemetry.addData("Power", robot.verticalSlide.motors[0].getPower());
+            telemetry.addData("Stop dir", robot.verticalSlide.stopDirection);
+            telemetry.addData("Mode", robot.verticalSlide.motors[0].getMode());
+            telemetry.update();
+        }
 
         telemetry.addLine("Yippee!");
         telemetry.update();

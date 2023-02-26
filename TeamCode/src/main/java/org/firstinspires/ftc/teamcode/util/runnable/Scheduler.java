@@ -9,17 +9,29 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Scheduler {
-    static List<Function<Void, Boolean>> globalQueries = new ArrayList<>();
-    static List<Consumer<Void>> globalActions = new ArrayList<>();
-    static List<Double> globalWaits = new ArrayList<>();
-    static List<Double> globalStartTimes = new ArrayList<>();
+    List<Function<Void, Boolean>> globalQueries; // = new ArrayList<>();
+    List<Consumer<Void>> globalActions; // = new ArrayList<>();
+    List<Double> globalWaits; // = new ArrayList<>();
+    List<Double> globalStartTimes; // = new ArrayList<>();
 
-    static List<Function<Void, Boolean>> linearQueries = new ArrayList<>();
-    static List<Consumer<Void>> linearActions = new ArrayList<>();
-    static List<Double> linearWaits = new ArrayList<>();
-    static List<Double> linearStartTimes = new ArrayList<>();
-    static ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    List<Function<Void, Boolean>> linearQueries; // = new ArrayList<>();
+    List<Consumer<Void>> linearActions; // = new ArrayList<>();
+    List<Double> linearWaits; // = new ArrayList<>();
+    List<Double> linearStartTimes; // = new ArrayList<>();
+    ElapsedTime timer; // = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
+    public Scheduler() {
+        globalQueries = new ArrayList<>();
+        globalActions = new ArrayList<>();
+        globalWaits = new ArrayList<>();
+        globalStartTimes = new ArrayList<>();
+
+        linearQueries = new ArrayList<>();
+        linearActions = new ArrayList<>();
+        linearWaits = new ArrayList<>();
+        linearStartTimes = new ArrayList<>();
+        timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    }
     /**
      *
      * Schedule globally queued actions.
@@ -38,11 +50,11 @@ public class Scheduler {
      * @param query The check function to query, must return a boolean.
      * @param action The action function to run once the query returns true, must return void.
      */
-    public static void globalSchedule(Function<Void, Boolean> query, Consumer<Void> action) {
+    public void globalSchedule(Function<Void, Boolean> query, Consumer<Void> action) {
         globalSchedule(query, action, 0);
     }
 
-    public static void globalSchedule(Function<Void, Boolean> query, Consumer<Void> action, double wait) {
+    public void globalSchedule(Function<Void, Boolean> query, Consumer<Void> action, double wait) {
         globalQueries.add(query);
         globalActions.add(action);
         globalWaits.add(wait);
@@ -64,7 +76,7 @@ public class Scheduler {
      * @param query The check function to query, must return a boolean
      * @param action The action function to run once the query returns true, must return void
      */
-    public static void linearSchedule(Function<Void, Boolean> query, Consumer<Void> action) {
+    public void linearSchedule(Function<Void, Boolean> query, Consumer<Void> action) {
         linearSchedule(query, action, 0);
     }
 
@@ -74,14 +86,36 @@ public class Scheduler {
      * @param action
      * @param wait Wait time in milliseconds
      */
-    public static void linearSchedule(Function<Void, Boolean> query, Consumer<Void> action, double wait) {
+    public void linearSchedule(Function<Void, Boolean> query, Consumer<Void> action, double wait) {
         linearQueries.add(query);
         linearActions.add(action);
         linearWaits.add(wait);
         linearStartTimes.add(-1d);
     }
 
-    public static void update() {
+    public boolean hasLinearQueries() {
+        return linearQueries.size() > 0;
+    }
+
+    public boolean hasGlobalQueries() {
+        return globalQueries.size() > 0;
+    }
+
+    public void clearLinear() {
+        linearQueries.clear();
+        linearActions.clear();
+        linearWaits.clear();
+        linearStartTimes.clear();
+    }
+
+    public void clearGlobal() {
+        globalQueries.clear();
+        globalActions.clear();
+        globalWaits.clear();
+        globalStartTimes.clear();
+    }
+
+    public void update() {
         // Global
         int i = 0;
         while (i < globalQueries.size()) {
@@ -111,22 +145,21 @@ public class Scheduler {
 
         // Linear
         if (linearQueries.size() > 0) {
-            int last_index = linearActions.size() - 1;
-            Function<Void, Boolean> check = linearQueries.get(last_index);
-            Consumer<Void> run = linearActions.get(last_index);
-            double wait = linearWaits.get(last_index);
-            if (linearStartTimes.get(last_index) < 0)
-                linearStartTimes.set(last_index, timer.time());
-            double startTime = linearStartTimes.get(last_index);
+            Function<Void, Boolean> check = linearQueries.get(0);
+            Consumer<Void> run = linearActions.get(0);
+            double wait = linearWaits.get(0);
+            if (linearStartTimes.get(0) < 0)
+                linearStartTimes.set(0, timer.time());
+            double startTime = linearStartTimes.get(0);
 
             if (timer.time() >= startTime + wait) {
                 try {
                     if (check.apply(null)) {
                         run.accept(null);
-                        linearQueries.remove(last_index);
-                        linearActions.remove(last_index);
-                        linearWaits.remove(last_index);
-                        linearStartTimes.remove(last_index);
+                        linearQueries.remove(0);
+                        linearActions.remove(0);
+                        linearWaits.remove(0);
+                        linearStartTimes.remove(0);
                     }
                 } catch (Exception e) {
                     // query or action failed

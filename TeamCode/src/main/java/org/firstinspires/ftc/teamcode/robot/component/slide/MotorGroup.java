@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot.component.slide;
 
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_RUN_TO_POSITION_POWER;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_SET_POSITION_THRESHOLD;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -16,7 +16,7 @@ public class MotorGroup extends HardwareComponent {
     double MIN_ENCODER_POSITION;
     double MAX_ENCODER_POSITION;
     double TICKS_PER_INCH;
-    double RUN_TO_POSITION_POWER = 1;
+    double RUN_TO_POSITION_POWER = S_RUN_TO_POSITION_POWER;
 
     ArrayList<Integer> setPositions;
     int lastPosition = 0;
@@ -24,7 +24,7 @@ public class MotorGroup extends HardwareComponent {
     double startMaxPower;
     double lastPower = 0;
 
-    DcMotorEx[] motors;
+    public DcMotorEx[] motors;
 
     public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx motor, double ticksPerInch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{motor}, ticksPerInch);
@@ -51,7 +51,7 @@ public class MotorGroup extends HardwareComponent {
     protected void initializeHardware() {
         for (DcMotorEx motor : motors) {
             motor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         }
     }
 
@@ -95,7 +95,7 @@ public class MotorGroup extends HardwareComponent {
         return Math.abs(currentValue - targetValue) <= threshold;
     }
 
-    public boolean atSetPosition() { return atSetPosition(SET_POSITION_THRESHOLD); }
+    public boolean atSetPosition() { return atSetPosition(S_SET_POSITION_THRESHOLD); }
 
     public boolean atSetPosition(double threshold) {
         double sum = 0;
@@ -113,10 +113,14 @@ public class MotorGroup extends HardwareComponent {
         lastPosition = getPosition();
 
         for (DcMotorEx motor : motors) {
-            motor.setPower(RUN_TO_POSITION_POWER);
             motor.setTargetPosition(position);
+            motor.setPower(RUN_TO_POSITION_POWER);
             motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         }
+    }
+
+    public double getTargetPosition() {
+        return motors[0].getTargetPosition();
     }
 
     public void goToSetPosition(int setPosition) {
@@ -124,6 +128,24 @@ public class MotorGroup extends HardwareComponent {
             telemetry.addLine("Undefined set position!");
         }
         setTargetPosition(setPositions.get(setPosition));
+    }
+
+    public boolean goToPositionConstant(VerticalSlide.SetPosition index){
+        return goToPositionConstant(index.ordinal());
+    }
+
+    public boolean goToPositionConstant(int index) {
+        if (index > setPositions.size()) {
+            telemetry.addLine("Undefined set position!");
+            return false;
+        }
+        if (Math.abs(setPositions.get(index) - getPosition()) < S_SET_POSITION_THRESHOLD) {
+            setPower(0);
+            return true;
+        } else {
+            setPower(Math.signum(setPositions.get(index) - getPosition()) * RUN_TO_POSITION_POWER);
+            return false;
+        }
     }
 
     public void goToLastPosition() {
@@ -190,11 +212,7 @@ public class MotorGroup extends HardwareComponent {
         return totalVel / motors.length;
     }
 
-    public void stop() {
-        setMaxPower(0);
-    }
-
-    public void refresh() {
-        setMaxPower(startMaxPower);
+    public void update() {
+        // do nothing
     }
 }

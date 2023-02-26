@@ -18,8 +18,6 @@ public class VerticalSlide extends MotorGroup {
 
     public double stopDirection = 0;
 
-    public DcMotorEx[] motors;
-
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, limitSwitch);
     }
@@ -44,7 +42,7 @@ public class VerticalSlide extends MotorGroup {
         for (DcMotorEx motor : motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            motor.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, VS_PIDF);
+            //motor.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, VS_PIDF);
         }
     }
 
@@ -63,9 +61,11 @@ public class VerticalSlide extends MotorGroup {
     }
 
     public enum SetPosition {
+        GROUND,
         LOW,
         MEDIUM,
-        HIGH
+        HIGH,
+        AUTO,
     }
 
     public boolean getLimitState() {
@@ -73,8 +73,14 @@ public class VerticalSlide extends MotorGroup {
     }
 
     public void setPower(double power) {
-        if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
-            return;
+        if (Math.abs(power) < 0.1 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            // In RUN_TO_POSITION MODE
+            if (Math.signum(getTargetPosition() - getPosition()) == stopDirection && stopDirection != 0) {
+                // If hit limit switch, actually set power to 0
+                power = 0;
+            } else {
+                return;
+            }
         }
         lastPower = power;
         if (stopDirection == 1 && power > 0) {
@@ -91,7 +97,19 @@ public class VerticalSlide extends MotorGroup {
         }
     }
 
+    public boolean goToTop() {
+        update();
+        setPower(maxPower);
+        return stopDirection == 1;
+    }
 
+    public boolean goToBottom() {
+        update();
+        setPower(-maxPower);
+        return stopDirection == -1;
+    }
+
+    @Override
     public void update() {
         // If switch is pressed
         if (getLimitState()) {
@@ -101,7 +119,8 @@ public class VerticalSlide extends MotorGroup {
                 // stop()
             // If going downwards and at the bottom, stop
             } else if (getPosition() <= VS_ENCODER_CENTER) { // && getDirection() < 0) {
-                hardReset();
+                if (motors[0].getMode() == DcMotor.RunMode.RUN_USING_ENCODER)
+                    hardReset();
                 stopDirection = -1;
                 // stop();
             // Else, continue fine

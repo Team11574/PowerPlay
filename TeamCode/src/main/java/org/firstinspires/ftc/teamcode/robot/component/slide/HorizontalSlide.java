@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.component.slide;
 
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_BRAKE_THRESHOLD;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_PIDF;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TICKS_PER_IN;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -14,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class HorizontalSlide extends MotorGroup {
 
     public double stopDirection = 0;
+
     public HorizontalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor});
     }
@@ -28,20 +27,20 @@ public class HorizontalSlide extends MotorGroup {
         this.motors = slideMotors;
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
-        setTargetPosition(0);
+        //setTargetPosition(0);
         initializeHardware();
     }
 
     protected void initializeHardware() {
         for (DcMotorEx motor : motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            motor.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, HS_PIDF);
+            motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            //motor.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, HS_PIDF);
         }
     }
 
     public void setPower(double power) {
-        if (power == 0 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+        if (Math.abs(power) < 0.1 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
             return;
         }
         lastPower = power;
@@ -59,6 +58,7 @@ public class HorizontalSlide extends MotorGroup {
         }
     }
 
+    @Override
     public void update() {
         if (getPosition() > MAX_ENCODER_POSITION - HS_BRAKE_THRESHOLD) {
             stopDirection = 1;

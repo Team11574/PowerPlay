@@ -6,10 +6,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SetServo extends HardwareComponent {
-    private Servo servo;
-    private double[] positions;
-    private int currentPositionIndex;
+    protected Servo servo;
+    protected List<Double> positions;
+    protected int currentPositionIndex;
 
     public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
                     double position) {
@@ -24,10 +27,17 @@ public class SetServo extends HardwareComponent {
     public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
                     double[] setPositions) {
         super(hardwareMap, telemetry);
-        positions = setPositions;
+        positions = new ArrayList<>();
+        addSetPositions(setPositions);
         servo = clawServo;
         goToSetPosition(0);
         initializeHardware();
+    }
+
+    public void addSetPositions(double[] newPositions) {
+        for (double position : newPositions) {
+            positions.add(position);
+        }
     }
 
     public Servo getServo() {
@@ -36,19 +46,19 @@ public class SetServo extends HardwareComponent {
 
     public void goToSetPosition(int index) {
         if (index < 0) {
-            index = positions.length - index;
+            index = positions.size() - index;
         }
-        if (index >= positions.length || index < 0) {
+        if (index >= positions.size() || index < 0) {
             telemetry.addLine("Servo undefined set position!");
         } else {
-            servo.setPosition(positions[index]);
+            servo.setPosition(positions.get(index));
             currentPositionIndex = index;
         }
     }
 
     public void toggle() {
         currentPositionIndex++;
-        currentPositionIndex %= positions.length;
+        currentPositionIndex %= positions.size();
         goToSetPosition(currentPositionIndex);
     }
 
@@ -60,13 +70,13 @@ public class SetServo extends HardwareComponent {
 
     public double getSetPositionAtIndex(int index) {
         if (index < 0) {
-            index = positions.length - index;
+            index = positions.size() - index;
         }
-        if (index >= positions.length || index < 0) {
+        if (index >= positions.size() || index < 0) {
             telemetry.addLine("Servo undefined set position!");
             return -1;
         } else {
-            return positions[index];
+            return positions.get(index);
         }
     }
 

@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.tele;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
@@ -27,6 +29,8 @@ public class TeleTesting extends RobotOpMode {
         pad1 = new GamepadPlus(gamepad1);
         pad2 = new GamepadPlus(gamepad2);
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        multiTelemetry.addData("Turret position", robot.turret.getPosition());
+        multiTelemetry.addData("Lever position", robot.lever.getPosition());
     }
 
     @Override
@@ -80,7 +84,12 @@ public class TeleTesting extends RobotOpMode {
 
         if (pad2.dpad_left_pressed) {
             multiTelemetry.addLine("Left pressed");
-            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.LOW);
+            //robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.LOW);
+            for (DcMotorEx motor : robot.verticalSlide.motors) {
+                motor.setTargetPosition(700);
+                motor.setPower(1);
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
         }
 
         if (pad2.dpad_up_pressed) {
@@ -103,8 +112,10 @@ public class TeleTesting extends RobotOpMode {
             robot.horizontalSlide.setTargetPosition(0);
         }
 
-        robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
+        // robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
         robot.horizontalSlide.setPower(-pad2.get_partitioned_left_stick_x());
+        robot.moveLever(-pad2.get_partitioned_right_stick_y());
+        robot.moveTurret(pad2.get_partitioned_right_stick_x());
 
         fullTelemetry();
     }
@@ -122,15 +133,20 @@ public class TeleTesting extends RobotOpMode {
         multiTelemetry.addData("X pressed", pad2.x_pressed);
         multiTelemetry.addData("Partitioned Left Y", pad2.get_partitioned_left_stick_y());
         multiTelemetry.addData("Partitioned Left X", pad2.get_partitioned_left_stick_x());
+        multiTelemetry.addData("Partitioned Right Y", pad2.get_partitioned_right_stick_y());
+        multiTelemetry.addData("Partitioned Right X", pad2.get_partitioned_right_stick_x());
         multiTelemetry.addData("Vertical max power", robot.verticalSlide.maxPower);
         multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
         multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
-        multiTelemetry.addData("Horizontal stop", robot.horizontalSlide.stopDirection);
         multiTelemetry.addLine();
-        multiTelemetry.addData("Target", robot.verticalSlide.motors[0].getTargetPosition());
-        multiTelemetry.addData("Vel", robot.verticalSlide.motors[0].getVelocity());
-        multiTelemetry.addData("Power", robot.verticalSlide.motors[0].getPower());
-        multiTelemetry.addData("Mode", robot.verticalSlide.motors[0].getMode());
+        multiTelemetry.addData("Horizontal direction", robot.horizontalSlide.stopDirection);
+        multiTelemetry.addData("Target", robot.horizontalSlide.motors[0].getTargetPosition());
+        multiTelemetry.addData("Vel", robot.horizontalSlide.motors[0].getVelocity());
+        multiTelemetry.addData("Power", robot.horizontalSlide.motors[0].getPower());
+        multiTelemetry.addData("Mode", robot.horizontalSlide.motors[0].getMode());
+        multiTelemetry.addLine();
+        multiTelemetry.addData("Turret pos", robot.turret.getPosition());
+        multiTelemetry.addData("Lever pos", robot.lever.getPosition());
         multiTelemetry.update();
     }
 }

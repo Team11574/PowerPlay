@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes.tele;
 
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.SET_POSITION_THRESHOLD;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
@@ -21,10 +21,16 @@ public class Tele extends RobotOpMode {
     GamepadPlus pad2;
     MultipleTelemetry multiTelemetry;
 
+    boolean goingPos0 = false;
+    boolean goingPos1 = false;
+    boolean goingPos2 = false;
+    boolean goingPos3 = false;
+
     @Override
     public void init() {
         //super.init();
         this.robot = new Robot(hardwareMap, telemetry);
+        robot.verticalClaw.open();
         this.drivetrain = robot.drivetrain;
         pad1 = new GamepadPlus(gamepad1);
         pad2 = new GamepadPlus(gamepad2);
@@ -50,10 +56,12 @@ public class Tele extends RobotOpMode {
         drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
 
         // HOLD TRIGGER to flip
-        if (pad2.right_trigger_pressed()) {
-            robot.verticalFlip.flipDown();
-        } else {
-            robot.verticalFlip.flipUp();
+        if (!robot.isDepositing) {
+            if (pad2.right_trigger_pressed()) {
+                robot.verticalFlip.flipDown();
+            } else {
+                robot.verticalFlip.flipUp();
+            }
         }
 
         // TOGGLE X to toggle back claw
@@ -63,7 +71,7 @@ public class Tele extends RobotOpMode {
 
         // TOGGLE B to toggle front claw
         if (pad2.b_pressed) {
-            robot.horizontalClaw.toggle();
+            robot.verticalClaw.toggle();
         }
 
         // PRESS A to retract
@@ -71,8 +79,54 @@ public class Tele extends RobotOpMode {
             robot.retractArm();
         }
 
+        if (pad2.y_pressed) {
+            goingPos0 = false;
+            goingPos1 = false;
+            goingPos2 = false;
+            goingPos3 = false;
+            robot.verticalScheduler.clearGlobal();
+            robot.verticalScheduler.clearLinear();
+            robot.retractScheduler.clearGlobal();
+            robot.retractScheduler.clearLinear();
+            robot.isRetracting = false;
+        }
+
+        if (pad2.dpad_down_pressed) {
+            multiTelemetry.addLine("Down pressed");
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        }
+
+        if (pad2.dpad_left_pressed) {
+            multiTelemetry.addLine("Left pressed");
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.LOW);
+        }
+
+        if (pad2.dpad_up_pressed) {
+            multiTelemetry.addLine("Up pressed");
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.MEDIUM);
+        }
+
+        if (pad2.dpad_right_pressed) {
+            multiTelemetry.addLine("Right pressed");
+            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        }
+
+        if (pad2.right_bumper_pressed) {
+            robot.depositCone();
+        }
+
+        // Hinge control, temporary
+        if (pad2.left_bumper_pressed) {
+            robot.hinge.setOffsetFactor(robot.hinge.getOffsetFactor() * -1);
+        }
+        robot.hinge.offsetPosition(pad2.gamepad.left_trigger);
+
         robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
-        robot.horizontalSlide.setPower(-pad2.get_partitioned_left_stick_x());
+        if (!robot.isRetracting)
+            robot.horizontalSlide.setPower(pad2.get_partitioned_left_stick_x());
+        robot.moveLever(-pad2.get_partitioned_right_stick_y());
+        robot.moveTurret(-pad2.get_partitioned_right_stick_x());
+
 
         fullTelemetry();
     }
@@ -87,13 +141,26 @@ public class Tele extends RobotOpMode {
         multiTelemetry.addData("Vertical motor encoder", robot.verticalSlide.getPosition());
         multiTelemetry.addData("Limit switch:", robot.verticalSlide.getLimitState());
         multiTelemetry.addData("Vertical velocity", robot.verticalSlide.getVelocity());
-        multiTelemetry.addData("X pressed", pad2.x_pressed);
         multiTelemetry.addData("Partitioned Left Y", pad2.get_partitioned_left_stick_y());
         multiTelemetry.addData("Partitioned Left X", pad2.get_partitioned_left_stick_x());
-        multiTelemetry.addData("Vertical max power", robot.verticalSlide.maxPower);
-        multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
-        multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
-        multiTelemetry.addData("Horizontal stop", robot.horizontalSlide.stopDirection);
+        multiTelemetry.addData("Partitioned Right Y", pad2.get_partitioned_right_stick_y());
+        multiTelemetry.addData("Partitioned Right X", pad2.get_partitioned_right_stick_x());
+        // multiTelemetry.addData("Vertical max power", robot.verticalSlide.maxPower);
+        // multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
+        // multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
+        multiTelemetry.addLine();
+        multiTelemetry.addData("Vertical stopDir", robot.verticalSlide.stopDirection);
+        multiTelemetry.addData("Horizontal stopDir", robot.horizontalSlide.stopDirection);
+        multiTelemetry.addData("Retracting", robot.isRetracting);
+        multiTelemetry.addData("Depositing", robot.isDepositing);
+        // multiTelemetry.addData("Target", robot.horizontalSlide.motors[0].getTargetPosition());
+        // multiTelemetry.addData("Vel", robot.horizontalSlide.motors[0].getVelocity());
+        // multiTelemetry.addData("Power", robot.horizontalSlide.motors[0].getPower());
+        // multiTelemetry.addData("Mode", robot.horizontalSlide.motors[0].getMode());
+        multiTelemetry.addLine();
+        multiTelemetry.addData("Turret pos", robot.turret.getPosition());
+        multiTelemetry.addData("Lever pos", robot.lever.getPosition());
+        multiTelemetry.addData("Hinge pos", robot.hinge.getPosition());
         multiTelemetry.update();
     }
 }
