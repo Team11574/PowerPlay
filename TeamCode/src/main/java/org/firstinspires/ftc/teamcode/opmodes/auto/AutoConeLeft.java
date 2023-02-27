@@ -20,8 +20,6 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
     TrajectorySequence[] spots;
 
-    boolean flipping;
-    boolean opening;
     Scheduler scheduler;
 
 

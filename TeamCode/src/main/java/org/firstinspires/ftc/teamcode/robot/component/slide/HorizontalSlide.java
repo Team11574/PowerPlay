@@ -40,7 +40,7 @@ public class HorizontalSlide extends MotorGroup {
     }
 
     public void setPower(double power) {
-        if (Math.abs(power) < 0.1 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+        if (Math.abs(power) < 0.1 && motors[0].getMode() == DcMotorEx.RunMode.RUN_TO_POSITION) {
             return;
         }
         lastPower = power;

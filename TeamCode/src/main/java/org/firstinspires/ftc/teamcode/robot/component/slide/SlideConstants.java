@@ -26,8 +26,8 @@ public class SlideConstants {
     public static double VS_SP_HIGH = 50;
     public static double VS_SP_AUTO = 45;
 
-    public static double VS_CLAW_OPEN = 0.14;
-    public static double VS_CLAW_CLOSED = 0.07;
+    public static double VS_CLAW_OPEN = 0.23;
+    public static double VS_CLAW_CLOSED = 0;
 
     public static double VS_FLIP_DOWN = 0.95;
     public static double VS_FLIP_UP = 0.26;
@@ -57,7 +57,7 @@ public class SlideConstants {
     public static double HS_SP_HIGH = 20;
 
     public static double HS_CLAW_OPEN = 0.5;
-    public static double HS_CLAW_CLOSED = 0.8;
+    public static double HS_CLAW_CLOSED = 0.7;
 
     // TODO: 0 is currently not far enough to the left, so needs to be reprogrammed or reattached
     public static double HS_TURRET_START = 0.88;
@@ -65,7 +65,7 @@ public class SlideConstants {
     public static double HS_TURRET_MAX = 1;
     public static double HS_TURRET_SPEED = 0.02;
 
-    public static double HS_HINGE_START = 0.8;
+    public static double HS_HINGE_START = 0.86;
     public static double HS_HINGE_SPEED = 0.01;
     // TODO: Find correct start/end/mid positions for lever servo
     // Done? Double check IN with enclosure

@@ -60,7 +60,7 @@ public class Robot extends Component {
     public ContinuousServo hinge;
     public ContinuousServo lever;
 
-    public Scheduler retractScheduler;
+    public Scheduler horizontalScheduler;
     public Scheduler verticalScheduler;
 
     public boolean isRetracting = false;
@@ -80,7 +80,7 @@ public class Robot extends Component {
         if (cameraEnabled)
             autoCamera = new AutoCamera(hardwareMap, telemetry);
 
-        retractScheduler = new Scheduler();
+        horizontalScheduler = new Scheduler();
         verticalScheduler = new Scheduler();
         configureDrivetrain();
         configureHorizontalSlide();
@@ -184,17 +184,17 @@ public class Robot extends Component {
                 servo is in position, since we have no way of actually knowing if the lever
                 servo is in position or not.
              */
-            retractScheduler.linearSchedule(
+            horizontalScheduler.linearSchedule(
                     when -> horizontalSlide.goToPositionConstant(0),
                     // Lever in
                     then -> lever.goToSetPosition(0)
             );
-            retractScheduler.linearSchedule(
+            horizontalScheduler.linearSchedule(
                     when -> true,
                     then -> horizontalClaw.open(),
                     500
             );
-            retractScheduler.linearSchedule(
+            horizontalScheduler.linearSchedule(
                     when -> true,
                     then -> {
                         horizontalSlide.goToLastPosition();
@@ -206,6 +206,19 @@ public class Robot extends Component {
             );
 
         } // else, do nothing. We don't want to double schedule movements.
+    }
+
+    public void waitForRetract() {
+        // NOT ASYNC
+        while (horizontalScheduler.hasLinearQueries() || horizontalScheduler.hasGlobalQueries()) {
+            horizontalScheduler.update();
+        }
+    }
+
+    public void waitForDeposit() {
+        while(verticalScheduler.hasLinearQueries() || verticalScheduler.hasGlobalQueries()) {
+            verticalScheduler.update();
+        }
     }
 
     public void depositCone() {
@@ -232,7 +245,7 @@ public class Robot extends Component {
         verticalSlide.update();
         if (!isRetracting)
             horizontalSlide.update();
-        retractScheduler.update();
+        horizontalScheduler.update();
         verticalScheduler.update();
     }
 }

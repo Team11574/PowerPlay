@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.tele;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
@@ -86,8 +84,8 @@ public class Tele extends RobotOpMode {
             goingPos3 = false;
             robot.verticalScheduler.clearGlobal();
             robot.verticalScheduler.clearLinear();
-            robot.retractScheduler.clearGlobal();
-            robot.retractScheduler.clearLinear();
+            robot.horizontalScheduler.clearGlobal();
+            robot.horizontalScheduler.clearLinear();
             robot.isRetracting = false;
         }
 
