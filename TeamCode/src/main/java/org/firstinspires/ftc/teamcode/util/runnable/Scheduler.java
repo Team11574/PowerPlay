@@ -97,6 +97,9 @@ public class Scheduler {
         return linearQueries.size() > 0;
     }
 
+    public int linearQueryLength() { return linearQueries.size(); }
+    public int globalQueryLength() { return globalQueries.size(); }
+
     public boolean hasGlobalQueries() {
         return globalQueries.size() > 0;
     }

@@ -2,12 +2,20 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_FLAT;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_SPEED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_START;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_TICKS_PER_RAD;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FIFTH;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FLAT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FOURTH;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_MID;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SECOND;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SPEED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_THIRD;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_TICKS_PER_RAD;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MAX_ENCODER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MIN_ENCODER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_MAX;
@@ -34,6 +42,7 @@ import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.component.camera.AutoCamera;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Claw;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Flipper;
+import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
 import org.firstinspires.ftc.teamcode.robot.component.servo.ContinuousServo;
 import org.firstinspires.ftc.teamcode.robot.component.slide.HorizontalSlide;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
@@ -58,7 +67,7 @@ public class Robot extends Component {
     public Flipper verticalFlip;
     public ContinuousServo turret;
     public ContinuousServo hinge;
-    public ContinuousServo lever;
+    public Lever lever;
 
     public Scheduler horizontalScheduler;
     public Scheduler verticalScheduler;
@@ -140,8 +149,16 @@ public class Robot extends Component {
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
         telemetry.addLine("Creating lever");
-        lever = new ContinuousServo(hardwareMap, telemetry, HS_lever_S, new double[]{HS_LEVER_IN, HS_LEVER_MID, HS_LEVER_OUT}, HS_LEVER_OUT, HS_LEVER_IN);
-        lever.goToSetPosition(0);
+        lever = new Lever(hardwareMap, telemetry, HS_lever_S,
+                new double[]{HS_LEVER_IN,
+                        HS_LEVER_MID,
+                        HS_LEVER_FIFTH,
+                        HS_LEVER_FOURTH,
+                        HS_LEVER_THIRD,
+                        HS_LEVER_SECOND,
+                        HS_LEVER_OUT},
+                HS_LEVER_OUT, HS_LEVER_IN);
+        lever.goToSetPosition(Lever.LeverPosition.IN);
         lever.setOffsetFactor(HS_LEVER_SPEED);
     }
 
@@ -166,46 +183,60 @@ public class Robot extends Component {
     }
 
     public void retractArm() {
+        retractArm(true, true);
+    }
+
+    public void retractArm(boolean doReturn) {
+        retractArm(doReturn, false);
+    }
+    public void retractArm(boolean doReturn, boolean drop) {
         if (!isRetracting) {
             isRetracting = true;
-            //horizontalSlide.goToSetPosition(0);
             turret.goToSetPosition(0);
-            lever.goToSetPosition(1);
-
-            /* TODO: Determine if we can find a position where lever is positioned so that
-                the cone rests just above the lip of the enclosure.
-                If we can, this should work alright. It'll simply move the lever arm before
-                retracting the horizontal slides and drop the cone once those horizontal
-                slides reach 0.
-                If we can't then we have problems. Servos don't have
-                getCurrentPosition/getTargetPosition functions, they just have a
-                getPosition which outputs what position the servo should be at. So, we don't
-                have a great way of linearly scheduling the cone to drop once the lever
-                servo is in position, since we have no way of actually knowing if the lever
-                servo is in position or not.
-             */
+            // Lever mid
+            lever.goToSetPosition(Lever.LeverPosition.MID, false);
+            hinge.goToSetPosition(0, false);
             horizontalScheduler.linearSchedule(
-                    when -> horizontalSlide.goToPositionConstant(0),
+                    when -> true,
+                    then -> horizontalSlide.goToSetPosition(0),
+                    100
+            );
+            horizontalScheduler.linearSchedule(
+                    //when -> horizontalSlide.goToPositionConstant(0),
+                    when -> horizontalSlide.atSetPosition(),
                     // Lever in
-                    then -> lever.goToSetPosition(0)
+                    then -> lever.goToSetPosition(Lever.LeverPosition.IN, false)
             );
-            horizontalScheduler.linearSchedule(
-                    when -> true,
-                    then -> horizontalClaw.open(),
-                    500
-            );
-            horizontalScheduler.linearSchedule(
-                    when -> true,
-                    then -> {
-                        horizontalSlide.goToLastPosition();
-                        // Lever out
-                        lever.goToSetPosition(2);
-                        isRetracting = false;
-                    },
-                    500
-            );
+            if (drop) {
+                horizontalScheduler.linearSchedule(
+                        when -> true,
+                        then -> horizontalClaw.open(),
+                        500
+                );
+            }
+            if (doReturn) {
+                horizontalScheduler.linearSchedule(
+                        when -> true,
+                        then -> returnOut(),
+                        500
+                );
+                horizontalScheduler.linearSchedule(
+                        when -> horizontalSlide.atSetPosition(),
+                        then -> isRetracting = false
+                );
+            } else {
+                isRetracting = false;
+            }
 
         } // else, do nothing. We don't want to double schedule movements.
+    }
+
+    public void returnOut() {
+        horizontalSlide.goToLastPosition();
+        // Lever out
+        lever.goToLastPosition();
+        // Hinge back
+        hinge.goToLastPosition();
     }
 
     public void waitForRetract() {
@@ -216,6 +247,7 @@ public class Robot extends Component {
     }
 
     public void waitForDeposit() {
+        // NOT ASYNC
         while(verticalScheduler.hasLinearQueries() || verticalScheduler.hasGlobalQueries()) {
             verticalScheduler.update();
         }
@@ -236,9 +268,22 @@ public class Robot extends Component {
                         verticalFlip.flipUp();
                         isDepositing = false;
                     },
-                    500
+                    250
             );
         }
+    }
+
+    public void levelHinge() {
+        // The angle of the lever in radians
+        double leverAngle = (lever.getPosition() - HS_LEVER_FLAT) / HS_LEVER_TICKS_PER_RAD;
+
+        // Subtract from 2PI to keep hinge parallel to ground
+        double hingeParallel = leverAngle;
+
+        // The position of the hinge in ticks
+        double newHingePosition = hingeParallel * HS_HINGE_TICKS_PER_RAD + HS_HINGE_FLAT;
+
+        hinge.setPosition(newHingePosition);
     }
 
     public void update() {

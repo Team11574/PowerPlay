@@ -13,6 +13,7 @@ public class SetServo extends HardwareComponent {
     protected Servo servo;
     protected List<Double> positions;
     protected int currentPositionIndex;
+    protected double lastPosition;
 
     public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
                     double position) {
@@ -45,6 +46,10 @@ public class SetServo extends HardwareComponent {
     }
 
     public void goToSetPosition(int index) {
+        goToSetPosition(index, true);
+    }
+
+    public void goToSetPosition(int index, boolean updateLastPosition) {
         if (index < 0) {
             index = positions.size() - index;
         }
@@ -52,8 +57,14 @@ public class SetServo extends HardwareComponent {
             telemetry.addLine("Servo undefined set position!");
         } else {
             servo.setPosition(positions.get(index));
+            if (updateLastPosition)
+                lastPosition = positions.get(index);
             currentPositionIndex = index;
         }
+    }
+
+    public void goToLastPosition() {
+        servo.setPosition(lastPosition);
     }
 
     public void toggle() {

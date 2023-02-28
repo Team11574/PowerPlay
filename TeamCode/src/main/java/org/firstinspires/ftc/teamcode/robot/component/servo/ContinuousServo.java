@@ -52,8 +52,14 @@ public class ContinuousServo extends SetServo {
     }
 
     public void setPosition(double position) {
+        setPosition(position, true);
+    }
+
+    public void setPosition(double position, boolean updateLastPosition) {
         if (position < lowerBound) position = lowerBound;
         if (position > upperBound) position = upperBound;
+        if (updateLastPosition)
+            lastPosition = position;
         servo.setPosition(position);
     }
 

@@ -60,14 +60,6 @@ public class VerticalSlide extends MotorGroup {
         setSetPositionLength(setPosition.ordinal(), positionValue);
     }
 
-    public enum SetPosition {
-        GROUND,
-        LOW,
-        MEDIUM,
-        HIGH,
-        AUTO,
-    }
-
     public boolean getLimitState() {
         return !limitSwitch.getState();
     }
@@ -126,5 +118,13 @@ public class VerticalSlide extends MotorGroup {
             // Else, continue fine
             }
         }
+    }
+
+    public enum SetPosition {
+        GROUND,
+        LOW,
+        MEDIUM,
+        HIGH,
+        AUTO,
     }
 }
