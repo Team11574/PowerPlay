@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.component.slide;
 
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_SET_POSITION_THRESHOLD;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_ENCODER_CENTER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_PIDF;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_TICKS_PER_IN;
@@ -102,6 +103,23 @@ public class VerticalSlide extends MotorGroup {
     }
 
     @Override
+    public boolean atSetPosition() { return atSetPosition(S_SET_POSITION_THRESHOLD); }
+
+    @Override
+    public boolean atSetPosition(double threshold) {
+        if (motors[0].getTargetPosition() == 0 && stopDirection == -1) {
+            setPower(0);
+            return true;
+        }
+        double sum = 0;
+        for (DcMotorEx motor : motors) {
+            sum += motor.getCurrentPosition();
+        }
+        sum /= motors.length;
+        return withinThreshold(motors[0].getTargetPosition(), sum, threshold);
+    }
+
+    @Override
     public void update() {
         // If switch is pressed
         if (getLimitState()) {
@@ -111,8 +129,9 @@ public class VerticalSlide extends MotorGroup {
                 // stop()
             // If going downwards and at the bottom, stop
             } else if (getPosition() <= VS_ENCODER_CENTER) { // && getDirection() < 0) {
-                if (motors[0].getMode() == DcMotor.RunMode.RUN_USING_ENCODER)
+                if (motors[0].getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
                     hardReset();
+                }
                 stopDirection = -1;
                 // stop();
             // Else, continue fine

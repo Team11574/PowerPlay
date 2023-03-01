@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_FLAT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_NEG_PI_6;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_SPEED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_START;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_TICKS_PER_RAD;
@@ -11,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FOURTH;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_MID;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_NEG_PI_6;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SECOND;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SPEED;
@@ -192,14 +194,16 @@ public class Robot extends Component {
     public void retractArm(boolean doReturn, boolean drop) {
         if (!isRetracting) {
             isRetracting = true;
-            turret.goToSetPosition(0);
             // Lever mid
             lever.goToSetPosition(Lever.LeverPosition.MID, false);
-            hinge.goToSetPosition(0, false);
             horizontalScheduler.linearSchedule(
                     when -> true,
-                    then -> horizontalSlide.goToSetPosition(0),
-                    100
+                    then -> {
+                        horizontalSlide.goToSetPosition(0);
+                        turret.goToSetPosition(0);
+                        hinge.goToSetPosition(0, false);
+                    },
+                    500
             );
             horizontalScheduler.linearSchedule(
                     //when -> horizontalSlide.goToPositionConstant(0),
@@ -274,6 +278,7 @@ public class Robot extends Component {
     }
 
     public void levelHinge() {
+        /* OLD
         // The angle of the lever in radians
         double leverAngle = (lever.getPosition() - HS_LEVER_FLAT) / HS_LEVER_TICKS_PER_RAD;
 
@@ -284,6 +289,13 @@ public class Robot extends Component {
         double newHingePosition = hingeParallel * HS_HINGE_TICKS_PER_RAD + HS_HINGE_FLAT;
 
         hinge.setPosition(newHingePosition);
+         */
+        double hingePosition = lever.getPosition() - HS_LEVER_FLAT + HS_HINGE_FLAT + 0.05;
+        if (hingePosition < 1) {
+            hinge.setPosition(hingePosition);
+        } else {
+            hinge.goToSetPosition(0);
+        }
     }
 
     public void update() {

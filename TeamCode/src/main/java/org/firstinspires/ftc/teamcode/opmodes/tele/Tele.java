@@ -121,10 +121,11 @@ public class Tele extends RobotOpMode {
         //robot.hinge.offsetPosition(pad2.gamepad.left_trigger);
 
         robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
-        if (!robot.isRetracting)
+        if (!robot.isRetracting) {
             robot.horizontalSlide.setPower(pad2.get_partitioned_left_stick_x());
-        if (!robot.isRetracting)
             robot.moveLever(-pad2.get_partitioned_right_stick_y());
+            robot.levelHinge();
+        }
         robot.moveTurret(-pad2.get_partitioned_right_stick_x());
 
 
