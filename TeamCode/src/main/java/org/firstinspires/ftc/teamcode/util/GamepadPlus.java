@@ -34,6 +34,8 @@ public class GamepadPlus {
     public boolean right_bumper_pressed = false;
     public boolean left_stick_button_pressed = false;
     public boolean right_stick_button_pressed = false;
+    public boolean left_trigger_pressed = false;
+    public boolean right_trigger_pressed = false;
 
 
     public Gamepad gamepad;
@@ -74,16 +76,18 @@ public class GamepadPlus {
         return gamepad.right_stick_x;
     }
 
-    public boolean right_trigger_pressed() { return gamepad.right_trigger > 0; };
+    public boolean right_trigger_active() { return gamepad.right_trigger > 0; };
 
-    public boolean left_trigger_pressed() { return gamepad.left_trigger > 0; };
+    public boolean left_trigger_active() { return gamepad.left_trigger > 0; };
 
     public void update() {
         last_left_stick_x = gamepad.left_stick_x;
         last_left_stick_y = gamepad.left_stick_y;
         last_right_stick_x = gamepad.right_stick_x;
         last_right_stick_y = gamepad.right_stick_y;
+        left_trigger_pressed = last_left_trigger > 0 && gamepad.left_trigger > last_left_trigger;
         last_left_trigger = gamepad.left_trigger;
+        right_trigger_pressed = last_right_trigger > 0 && gamepad.right_trigger > last_right_trigger;
         last_right_trigger = gamepad.right_trigger;
 
         dpad_up_pressed = gamepad.dpad_up && !last_dpad_up;

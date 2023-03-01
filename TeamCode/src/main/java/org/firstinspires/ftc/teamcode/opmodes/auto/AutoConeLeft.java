@@ -84,6 +84,7 @@ public class AutoConeLeft extends RobotLinearOpMode {
         spots = new TrajectorySequence[]{spot1, spot2, spot3};
 
         waitForStart();
+        robot.autoCamera.terminateCamera();
 
         int parkingSpot = robot.getParkingSpot();
 

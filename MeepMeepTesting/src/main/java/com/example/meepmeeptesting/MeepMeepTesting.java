@@ -35,12 +35,13 @@ public class MeepMeepTesting {
                                 .strafeLeft(24)
                                 .back(21.5)
 
-                                 */
                                 .forward(58)
                                 .back(3)
                                 .lineToLinearHeading(new Pose2d(startPos.component1() - 1.5, startPos.component2() + 58.5, Math.toRadians(171)))
                                 .lineToLinearHeading(new Pose2d(36, -12, Math.toRadians(90)))
                                 .strafeRight(21)
+                                */
+                                .lineToLinearHeading(new Pose2d(36, 0, Math.toRadians(180)))
                                 .build()
                         /*
                         .strafeLeft(24)

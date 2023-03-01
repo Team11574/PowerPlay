@@ -36,6 +36,7 @@ public class AutoTesting extends RobotLinearOpMode {
         scheduler = new Scheduler();
 
         waitForStart();
+        robot.autoCamera.terminateCamera();
 
         robot.lever.goToSetPosition(Lever.LeverPosition.FIFTH); // 5th cone height
         robot.levelHinge();

@@ -60,7 +60,7 @@ public class Robot extends Component {
     Telemetry telemetry;
 
     // -- Components --
-    private AutoCamera autoCamera;
+    public AutoCamera autoCamera;
     public Drivetrain drivetrain;
     public VerticalSlide verticalSlide;
     public HorizontalSlide horizontalSlide;
@@ -203,7 +203,7 @@ public class Robot extends Component {
                         turret.goToSetPosition(0);
                         hinge.goToSetPosition(0, false);
                     },
-                    500
+                    250
             );
             horizontalScheduler.linearSchedule(
                     //when -> horizontalSlide.goToPositionConstant(0),

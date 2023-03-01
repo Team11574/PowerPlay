@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.util.GamepadPlus;
+import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 @TeleOp(name = "Tele", group = "tele")
 public class Tele extends RobotOpMode {
@@ -18,11 +19,11 @@ public class Tele extends RobotOpMode {
     GamepadPlus pad1;
     GamepadPlus pad2;
     MultipleTelemetry multiTelemetry;
+    Scheduler scheduler;
 
-    boolean goingPos0 = false;
-    boolean goingPos1 = false;
-    boolean goingPos2 = false;
-    boolean goingPos3 = false;
+    boolean overrideMain = false;
+    boolean levellingEnabled = true;
+    boolean yRetraction = true;
 
     @Override
     public void init() {
@@ -33,6 +34,7 @@ public class Tele extends RobotOpMode {
         pad1 = new GamepadPlus(gamepad1);
         pad2 = new GamepadPlus(gamepad2);
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        scheduler = new Scheduler();
     }
 
     @Override
@@ -54,16 +56,38 @@ public class Tele extends RobotOpMode {
         drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
 
         // HOLD TRIGGER to flip
-        if (!robot.isDepositing) {
-            if (pad2.right_trigger_pressed()) {
-                robot.verticalFlip.flipDown();
-            } else {
-                robot.verticalFlip.flipUp();
+        if (!overrideMain) {
+            if (!robot.isDepositing) {
+                if (pad2.right_trigger_active()) {
+                    robot.verticalFlip.flipDown();
+                } else {
+                    robot.verticalFlip.flipUp();
+                }
+            }
+        } else {
+            if (pad2.right_trigger_pressed) {
+                robot.verticalFlip.toggle();
             }
         }
 
+        // Enable override, return to only front slide functionality
+        if (pad2.left_stick_button_pressed) {
+            overrideMain = !overrideMain;
+        }
+
+        // Reset schedules
+        if (pad2.right_stick_button_pressed) {
+            robot.verticalScheduler.clearGlobal();
+            robot.verticalScheduler.clearLinear();
+            robot.horizontalScheduler.clearGlobal();
+            robot.horizontalScheduler.clearLinear();
+            robot.isRetracting = false;
+            robot.isDepositing = false;
+        }
+
+
         // TOGGLE X to toggle back claw
-        if (pad2.x_pressed) {
+        if (pad2.x_pressed && !overrideMain) {
             robot.horizontalClaw.toggle();
         }
 
@@ -73,20 +97,23 @@ public class Tele extends RobotOpMode {
         }
 
         // PRESS A to retract
-        if (pad2.a_pressed) {
+        if (pad2.a_pressed && !overrideMain) {
             robot.retractArm();
         }
 
+        // PRESS Y to retract and hold, PRESS Y again to drop and return
         if (pad2.y_pressed) {
-            goingPos0 = false;
-            goingPos1 = false;
-            goingPos2 = false;
-            goingPos3 = false;
-            robot.verticalScheduler.clearGlobal();
-            robot.verticalScheduler.clearLinear();
-            robot.horizontalScheduler.clearGlobal();
-            robot.horizontalScheduler.clearLinear();
-            robot.isRetracting = false;
+            if (yRetraction) {
+                robot.retractArm(false, false);
+            } else {
+                robot.horizontalClaw.open();
+                scheduler.linearSchedule(
+                        when -> true,
+                        then -> robot.returnOut(),
+                        500
+                );
+            }
+            yRetraction = !yRetraction;
         }
 
         if (pad2.dpad_down_pressed) {
@@ -109,24 +136,29 @@ public class Tele extends RobotOpMode {
             robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         }
 
-        if (pad2.right_bumper_pressed) {
+        if (pad2.right_bumper_pressed && !overrideMain) {
             robot.depositCone();
         }
 
         // Hinge control, temporary
         if (pad2.left_bumper_pressed) {
             //robot.hinge.setOffsetFactor(robot.hinge.getOffsetFactor() * -1);
-            robot.levelHinge();
+            levellingEnabled = !levellingEnabled;
+            if (!levellingEnabled)
+                robot.hinge.goToSetPosition(0);
         }
         //robot.hinge.offsetPosition(pad2.gamepad.left_trigger);
 
         robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
-        if (!robot.isRetracting) {
-            robot.horizontalSlide.setPower(pad2.get_partitioned_left_stick_x());
-            robot.moveLever(-pad2.get_partitioned_right_stick_y());
-            robot.levelHinge();
+        if (!overrideMain) {
+            if (!robot.isRetracting) {
+                robot.horizontalSlide.setPower(pad2.get_partitioned_left_stick_x());
+                robot.moveLever(-pad2.get_partitioned_right_stick_y());
+                if (levellingEnabled)
+                    robot.levelHinge();
+            }
+            robot.moveTurret(-pad2.get_partitioned_right_stick_x());
         }
-        robot.moveTurret(-pad2.get_partitioned_right_stick_x());
 
 
         fullTelemetry();

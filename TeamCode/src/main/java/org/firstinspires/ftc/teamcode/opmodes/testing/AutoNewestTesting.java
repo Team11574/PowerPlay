@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.testing;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
@@ -13,12 +12,15 @@ import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
-@Autonomous(name = "AUTO New Testing", group = "testing")
-public class AutoNewTesting extends RobotLinearOpMode {
+@Autonomous(name = "AUTO Newest Testing", group = "testing")
+public class AutoNewestTesting extends RobotLinearOpMode {
     // Instance variables
     MultipleTelemetry multiTelemetry;
     Scheduler scheduler;
     TrajectorySequence[] spots;
+    TrajectorySequence initialPos;
+    TrajectorySequence moveLeft;
+    TrajectorySequence moveRight;
 
     @Override
     public void runOpMode() {
@@ -40,39 +42,18 @@ public class AutoNewTesting extends RobotLinearOpMode {
         //Pose2d startPos = new Pose2d(-36, 5.5, Math.toRadians(270));
         //Pose2d startPos = new Pose2d(0, 0, 0);//Math.toRadians(270));
         drivetrain.setPoseEstimate(startPos);
-        TrajectorySequence initialPos = drivetrain.trajectorySequenceBuilder(startPos)
-                .forward(58)
-                .back(3)
-                .lineToLinearHeading(new Pose2d(startPos.component1() - 2.5, startPos.component2() + 59, Math.toRadians(170.8)))
+        initialPos = drivetrain.trajectorySequenceBuilder(startPos)
+                .lineToLinearHeading(new Pose2d(36, 1, Math.toRadians(182)))
+                .lineToLinearHeading(new Pose2d(33, 1, Math.toRadians(182)))
                 .build();
-                /*
-                //.lineTo(new Vector2d(-36, 5.5))
-                .forward(59)
-                .back(2)
-                .strafeLeft(2)
-                .turn(Math.toRadians(70))
-                /*
-                .addDisplacementMarker(() -> {
-                    multiTelemetry.addData("Pose", drivetrain.getPoseEstimate());
-                    multiTelemetry.update();
-                })
-                .lineTo(new Vector2d(0, -32))
-                .addDisplacementMarker(() -> {
-                    multiTelemetry.addData("Pose", drivetrain.getPoseEstimate());
-                    multiTelemetry.update();
-                })
-                .waitSeconds(2)
-                .lineToLinearHeading(new Pose2d(4, -32, Math.toRadians(340))) // Math.toRadians(330)))
-                .addDisplacementMarker(() -> {
-                    multiTelemetry.addData("Pose", drivetrain.getPoseEstimate());
-                    multiTelemetry.update();
-                })
-                //.lineToLinearHeading(new Pose2d(36, -30, Math.toRadians(90)))
-                .waitSeconds(2)
-                //.lineToLinearHeading(new Pose2d(0, 58 - 3, 0))
-                //.lineToLinearHeading(new Pose2d(startPos.component1()-3, startPos.component2() + 57, Math.toRadians(160)))
-                */
+        // first cone stuff
+        moveLeft = drivetrain.trajectorySequenceBuilder(initialPos.end())
+                .strafeLeft(13.5)
+                .build();
 
+        moveRight = drivetrain.trajectorySequenceBuilder(moveLeft.end())
+                .strafeRight(13.5)
+                .build();
 
         TrajectorySequence readjustPos = drivetrain.trajectorySequenceBuilder(initialPos.end())
                 //.strafeLeft(3)
@@ -106,8 +87,79 @@ public class AutoNewTesting extends RobotLinearOpMode {
 
         //robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         drivetrain.followTrajectorySequence(initialPos);
+        //sleep(2000);
+        robot.horizontalSlide.setTargetPosition(1450);
+        robot.lever.goToSetPosition(Lever.LeverPosition.MID);
+        robot.levelHinge();
+
+        drivetrain.followTrajectorySequenceAsync(moveLeft);
+        while(drivetrain.isBusy() || !robot.horizontalSlide.atSetPosition()) {
+            drivetrain.update();
+            robot.update();
+            //scheduler.update();
+        }
+
+        robot.lever.goToSetPosition(Lever.LeverPosition.FIFTH);
+        robot.levelHinge();
+        sleep(350);
+        robot.horizontalClaw.close();
+        sleep(250);
+        robot.retractArm(false, true);
+
+        scheduler.globalSchedule(
+                when -> true,
+                then -> drivetrain.followTrajectorySequenceAsync(moveRight),
+                500
+        );
+
+        while(robot.isRetracting || drivetrain.isBusy() || scheduler.hasGlobalQueries()) {
+            drivetrain.update();
+            robot.update();
+            scheduler.update();
+        }
+
+        sleep(350);
+        robot.verticalClaw.close();
+        scheduler.globalSchedule(
+                when -> true,
+                then -> {
+                    robot.returnOut();
+                    robot.lever.goToSetPosition(Lever.LeverPosition.MID);
+                    robot.levelHinge();
+                },
+                500
+        );
+
+        drivetrain.followTrajectorySequenceAsync(moveLeft);
+        while (scheduler.hasGlobalQueries() || drivetrain.isBusy() || !robot.horizontalSlide.atSetPosition()) {
+            drivetrain.update();
+            robot.update();
+            scheduler.update();
+        }
+        robot.verticalClaw.open();
+        robot.lever.goToSetPosition(Lever.LeverPosition.FOURTH);
+        robot.levelHinge();
+        sleep(350);
+        robot.horizontalClaw.close();
+        sleep(250);
+        robot.retractArm(false, true);
+
+        scheduler.globalSchedule(
+                when -> true,
+                then -> drivetrain.followTrajectorySequenceAsync(moveRight),
+                500
+        );
+
+        while(robot.isRetracting || drivetrain.isBusy() || scheduler.hasGlobalQueries()) {
+            drivetrain.update();
+            robot.update();
+            scheduler.update();
+        }
+
+        sleep(350);
+        robot.verticalClaw.close();
         //runCones();
-        sleep(8000);
+        //sleep(8000);
 
         drivetrain.followTrajectorySequence(readjustPos);
         park(parkingSpot);

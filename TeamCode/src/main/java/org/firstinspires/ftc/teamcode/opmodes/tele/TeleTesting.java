@@ -52,7 +52,7 @@ public class TeleTesting extends RobotOpMode {
         drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
 
         // HOLD TRIGGER to flip
-        if (pad2.right_trigger_pressed()) {
+        if (pad2.right_trigger_active()) {
             robot.verticalFlip.flipDown();
         } else {
             robot.verticalFlip.flipUp();
