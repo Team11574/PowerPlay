@@ -107,10 +107,12 @@ public class VerticalSlide extends MotorGroup {
 
     @Override
     public boolean atSetPosition(double threshold) {
+        /*
         if (motors[0].getTargetPosition() == 0 && stopDirection == -1) {
             setPower(0);
             return true;
         }
+         */
         double sum = 0;
         for (DcMotorEx motor : motors) {
             sum += motor.getCurrentPosition();
@@ -129,7 +131,10 @@ public class VerticalSlide extends MotorGroup {
                 // stop()
             // If going downwards and at the bottom, stop
             } else if (getPosition() <= VS_ENCODER_CENTER) { // && getDirection() < 0) {
-                if (motors[0].getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+                if (motors[0].getMode() == DcMotorEx.RunMode.RUN_USING_ENCODER) {
+                    hardReset();
+                } else if (motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION &&
+                            getPosition() > getTargetPosition()) {
                     hardReset();
                 }
                 stopDirection = -1;

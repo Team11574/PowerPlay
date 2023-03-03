@@ -43,16 +43,16 @@ public class AutoNewestTesting extends RobotLinearOpMode {
         //Pose2d startPos = new Pose2d(0, 0, 0);//Math.toRadians(270));
         drivetrain.setPoseEstimate(startPos);
         initialPos = drivetrain.trajectorySequenceBuilder(startPos)
-                .lineToLinearHeading(new Pose2d(36, 1, Math.toRadians(182)))
-                .lineToLinearHeading(new Pose2d(33, 1, Math.toRadians(182)))
+                .lineToLinearHeading(new Pose2d(36, -1, Math.toRadians(182)))
+                .lineToLinearHeading(new Pose2d(33, -1, Math.toRadians(182)))
                 .build();
         // first cone stuff
         moveLeft = drivetrain.trajectorySequenceBuilder(initialPos.end())
-                .strafeLeft(13.5)
+                .strafeLeft(13)
                 .build();
 
         moveRight = drivetrain.trajectorySequenceBuilder(moveLeft.end())
-                .strafeRight(13.5)
+                .strafeRight(13)
                 .build();
 
         TrajectorySequence readjustPos = drivetrain.trajectorySequenceBuilder(initialPos.end())
@@ -83,43 +83,178 @@ public class AutoNewestTesting extends RobotLinearOpMode {
 
         int parkingSpot = robot.getParkingSpot();
 
-        if(isStopRequested()) return;
+        if (isStopRequested()) return;
+
+        initialPositionAndCone();
+
+        moveToPoleAndBack(Lever.LeverPosition.FIFTH, true);
+        moveToPoleAndBack(Lever.LeverPosition.FOURTH, false);
+
+        drivetrain.followTrajectorySequence(readjustPos);
+        park(parkingSpot);
+
+        multiTelemetry.addLine("Yippee!");
+        multiTelemetry.update();
+    }
+    private void initialPositionAndCone() {
 
         //robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
-        drivetrain.followTrajectorySequence(initialPos);
-        //sleep(2000);
+        // GO TO INITIAL POS
+        drivetrain.followTrajectorySequenceAsync(initialPos);
+        // START GOING UP
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        // Wait til at position and fully up
+        while (drivetrain.isBusy() || !robot.verticalSlide.atSetPosition()) {
+            if (drivetrain.isBusy()) {
+                drivetrain.update();
+            }
+            robot.update();
+            scheduler.update();
+        }
+        // First deposit
+        robot.depositCone();
+        // Queue horizontal slide out
         robot.horizontalSlide.setTargetPosition(1450);
         robot.lever.goToSetPosition(Lever.LeverPosition.MID);
         robot.levelHinge();
+        // Wait for deposit finish
+        robot.waitForDeposit();
+        // Queue vertical slide down
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+    }
 
+    private void moveToPoleAndBack(Lever.LeverPosition height, boolean oneMore) {
+        // Queue first move to stack
         drivetrain.followTrajectorySequenceAsync(moveLeft);
-        while(drivetrain.isBusy() || !robot.horizontalSlide.atSetPosition()) {
-            drivetrain.update();
+        // Wait until in position, horizontal slide is out (vertical slide not necessarily down)
+        while (drivetrain.isBusy() || !robot.horizontalSlide.atSetPosition()) {
+            if (drivetrain.isBusy())
+                drivetrain.update();
             robot.update();
-            //scheduler.update();
+            scheduler.update();
+            telemetry.addData("IsBusy", drivetrain.isBusy());
+            telemetry.addData("NotAtVerticalPos", !robot.verticalSlide.atSetPosition());
+            telemetry.addData("VerticalTarget", robot.verticalSlide.getTargetPosition());
+            telemetry.addData("NotAtHorizontalPos", !robot.horizontalSlide.atSetPosition());
+            telemetry.update();
         }
 
-        robot.lever.goToSetPosition(Lever.LeverPosition.FIFTH);
+        // Adjust arm
+        robot.lever.goToSetPosition(height);
         robot.levelHinge();
-        sleep(350);
+        nap(350);
+        // Grab cone
         robot.horizontalClaw.close();
-        sleep(250);
-        robot.retractArm(false, true);
+        nap(250);
+        // Queue horizontal retraction without drop
+        robot.retractArm(false, false);
 
+        // Queue moving back
         scheduler.globalSchedule(
                 when -> true,
                 then -> drivetrain.followTrajectorySequenceAsync(moveRight),
                 500
         );
 
-        while(robot.isRetracting || drivetrain.isBusy() || scheduler.hasGlobalQueries()) {
-            drivetrain.update();
+        // Wait until retracted, vertical slide at ground, and moved in position
+        while (robot.isRetracting  || scheduler.hasGlobalQueries() || drivetrain.isBusy()) { // || !robot.verticalSlide.atSetPosition()) {
+            if (drivetrain.isBusy()) {
+                drivetrain.update();
+            }
+            robot.update();
+            scheduler.update();
+
+            telemetry.addData("IsRetracting", robot.isRetracting);
+            telemetry.addData("IsBusy", drivetrain.isBusy());
+            telemetry.addData("HasQueries", scheduler.hasGlobalQueries());
+            telemetry.addData("NotAtVerticalPos", !robot.verticalSlide.atSetPosition());
+            telemetry.addData("VerticalTarget", robot.verticalSlide.getTargetPosition());
+            telemetry.addData("VerticalPos", robot.verticalSlide.getPosition());
+            telemetry.update();
+        }
+        robot.update();
+        // Swap cone
+        //sleep(250);
+        robot.horizontalClaw.open();
+        nap(350);
+        // Swap cone
+        robot.verticalClaw.close();
+        // Queue vertical slide up
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        // Queue horizontal slide out if want one more cone
+        if (oneMore) {
+            scheduler.globalSchedule(
+                    when -> true,
+                    then -> {
+                        robot.returnOut();
+                        robot.lever.goToSetPosition(Lever.LeverPosition.MID);
+                        robot.levelHinge();
+                    },
+                    500
+            );
+        }
+
+        // Wait until at height
+        while (!robot.verticalSlide.atSetPosition()) {
+            robot.update();
+            scheduler.update();
+        }
+        // Deposit second cone
+        robot.depositCone();
+        robot.waitForDeposit();
+        // Queue vertical slide to ground
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+
+        /*
+        // Queue drivetrain to move towards stack
+        drivetrain.followTrajectorySequenceAsync(moveLeft);
+        // Wait until horizontal slide is ready and drivetrain is in position
+        while (scheduler.hasGlobalQueries() || drivetrain.isBusy() ||
+                !robot.horizontalSlide.atSetPosition()) {
+            if (drivetrain.isBusy()) {
+                drivetrain.update();
+            }
+            robot.update();
+            scheduler.update();
+        }
+        // Adjust arm
+        robot.lever.goToSetPosition(Lever.LeverPosition.FOURTH);
+        robot.levelHinge();
+        sleep(350);
+        // Grab cone
+        robot.horizontalClaw.close();
+        sleep(250);
+        // Queue retraction
+        robot.retractArm(false, false);
+
+        // Queue move to pole
+        scheduler.globalSchedule(
+                when -> true,
+                then -> drivetrain.followTrajectorySequenceAsync(moveRight),
+                500
+        );
+
+        // Wait until retracted and at pole
+        while(robot.isRetracting || drivetrain.isBusy() ||
+                scheduler.hasGlobalQueries() || !robot.verticalSlide.atSetPosition()) {
+            if (drivetrain.isBusy()) {
+                drivetrain.update();
+            }
             robot.update();
             scheduler.update();
         }
 
-        sleep(350);
+
+
+
+        sleep(250);
+        robot.horizontalClaw.open();
+        sleep(250);
+        // Grab second cone
         robot.verticalClaw.close();
+        // Queue vertical slide up
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        // Queue horizontal slide out
         scheduler.globalSchedule(
                 when -> true,
                 then -> {
@@ -130,137 +265,85 @@ public class AutoNewestTesting extends RobotLinearOpMode {
                 500
         );
 
-        drivetrain.followTrajectorySequenceAsync(moveLeft);
-        while (scheduler.hasGlobalQueries() || drivetrain.isBusy() || !robot.horizontalSlide.atSetPosition()) {
-            drivetrain.update();
+        // Wait until at height
+        while (!robot.verticalSlide.atSetPosition()) {
             robot.update();
             scheduler.update();
         }
-        robot.verticalClaw.open();
-        robot.lever.goToSetPosition(Lever.LeverPosition.FOURTH);
+        // Deposit second cone
+        robot.depositCone();
+        robot.waitForDeposit();
+        // Queue vertical slide to ground
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        // Queue drivetrain to move towards stack
+        drivetrain.followTrajectorySequenceAsync(moveLeft);
+        // Wait until horizontal slide is ready and drivetrain is in position
+        while (scheduler.hasGlobalQueries() || drivetrain.isBusy() ||
+                !robot.horizontalSlide.atSetPosition()) {
+            if (drivetrain.isBusy()) {
+                drivetrain.update();
+            }
+            robot.update();
+            scheduler.update();
+        }
+        // Adjust arm
+        robot.lever.goToSetPosition(Lever.LeverPosition.THIRD);
         robot.levelHinge();
         sleep(350);
+        // Grab third stack cone
         robot.horizontalClaw.close();
         sleep(250);
-        robot.retractArm(false, true);
+        // Queue retraction
+        robot.retractArm(false, false);
 
+        // Queue move to pole
         scheduler.globalSchedule(
                 when -> true,
                 then -> drivetrain.followTrajectorySequenceAsync(moveRight),
                 500
         );
 
-        while(robot.isRetracting || drivetrain.isBusy() || scheduler.hasGlobalQueries()) {
-            drivetrain.update();
+        // Wait until retracted and at pole
+        while(robot.isRetracting || drivetrain.isBusy() ||
+                scheduler.hasGlobalQueries() || !robot.verticalSlide.atSetPosition()) {
+            if (drivetrain.isBusy()) {
+                drivetrain.update();
+            }
             robot.update();
             scheduler.update();
         }
 
-        sleep(350);
+        sleep(250);
+        robot.horizontalClaw.open();
+        sleep(250);
+        // Grab third stack cone inner
         robot.verticalClaw.close();
+        // Queue vertical slide up
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        // Queue horizontal slide out
+        scheduler.globalSchedule(
+                when -> true,
+                then -> {
+                    robot.returnOut();
+                    robot.lever.goToSetPosition(Lever.LeverPosition.MID);
+                    robot.levelHinge();
+                },
+                500
+        );
+
+        // Wait until at height
+        while (!robot.verticalSlide.atSetPosition()) {
+            robot.update();
+            scheduler.update();
+        }
+        // Deposit second cone
+        robot.depositCone();
+        robot.waitForDeposit();
+        // Queue vertical slide to ground
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+         */
         //runCones();
         //sleep(8000);
-
-        drivetrain.followTrajectorySequence(readjustPos);
-        park(parkingSpot);
-
-        multiTelemetry.addLine("Yippee!");
-        multiTelemetry.update();
-
-    }
-
-    void runCones() {
-        robot.depositCone();
-        robot.lever.goToSetPosition(Lever.LeverPosition.FIFTH); // 5th cone height
-        robot.levelHinge();
-        robot.horizontalSlide.setTargetPosition(1630);
-        robot.horizontalClaw.open();
-        while (robot.isDepositing) {
-            robot.update();
-        }
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
-        robot.verticalClaw.open();
-        while (!robot.horizontalSlide.atSetPosition()) {
-            // wait
-            robot.update();
-        }
-
-        robot.horizontalClaw.close();
-        sleep(250);
-        robot.retractArm(false, true);
-        robot.waitForRetract();
-        sleep(350);
-        robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
-        scheduler.linearSchedule(
-                when -> true,
-                then -> {
-                    robot.returnOut();
-                    robot.lever.goToSetPosition(Lever.LeverPosition.FOURTH);
-                    robot.levelHinge();
-                },
-                500
-        );
-        while (!robot.verticalSlide.atSetPosition()) {
-            // wait
-            robot.update();
-            scheduler.update();
-        }
-        robot.depositCone();
-        robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
-        robot.horizontalClaw.close();
-        sleep(350);
-        robot.retractArm(false, false);
-
-        while (!robot.verticalSlide.atSetPosition()) {
-            // wait
-            robot.update();
-        }
-        robot.waitForRetract(); // double check horizontal is completed
-        sleep(500);
-        robot.horizontalClaw.open();
-        sleep(250);
-        robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
-        scheduler.linearSchedule(
-                when -> true,
-                then -> {
-                    robot.returnOut();
-                    robot.lever.goToSetPosition(Lever.LeverPosition.THIRD);
-                    robot.levelHinge();
-                },
-                500
-        );
-        while (!robot.verticalSlide.atSetPosition()) {
-            // wait
-            robot.update();
-            scheduler.update();
-        }
-        robot.depositCone();
-        robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
-        robot.horizontalClaw.close();
-        sleep(350);
-        robot.retractArm(false, false);
-
-        while (!robot.verticalSlide.atSetPosition()) {
-            // wait
-            robot.update();
-        }
-        robot.waitForRetract(); // double check horizontal is completed
-        sleep(500);
-        robot.horizontalClaw.open();
-        sleep(250);
-        robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
-        while (!robot.verticalSlide.atSetPosition()) {
-            // wait
-            robot.update();
-        }
-        robot.depositCone();
-        robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
     }
 
     void park(int parkingSpot) {
@@ -268,5 +351,19 @@ public class AutoNewestTesting extends RobotLinearOpMode {
         if (!isStopRequested())
             drivetrain.followTrajectorySequence(spots[parkingSpot - 1]);
 
+    }
+
+    void nap(double milliseconds) {
+        nap(milliseconds, 10);
+    }
+
+    void nap(double milliseconds, double refreshTime) {
+        double remainder = milliseconds % refreshTime;
+        for (int i = 1; i <= milliseconds/refreshTime; i++) {
+            robot.update();
+            sleep((long) refreshTime);
+        }
+        if (remainder != 0)
+            sleep((long) remainder);
     }
 }

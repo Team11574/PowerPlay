@@ -23,7 +23,7 @@ public class Tele extends RobotOpMode {
 
     boolean overrideMain = false;
     boolean levellingEnabled = true;
-    boolean yRetraction = true;
+    boolean yRetraction = false;
 
     @Override
     public void init() {
@@ -73,6 +73,7 @@ public class Tele extends RobotOpMode {
         // Enable override, return to only front slide functionality
         if (pad2.left_stick_button_pressed) {
             overrideMain = !overrideMain;
+            robot.horizontalSlide.setPower(0);
         }
 
         // Reset schedules
@@ -103,17 +104,20 @@ public class Tele extends RobotOpMode {
 
         // PRESS Y to retract and hold, PRESS Y again to drop and return
         if (pad2.y_pressed) {
-            if (yRetraction) {
+            if (!yRetraction) {
                 robot.retractArm(false, false);
+                yRetraction = true;
             } else {
                 robot.horizontalClaw.open();
                 scheduler.linearSchedule(
                         when -> true,
-                        then -> robot.returnOut(),
+                        then -> {
+                            robot.returnOut();
+                            yRetraction = false;
+                        },
                         500
                 );
             }
-            yRetraction = !yRetraction;
         }
 
         if (pad2.dpad_down_pressed) {
@@ -153,13 +157,12 @@ public class Tele extends RobotOpMode {
         if (!overrideMain) {
             if (!robot.isRetracting) {
                 robot.horizontalSlide.setPower(pad2.get_partitioned_left_stick_x());
-                robot.moveLever(-pad2.get_partitioned_right_stick_y());
-                if (levellingEnabled)
+                robot.moveLever(-pad2.get_partitioned_right_stick_y(), !yRetraction);
+                if (levellingEnabled && !yRetraction)
                     robot.levelHinge();
             }
             robot.moveTurret(-pad2.get_partitioned_right_stick_x());
         }
-
 
         fullTelemetry();
     }
@@ -167,6 +170,7 @@ public class Tele extends RobotOpMode {
     public void update() {
         pad1.update();
         pad2.update();
+        scheduler.update();
     }
 
     public void fullTelemetry() {

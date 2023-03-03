@@ -85,9 +85,9 @@ public class GamepadPlus {
         last_left_stick_y = gamepad.left_stick_y;
         last_right_stick_x = gamepad.right_stick_x;
         last_right_stick_y = gamepad.right_stick_y;
-        left_trigger_pressed = last_left_trigger > 0 && gamepad.left_trigger > last_left_trigger;
+        left_trigger_pressed = last_left_trigger == 0 && gamepad.left_trigger > last_left_trigger;
         last_left_trigger = gamepad.left_trigger;
-        right_trigger_pressed = last_right_trigger > 0 && gamepad.right_trigger > last_right_trigger;
+        right_trigger_pressed = last_right_trigger == 0 && gamepad.right_trigger > last_right_trigger;
         last_right_trigger = gamepad.right_trigger;
 
         dpad_up_pressed = gamepad.dpad_up && !last_dpad_up;

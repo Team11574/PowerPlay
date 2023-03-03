@@ -94,7 +94,6 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
         while (!robot.verticalSlide.goToPositionConstant(VerticalSlide.SetPosition.AUTO)){ //!robot.verticalSlide.atSetPosition()) {
             telemetry.addData("Position", robot.verticalSlide.getPosition());
-            telemetry.addData("Max power", robot.verticalSlide.maxPower);
             telemetry.addData("Target", robot.verticalSlide.motors[0].getTargetPosition());
             telemetry.addData("Vel", robot.verticalSlide.motors[0].getVelocity());
             telemetry.addData("Power", robot.verticalSlide.motors[0].getPower());
@@ -146,7 +145,6 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
         while (!robot.verticalSlide.goToBottom()){ //!robot.verticalSlide.atSetPosition()) {
             telemetry.addData("Position", robot.verticalSlide.getPosition());
-            telemetry.addData("Max power", robot.verticalSlide.maxPower);
             telemetry.addData("Target", robot.verticalSlide.motors[0].getTargetPosition());
             telemetry.addData("Vel", robot.verticalSlide.motors[0].getVelocity());
             telemetry.addData("Power", robot.verticalSlide.motors[0].getPower());

@@ -135,7 +135,6 @@ public class TeleTesting extends RobotOpMode {
         multiTelemetry.addData("Partitioned Left X", pad2.get_partitioned_left_stick_x());
         multiTelemetry.addData("Partitioned Right Y", pad2.get_partitioned_right_stick_y());
         multiTelemetry.addData("Partitioned Right X", pad2.get_partitioned_right_stick_x());
-        multiTelemetry.addData("Vertical max power", robot.verticalSlide.maxPower);
         multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
         multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
         multiTelemetry.addLine();

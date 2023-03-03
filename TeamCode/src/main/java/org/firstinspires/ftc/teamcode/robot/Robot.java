@@ -177,7 +177,11 @@ public class Robot extends Component {
     }
 
     public void moveLever(double amount) {
-        lever.offsetPosition(amount);
+        moveLever(amount, true);
+    }
+
+    public void moveLever(double amount, boolean updateLastPosition) {
+        lever.offsetPosition(amount, updateLastPosition);
     }
 
     public void moveTurret(double amount) {
@@ -200,8 +204,8 @@ public class Robot extends Component {
                     when -> true,
                     then -> {
                         horizontalSlide.goToSetPosition(0);
-                        turret.goToSetPosition(0);
                         hinge.goToSetPosition(0, false);
+                        turret.goToSetPosition(0);
                     },
                     250
             );
@@ -209,12 +213,22 @@ public class Robot extends Component {
                     //when -> horizontalSlide.goToPositionConstant(0),
                     when -> horizontalSlide.atSetPosition(),
                     // Lever in
-                    then -> lever.goToSetPosition(Lever.LeverPosition.IN, false)
+                    then -> {
+                        lever.goToSetPosition(Lever.LeverPosition.IN, false);
+                        if (!drop && !doReturn) {
+                            isRetracting = false;
+                        }
+                    }
             );
             if (drop) {
                 horizontalScheduler.linearSchedule(
                         when -> true,
-                        then -> horizontalClaw.open(),
+                        then -> {
+                            horizontalClaw.open();
+                            if (!doReturn) {
+                                isRetracting = false;
+                            }
+                        },
                         500
                 );
             }
@@ -228,8 +242,6 @@ public class Robot extends Component {
                         when -> horizontalSlide.atSetPosition(),
                         then -> isRetracting = false
                 );
-            } else {
-                isRetracting = false;
             }
 
         } // else, do nothing. We don't want to double schedule movements.
@@ -245,14 +257,14 @@ public class Robot extends Component {
 
     public void waitForRetract() {
         // NOT ASYNC
-        while (horizontalScheduler.hasLinearQueries() || horizontalScheduler.hasGlobalQueries()) {
+        while (isRetracting) {
             horizontalScheduler.update();
         }
     }
 
     public void waitForDeposit() {
         // NOT ASYNC
-        while(verticalScheduler.hasLinearQueries() || verticalScheduler.hasGlobalQueries()) {
+        while(isDepositing) {
             verticalScheduler.update();
         }
     }
@@ -270,9 +282,17 @@ public class Robot extends Component {
                     when -> true,
                     then -> {
                         verticalFlip.flipUp();
+                        verticalClaw.close();
                         isDepositing = false;
                     },
                     250
+            );
+            verticalScheduler.linearSchedule(
+                    when -> true,
+                    then -> {
+                        verticalClaw.open();
+                    },
+                    650
             );
         }
     }

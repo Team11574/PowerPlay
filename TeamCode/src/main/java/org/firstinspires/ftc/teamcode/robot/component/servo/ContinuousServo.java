@@ -70,7 +70,11 @@ public class ContinuousServo extends SetServo {
     public double getOffsetFactor() { return offsetFactor; }
 
     public void offsetPosition(double offset) {
-        setPosition(getPosition() + offset * offsetFactor);
+        offsetPosition(offset, true);
+    }
+
+    public void offsetPosition(double offset, boolean updateLastPosition) {
+        setPosition(getPosition() + offset * offsetFactor, updateLastPosition);
     }
 
     /*

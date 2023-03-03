@@ -104,9 +104,9 @@ public class AutoNewTesting extends RobotLinearOpMode {
 
         if(isStopRequested()) return;
 
-        //robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         drivetrain.followTrajectorySequence(initialPos);
-        //runCones();
+        runCones();
         sleep(8000);
 
         drivetrain.followTrajectorySequence(readjustPos);

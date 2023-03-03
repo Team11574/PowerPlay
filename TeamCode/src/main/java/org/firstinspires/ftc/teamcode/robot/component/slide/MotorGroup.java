@@ -16,11 +16,12 @@ public class MotorGroup extends HardwareComponent {
     double MIN_ENCODER_POSITION;
     double MAX_ENCODER_POSITION;
     double TICKS_PER_INCH;
-    double RUN_TO_POSITION_POWER = S_RUN_TO_POSITION_POWER;
+    // temp public
+    public double RUN_TO_POSITION_POWER = S_RUN_TO_POSITION_POWER;
 
     ArrayList<Integer> setPositions;
     int lastPosition = 0;
-    public double maxPower = 1;
+    double maxPower = 1;
     double startMaxPower;
     double lastPower = 0;
 

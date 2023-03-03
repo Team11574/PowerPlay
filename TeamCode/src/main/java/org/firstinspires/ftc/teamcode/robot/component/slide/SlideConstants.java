@@ -55,7 +55,7 @@ public class SlideConstants {
     public static double HS_SP_HIGH = 20;
 
     public static double HS_CLAW_OPEN = 0.5;
-    public static double HS_CLAW_CLOSED = 0.7;
+    public static double HS_CLAW_CLOSED = 0.75;
 
 
     public static double HS_TURRET_START = 0.88;
@@ -68,8 +68,8 @@ public class SlideConstants {
 
     public static double HS_LEVER_IN = 0.7;
     public static double HS_LEVER_MID = 0.5;
-    public static double HS_LEVER_FIFTH = 0.3;
-    public static double HS_LEVER_FOURTH = 0.27;
+    public static double HS_LEVER_FIFTH = 0.315;
+    public static double HS_LEVER_FOURTH = 0.275;
     public static double HS_LEVER_THIRD = 0.23;
     public static double HS_LEVER_SECOND = 0.19;
     public static double HS_LEVER_OUT = 0.1;
