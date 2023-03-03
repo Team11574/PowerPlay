@@ -27,6 +27,9 @@
             <!-- Horizontal Slide Motors -->
             <goBILDA5202SeriesMotor name="HS_slide_M" port="2" />
 
+            <!-- REMOVE THIS AFTER DONE TESTING -->
+            <goBILDA5202SeriesMotor name="testing_M" port="3" />
+
             <!-- Horizontal Slide Servos -->
             <Servo name="HS_claw_S" port="0" />
             <Servo name="HS_turret_S" port="1" />
