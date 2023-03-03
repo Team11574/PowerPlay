@@ -18,6 +18,7 @@ public class VerticalSlide extends MotorGroup {
     DigitalChannel limitSwitch;
 
     public double stopDirection = 0;
+    public boolean disabled = false;
 
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, limitSwitch);
@@ -123,6 +124,8 @@ public class VerticalSlide extends MotorGroup {
 
     @Override
     public void update() {
+        if (disabled) return;
+
         // If switch is pressed
         if (getLimitState()) {
             // If going upwards and at the top, stop
@@ -138,9 +141,21 @@ public class VerticalSlide extends MotorGroup {
                     hardReset();
                 }
                 stopDirection = -1;
-                // stop();
-            // Else, continue fine
             }
+        }
+
+        for (DcMotorEx motor : motors) {
+            if (motor.isOverCurrent()) {
+                disabled = true;
+            }
+        }
+
+        if (disabled) disable_slide();
+    }
+
+    public void disable_slide() {
+        for (DcMotorEx motor : motors) {
+            motor.setMotorDisable();
         }
     }
 

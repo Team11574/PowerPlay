@@ -42,6 +42,7 @@ public class Pipeline extends OpenCvPipeline {
     List<Scalar> colorRange;
 
     int i;
+    int j;
     int maxIndex;
 
     double area;
@@ -104,10 +105,10 @@ public class Pipeline extends OpenCvPipeline {
 
         // Creates a region of interest in the middle of the frame
         imageROI = imageROI.adjustROI(
-                searchZone.y,
-                searchZone.y + searchZone.height,
-                searchZone.x,
-                searchZone.x + searchZone.width
+                -searchZone.y,
+                -(searchZone.height + searchZone.y) + 320,
+                -searchZone.x,
+                -(searchZone.width + searchZone.x) + 240
         );
 
         // === Find largest area ===
@@ -133,7 +134,6 @@ public class Pipeline extends OpenCvPipeline {
         telemetry.update();
 
         imageROI.release();
-
         return input;
 
     }
@@ -153,8 +153,8 @@ public class Pipeline extends OpenCvPipeline {
 
         Imgproc.findContours(val, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        for (i = 0; i < contours.size(); i++) {
-            contour = contours.get(i);
+        for (j = 0; j < contours.size(); j++) {
+            contour = contours.get(j);
             area2 = Imgproc.contourArea(contour);
             if (area2 > maxArea) {
                 maxArea = area2;
