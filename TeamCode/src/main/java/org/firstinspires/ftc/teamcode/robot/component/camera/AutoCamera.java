@@ -23,7 +23,7 @@ public class AutoCamera extends CameraSuper {
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "camera");
         cvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
-        pipeline = new AutoPipeline(telemetry, true);
+        pipeline = new Pipeline(telemetry);//new AutoPipeline(telemetry, true);
 
         cvCamera.setPipeline(pipeline);
 

@@ -12,7 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class CameraSuper extends HardwareComponent {
 
     // Instance Variables
-    AutoPipeline pipeline;
+    Pipeline pipeline;
     OpenCvCamera cvCamera;
 
     public CameraSuper(HardwareMap hardwareMap, Telemetry telemetry) {
