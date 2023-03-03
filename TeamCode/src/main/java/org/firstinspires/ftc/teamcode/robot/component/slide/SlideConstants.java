@@ -87,4 +87,8 @@ public class SlideConstants {
     /* == Slides General == */
     public static double S_SET_POSITION_THRESHOLD = 20;
     public static double S_RUN_TO_POSITION_POWER = 0.75;
+
+
+    // REMOVE ONCE CURRENT ALERT TESTING IS FINISHED
+    public static double CURRENT_ALERT = 100000;
 }

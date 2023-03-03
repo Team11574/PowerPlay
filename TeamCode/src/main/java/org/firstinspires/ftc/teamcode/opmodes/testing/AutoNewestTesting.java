@@ -354,7 +354,7 @@ public class AutoNewestTesting extends RobotLinearOpMode {
     }
 
     void nap(double milliseconds) {
-        nap(milliseconds, 10);
+        nap(milliseconds, 1);
     }
 
     void nap(double milliseconds, double refreshTime) {
