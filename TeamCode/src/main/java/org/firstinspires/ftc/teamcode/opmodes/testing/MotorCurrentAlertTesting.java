@@ -25,7 +25,7 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
     @Override
     public void init() {
         testing_M = hardwareMap.get(DcMotorEx.class, "testing_M");
-        testing_M.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        testing_M.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         tel = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         tel.addData("Starting Current Alert", testing_M.getCurrentAlert(CurrentUnit.MILLIAMPS));
         tel.update();
