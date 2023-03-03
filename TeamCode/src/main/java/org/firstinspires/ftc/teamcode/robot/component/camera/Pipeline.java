@@ -45,6 +45,7 @@ public class Pipeline extends OpenCvPipeline {
     int maxIndex;
 
     double area;
+    double area2;
     double maxArea;
 
     ArrayList<Integer> parkingList = new ArrayList<Integer>();
@@ -123,6 +124,14 @@ public class Pipeline extends OpenCvPipeline {
 
         parkingList.add(maxIndex + 1);
 
+        telemetry.addData("Array", areas);
+        telemetry.addData("Orange Area", areas.get(0));
+        telemetry.addData("Purple Area", areas.get(1));
+        telemetry.addData("Green Area", areas.get(2));
+        telemetry.addData("Max Area", maxArea);
+        telemetry.addData("Max Index+1", maxIndex+1);
+        telemetry.update();
+
         imageROI.release();
 
         return input;
@@ -146,9 +155,9 @@ public class Pipeline extends OpenCvPipeline {
 
         for (i = 0; i < contours.size(); i++) {
             contour = contours.get(i);
-            area = Imgproc.contourArea(contour);
-            if (area > maxArea) {
-                maxArea = area;
+            area2 = Imgproc.contourArea(contour);
+            if (area2 > maxArea) {
+                maxArea = area2;
             }
             contour.release();
         }

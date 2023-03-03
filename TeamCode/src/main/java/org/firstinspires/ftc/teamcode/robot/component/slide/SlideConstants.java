@@ -90,5 +90,5 @@ public class SlideConstants {
 
 
     // REMOVE ONCE CURRENT ALERT TESTING IS FINISHED
-    public static double CURRENT_ALERT = 100000;
+    public static double CURRENT_ALERT = 30000;
 }
