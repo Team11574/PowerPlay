@@ -142,36 +142,39 @@ public class Pipeline extends OpenCvPipeline {
             e.printStackTrace();
             return input;
         }
-
     }
 
-    public double getArea(Mat input, List<Scalar> colorRange) {
-        procFrame = input.clone();
+    public double getArea(Mat input, List<Scalar> colorRange){
+        try {
+            procFrame = input.clone();
 
-        maxArea = 0;
+            maxArea = 0;
 
-        Core.inRange(procFrame, colorRange.get(0), colorRange.get(1), mask);
+            Core.inRange(procFrame, colorRange.get(0), colorRange.get(1), mask);
 
-        Core.split(procFrame, channels);
+            Core.split(procFrame, channels);
 
-        Core.bitwise_and(channels.get(2), mask, val);
+            Core.bitwise_and(channels.get(2), mask, val);
 
-        contours.clear();
+            contours.clear();
 
-        Imgproc.findContours(val, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(val, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        for (j = 0; j < contours.size(); j++) {
-            contour = contours.get(j);
-            area2 = Imgproc.contourArea(contour);
-            if (area2 > maxArea) {
-                maxArea = area2;
+            for (j = 0; j < contours.size(); j++) {
+                contour = contours.get(j);
+                area2 = Imgproc.contourArea(contour);
+                if (area2 > maxArea) {
+                    maxArea = area2;
+                }
+                contour.release();
             }
-            contour.release();
+
+            procFrame.release();
+
+            return maxArea;
+        } catch (ConcurrentModificationException c) {
+            return 0;
         }
-
-        procFrame.release();
-
-        return maxArea;
     }
 
     /**
@@ -181,11 +184,14 @@ public class Pipeline extends OpenCvPipeline {
      * @return parking spot
      */
     public int getParkingSpot() {
-        if (parkingList.size() > SAMPLES) {
-            return mode(parkingList.subList(Math.max(parkingList.size() - (SAMPLES + 1), 0), parkingList.size()));
-        }
-        else {
-            return mode(parkingList);
+        try {
+            if (parkingList.size() > SAMPLES) {
+                return mode(parkingList.subList(Math.max(parkingList.size() - (SAMPLES + 1), 0), parkingList.size()));
+            } else {
+                return mode(parkingList);
+            }
+        } catch (ConcurrentModificationException c) {
+            return 2;
         }
     }
 
@@ -196,24 +202,28 @@ public class Pipeline extends OpenCvPipeline {
      * @return mode
      */
     static int mode(List<Integer> a) {
-        int output = 2, maxCount = 0;
-        int i;
-        int j;
+        try {
+            int output = 2, maxCount = 0;
+            int i;
+            int j;
 
-        for (i = 0; i < a.size(); ++i) {
-            int count = 0;
-            for (j = 0; j < a.size(); ++j) {
-                if (a.get(j) == a.get(i))
-                    ++count;
+            for (i = 0; i < a.size(); ++i) {
+                int count = 0;
+                for (j = 0; j < a.size(); ++j) {
+                    if (a.get(j) == a.get(i))
+                        ++count;
+                }
+
+                if (count > maxCount) {
+                    maxCount = count;
+                    output = a.get(i);
+                }
             }
 
-            if (count > maxCount) {
-                maxCount = count;
-                output = a.get(i);
-            }
+            return output;
+        } catch (ConcurrentModificationException c) {
+            return 2;
         }
-
-        return output;
     }
 
     /**
