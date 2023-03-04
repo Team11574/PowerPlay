@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing;
+package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
@@ -12,8 +13,10 @@ import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
-@Autonomous(name = "AUTO Newest Testing", group = "testing")
-public class AutoNewestTesting extends RobotLinearOpMode {
+import java.util.concurrent.TimeUnit;
+
+@Autonomous(name = "AUTO Right 3 Cone", group = "auto", preselectTeleOp = "Tele")
+public class AutoRight3Cone extends RobotLinearOpMode {
     // Instance variables
     MultipleTelemetry multiTelemetry;
     Scheduler scheduler;
@@ -21,6 +24,7 @@ public class AutoNewestTesting extends RobotLinearOpMode {
     TrajectorySequence initialPos;
     TrajectorySequence moveLeft;
     TrajectorySequence moveRight;
+    ElapsedTime timer;
 
     @Override
     public void runOpMode() {
@@ -29,13 +33,17 @@ public class AutoNewestTesting extends RobotLinearOpMode {
         // drive.trajectorySequenceBuilder(new Pose2d(36, -61.5, Math.toRadians(90)))
         // Forward 57, left 2, rotate 160 degrees
 
-        this.robot = new Robot(hardwareMap, telemetry, true);
+        multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+
+        this.robot = new Robot(hardwareMap, multiTelemetry, true);
 
         drivetrain = robot.drivetrain;
 
-        multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         scheduler = new Scheduler();
+
+        timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
         //Pose2d startPos = new Pose2d(36, 62.5, Math.toRadians(270));
         Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
@@ -132,11 +140,11 @@ public class AutoNewestTesting extends RobotLinearOpMode {
                 drivetrain.update();
             robot.update();
             scheduler.update();
-            telemetry.addData("IsBusy", drivetrain.isBusy());
-            telemetry.addData("NotAtVerticalPos", !robot.verticalSlide.atSetPosition());
-            telemetry.addData("VerticalTarget", robot.verticalSlide.getTargetPosition());
-            telemetry.addData("NotAtHorizontalPos", !robot.horizontalSlide.atSetPosition());
-            telemetry.update();
+            multiTelemetry.addData("IsBusy", drivetrain.isBusy());
+            multiTelemetry.addData("NotAtVerticalPos", !robot.verticalSlide.atSetPosition());
+            multiTelemetry.addData("VerticalTarget", robot.verticalSlide.getTargetPosition());
+            multiTelemetry.addData("NotAtHorizontalPos", !robot.horizontalSlide.atSetPosition());
+            multiTelemetry.update();
         }
 
         // Adjust arm
@@ -164,13 +172,13 @@ public class AutoNewestTesting extends RobotLinearOpMode {
             robot.update();
             scheduler.update();
 
-            telemetry.addData("IsRetracting", robot.isRetracting);
-            telemetry.addData("IsBusy", drivetrain.isBusy());
-            telemetry.addData("HasQueries", scheduler.hasGlobalQueries());
-            telemetry.addData("NotAtVerticalPos", !robot.verticalSlide.atSetPosition());
-            telemetry.addData("VerticalTarget", robot.verticalSlide.getTargetPosition());
-            telemetry.addData("VerticalPos", robot.verticalSlide.getPosition());
-            telemetry.update();
+            multiTelemetry.addData("IsRetracting", robot.isRetracting);
+            multiTelemetry.addData("IsBusy", drivetrain.isBusy());
+            multiTelemetry.addData("HasQueries", scheduler.hasGlobalQueries());
+            multiTelemetry.addData("NotAtVerticalPos", !robot.verticalSlide.atSetPosition());
+            multiTelemetry.addData("VerticalTarget", robot.verticalSlide.getTargetPosition());
+            multiTelemetry.addData("VerticalPos", robot.verticalSlide.getPosition());
+            multiTelemetry.update();
         }
         robot.update();
         // Swap cone
@@ -347,14 +355,23 @@ public class AutoNewestTesting extends RobotLinearOpMode {
     }
 
     void park(int parkingSpot) {
-        telemetry.addLine("Attempting to park in space " + parkingSpot);
+        multiTelemetry.addLine("Attempting to park in space " + parkingSpot);
         if (!isStopRequested())
             drivetrain.followTrajectorySequence(spots[parkingSpot - 1]);
 
     }
 
     void nap(double milliseconds) {
-        nap(milliseconds, 1);
+        timer.reset();
+        while (timer.time(TimeUnit.MILLISECONDS) <= milliseconds) {
+            robot.update();
+        }
+    }
+
+    /*
+
+    void nap(double milliseconds) {
+        nap(milliseconds, 5);
     }
 
     void nap(double milliseconds, double refreshTime) {
@@ -366,4 +383,5 @@ public class AutoNewestTesting extends RobotLinearOpMode {
         if (remainder != 0)
             sleep((long) remainder);
     }
+     */
 }

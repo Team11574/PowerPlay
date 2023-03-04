@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing;
+package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
@@ -13,12 +13,16 @@ import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
-@Autonomous(name = "AUTO New Testing", group = "testing")
-public class AutoNewTesting extends RobotLinearOpMode {
+import java.util.concurrent.TimeUnit;
+
+@Autonomous(name = "AUTO Right 4 Cone", group = "auto", preselectTeleOp = "Tele")
+public class AutoRight4Cone extends RobotLinearOpMode {
     // Instance variables
     MultipleTelemetry multiTelemetry;
     Scheduler scheduler;
     TrajectorySequence[] spots;
+
+    ElapsedTime timer;
 
     @Override
     public void runOpMode() {
@@ -34,6 +38,8 @@ public class AutoNewTesting extends RobotLinearOpMode {
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         scheduler = new Scheduler();
+
+        timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
         //Pose2d startPos = new Pose2d(36, 62.5, Math.toRadians(270));
         Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
@@ -107,7 +113,6 @@ public class AutoNewTesting extends RobotLinearOpMode {
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         drivetrain.followTrajectorySequence(initialPos);
         runCones();
-        sleep(8000);
 
         drivetrain.followTrajectorySequence(readjustPos);
         park(parkingSpot);
@@ -121,7 +126,7 @@ public class AutoNewTesting extends RobotLinearOpMode {
         robot.depositCone();
         robot.lever.goToSetPosition(Lever.LeverPosition.FIFTH); // 5th cone height
         robot.levelHinge();
-        robot.horizontalSlide.setTargetPosition(1630);
+        robot.horizontalSlide.setTargetPosition(1620);
         robot.horizontalClaw.open();
         while (robot.isDepositing) {
             robot.update();
@@ -134,10 +139,10 @@ public class AutoNewTesting extends RobotLinearOpMode {
         }
 
         robot.horizontalClaw.close();
-        sleep(250);
+        nap(250);
         robot.retractArm(false, true);
         robot.waitForRetract();
-        sleep(350);
+        nap(350);
         robot.verticalClaw.close();
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         scheduler.linearSchedule(
@@ -158,7 +163,7 @@ public class AutoNewTesting extends RobotLinearOpMode {
         robot.waitForDeposit();
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
         robot.horizontalClaw.close();
-        sleep(350);
+        nap(350);
         robot.retractArm(false, false);
 
         while (!robot.verticalSlide.atSetPosition()) {
@@ -166,9 +171,9 @@ public class AutoNewTesting extends RobotLinearOpMode {
             robot.update();
         }
         robot.waitForRetract(); // double check horizontal is completed
-        sleep(500);
+        nap(500);
         robot.horizontalClaw.open();
-        sleep(250);
+        nap(250);
         robot.verticalClaw.close();
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         scheduler.linearSchedule(
@@ -189,7 +194,7 @@ public class AutoNewTesting extends RobotLinearOpMode {
         robot.waitForDeposit();
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
         robot.horizontalClaw.close();
-        sleep(350);
+        nap(350);
         robot.retractArm(false, false);
 
         while (!robot.verticalSlide.atSetPosition()) {
@@ -197,9 +202,9 @@ public class AutoNewTesting extends RobotLinearOpMode {
             robot.update();
         }
         robot.waitForRetract(); // double check horizontal is completed
-        sleep(500);
+        nap(500);
         robot.horizontalClaw.open();
-        sleep(250);
+        nap(250);
         robot.verticalClaw.close();
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         while (!robot.verticalSlide.atSetPosition()) {
@@ -216,5 +221,12 @@ public class AutoNewTesting extends RobotLinearOpMode {
         if (!isStopRequested())
             drivetrain.followTrajectorySequence(spots[parkingSpot - 1]);
 
+    }
+
+    void nap(double milliseconds) {
+        timer.reset();
+        while (timer.time(TimeUnit.MILLISECONDS) <= milliseconds) {
+            robot.update();
+        }
     }
 }

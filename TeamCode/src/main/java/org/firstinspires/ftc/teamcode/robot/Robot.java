@@ -195,6 +195,7 @@ public class Robot extends Component {
     public void retractArm(boolean doReturn) {
         retractArm(doReturn, false);
     }
+
     public void retractArm(boolean doReturn, boolean drop) {
         if (!isRetracting) {
             isRetracting = true;
@@ -258,14 +259,16 @@ public class Robot extends Component {
     public void waitForRetract() {
         // NOT ASYNC
         while (isRetracting) {
-            horizontalScheduler.update();
+            //horizontalScheduler.update();
+            update();
         }
     }
 
     public void waitForDeposit() {
         // NOT ASYNC
         while(isDepositing) {
-            verticalScheduler.update();
+            //verticalScheduler.update();
+            update();
         }
     }
 
@@ -292,7 +295,7 @@ public class Robot extends Component {
                     then -> {
                         verticalClaw.open();
                     },
-                    650
+                    750
             );
         }
     }

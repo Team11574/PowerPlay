@@ -161,7 +161,7 @@ public class Tele extends RobotOpMode {
                 if (levellingEnabled && !yRetraction)
                     robot.levelHinge();
             }
-            robot.moveTurret(-pad2.get_partitioned_right_stick_x());
+            robot.moveTurret(pad2.get_partitioned_right_stick_x());
         }
 
         fullTelemetry();

@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_KG;
-
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
-@Autonomous(name = "AUTO Cone Left", group = "auto", preselectTeleOp = "Tele")
-public class AutoConeLeft extends RobotLinearOpMode {
+@Autonomous(name = "AUTO Right 1 Cone", group = "auto", preselectTeleOp = "Tele")
+public class AutoRight1Cone extends RobotLinearOpMode {
     // Instance variables
     TrajectorySequence spot1;
     TrajectorySequence spot2;
@@ -22,11 +22,14 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
     Scheduler scheduler;
 
+    MultipleTelemetry tel;
+
 
     @Override
     public void runOpMode() {
         //super.runOpMode();
-        this.robot = new Robot(hardwareMap, telemetry, true);
+        tel = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        this.robot = new Robot(hardwareMap, tel, true);
 
         drivetrain = robot.drivetrain;
 
@@ -90,6 +93,10 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
         drivetrain.followTrajectorySequence(cone);
 
+        runCone();
+
+        /*
+
         //robot.verticalSlide.goToTop();
 
         while (!robot.verticalSlide.goToPositionConstant(VerticalSlide.SetPosition.AUTO)){ //!robot.verticalSlide.atSetPosition()) {
@@ -131,7 +138,7 @@ public class AutoConeLeft extends RobotLinearOpMode {
         }
         robot.verticalClaw.close();
         robot.verticalFlip.flipUp();
-         */
+
 
         robot.depositCone();
         while (robot.verticalScheduler.hasLinearQueries()) {
@@ -152,6 +159,7 @@ public class AutoConeLeft extends RobotLinearOpMode {
             telemetry.addData("Mode", robot.verticalSlide.motors[0].getMode());
             telemetry.update();
         }
+         */
 
         telemetry.addLine("Yippee!");
         telemetry.update();
@@ -160,10 +168,27 @@ public class AutoConeLeft extends RobotLinearOpMode {
 
     }
 
+    void runCone() {
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        while(!robot.verticalSlide.atSetPosition()) {
+            robot.update();
+        }
+        robot.depositCone();
+        robot.waitForDeposit();
+        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        while (!robot.verticalSlide.atSetPosition()) {
+            robot.update();
+        }
+    }
+
     void park(int parkingSpot) {
         telemetry.addLine("Attempting to park in space " + parkingSpot);
-        if (!isStopRequested())
-            drivetrain.followTrajectorySequence(spots[parkingSpot - 1]);
-
+        if (!isStopRequested()) {
+            drivetrain.followTrajectorySequenceAsync(spots[parkingSpot - 1]);
+            while (drivetrain.isBusy()) {
+                drivetrain.update();
+                robot.update();
+            }
+        }
     }
 }

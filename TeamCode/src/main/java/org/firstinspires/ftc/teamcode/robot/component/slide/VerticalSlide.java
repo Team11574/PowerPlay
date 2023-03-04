@@ -67,6 +67,8 @@ public class VerticalSlide extends MotorGroup {
     }
 
     public void setPower(double power) {
+        if (disabled)
+            return;
         if (Math.abs(power) < 0.1 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
             // In RUN_TO_POSITION MODE
             if (Math.signum(getTargetPosition() - getPosition()) == stopDirection && stopDirection != 0) {
@@ -124,6 +126,7 @@ public class VerticalSlide extends MotorGroup {
 
     @Override
     public void update() {
+        super.update();
         if (disabled) return;
 
         // If switch is pressed
@@ -144,6 +147,7 @@ public class VerticalSlide extends MotorGroup {
             }
         }
 
+        /*
         for (DcMotorEx motor : motors) {
             if (motor.isOverCurrent()) {
                 disabled = true;
@@ -151,13 +155,16 @@ public class VerticalSlide extends MotorGroup {
         }
 
         if (disabled) disable_slide();
+         */
     }
 
+    /*
     public void disable_slide() {
         for (DcMotorEx motor : motors) {
             motor.setMotorDisable();
         }
     }
+     */
 
     public enum SetPosition {
         GROUND,

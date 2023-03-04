@@ -15,6 +15,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 public class Pipeline extends OpenCvPipeline {
@@ -89,52 +90,58 @@ public class Pipeline extends OpenCvPipeline {
      */
     @Override
     public Mat processFrame(Mat input) {
-        if (stopped) {
+        try {
+            if (stopped) {
+                return input;
+            }
+
+            if (imageROI != null)
+                imageROI.release();
+
+            // Clone input to imageROI
+            imageROI = input.clone();
+
+            // Makes input to HSV from RGB image
+            Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
+
+
+            // Creates a region of interest in the middle of the frame
+            imageROI = imageROI.adjustROI(
+                    -searchZone.y,
+                    -(searchZone.height + searchZone.y) + 320,
+                    -searchZone.x,
+                    -(searchZone.width + searchZone.x) + 240
+            );
+
+            // === Find largest area ===
+            areas.clear();
+            for (i = 0; i < colorRanges.size(); i++) {
+                colorRange = colorRanges.get(i);
+
+                area = getArea(imageROI, colorRange);
+                areas.add(area);
+            }
+
+            maxArea = Collections.max(areas);
+            maxIndex = areas.indexOf(maxArea);
+
+            parkingList.add(maxIndex + 1);
+
+            telemetry.addData("Array", areas);
+            telemetry.addData("Orange Area", areas.get(0));
+            telemetry.addData("Purple Area", areas.get(1));
+            telemetry.addData("Green Area", areas.get(2));
+            telemetry.addData("Max Area", maxArea);
+            telemetry.addData("Max Index+1", maxIndex + 1);
+            telemetry.update();
+
+            imageROI.release();
             return input;
         }
-
-        if (imageROI != null)
-            imageROI.release();
-
-        // Clone input to imageROI
-        imageROI = input.clone();
-
-        // Makes input to HSV from RGB image
-        Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
-
-
-        // Creates a region of interest in the middle of the frame
-        imageROI = imageROI.adjustROI(
-                -searchZone.y,
-                -(searchZone.height + searchZone.y) + 320,
-                -searchZone.x,
-                -(searchZone.width + searchZone.x) + 240
-        );
-
-        // === Find largest area ===
-        areas.clear();
-        for (i = 0; i < colorRanges.size(); i++) {
-            colorRange = colorRanges.get(i);
-
-            area = getArea(imageROI, colorRange);
-            areas.add(area);
+        catch (ConcurrentModificationException e) {
+            e.printStackTrace();
+            return input;
         }
-
-        maxArea = Collections.max(areas);
-        maxIndex = areas.indexOf(maxArea);
-
-        parkingList.add(maxIndex + 1);
-
-        telemetry.addData("Array", areas);
-        telemetry.addData("Orange Area", areas.get(0));
-        telemetry.addData("Purple Area", areas.get(1));
-        telemetry.addData("Green Area", areas.get(2));
-        telemetry.addData("Max Area", maxArea);
-        telemetry.addData("Max Index+1", maxIndex+1);
-        telemetry.update();
-
-        imageROI.release();
-        return input;
 
     }
 

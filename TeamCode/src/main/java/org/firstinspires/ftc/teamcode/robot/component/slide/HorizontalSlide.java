@@ -40,6 +40,9 @@ public class HorizontalSlide extends MotorGroup {
     }
 
     public void setPower(double power) {
+        if (disabled)
+            return;
+
         if (Math.abs(power) < 0.1 && motors[0].getMode() == DcMotorEx.RunMode.RUN_TO_POSITION) {
             return;
         }
@@ -60,6 +63,7 @@ public class HorizontalSlide extends MotorGroup {
 
     @Override
     public void update() {
+        super.update();
         if (getPosition() > MAX_ENCODER_POSITION - HS_BRAKE_THRESHOLD) {
             stopDirection = 1;
         } else if (getPosition() < MIN_ENCODER_POSITION + HS_BRAKE_THRESHOLD) {

@@ -55,7 +55,7 @@ public class SlideConstants {
     public static double HS_SP_HIGH = 20;
 
     public static double HS_CLAW_OPEN = 0.5;
-    public static double HS_CLAW_CLOSED = 0.75;
+    public static double HS_CLAW_CLOSED = 0.78;
 
 
     public static double HS_TURRET_START = 0.88;
@@ -63,7 +63,7 @@ public class SlideConstants {
     public static double HS_TURRET_MAX = 1;
     public static double HS_TURRET_SPEED = 0.02;
 
-    public static double HS_HINGE_START = 0.505;
+    public static double HS_HINGE_START = 0.56; // 0.505;
     public static double HS_HINGE_SPEED = 0.01;
 
     public static double HS_LEVER_IN = 0.7;
@@ -72,7 +72,7 @@ public class SlideConstants {
     public static double HS_LEVER_FOURTH = 0.275;
     public static double HS_LEVER_THIRD = 0.23;
     public static double HS_LEVER_SECOND = 0.19;
-    public static double HS_LEVER_OUT = 0.1;
+    public static double HS_LEVER_OUT = 0.13;
 
     public static double HS_LEVER_SPEED = 0.03;
     // Extra Hinge Levelling Variables
@@ -90,5 +90,7 @@ public class SlideConstants {
 
 
     // REMOVE ONCE CURRENT ALERT TESTING IS FINISHED
-    public static double CURRENT_ALERT = 30000;
+    public static double CURRENT_ALERT = 10000;
+    public static double CURRENT_ALERT_STOPPED = 7500;
+    public static double VELOCITY_STOP_THRESHOLD = 100;
 }

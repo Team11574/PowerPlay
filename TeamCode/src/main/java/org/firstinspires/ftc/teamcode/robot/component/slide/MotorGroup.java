@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.robot.component.slide;
 
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.CURRENT_ALERT_STOPPED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_RUN_TO_POSITION_POWER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_SET_POSITION_THRESHOLD;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VELOCITY_STOP_THRESHOLD;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
 
@@ -26,6 +30,8 @@ public class MotorGroup extends HardwareComponent {
     double lastPower = 0;
 
     public DcMotorEx[] motors;
+
+    boolean disabled = false;
 
     public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx motor, double ticksPerInch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{motor}, ticksPerInch);
@@ -65,6 +71,9 @@ public class MotorGroup extends HardwareComponent {
     }
 
     public void setPower(double power) {
+        if (disabled)
+            return;
+
         if (power == 0 && motors[0].getMode() == DcMotorEx.RunMode.RUN_TO_POSITION) {
             return;
         }
@@ -108,6 +117,8 @@ public class MotorGroup extends HardwareComponent {
     }
 
     public void setTargetPosition(int position) {
+        if (disabled)
+            return;
         // Run to position needs some power value to run at, default is 1
         RUN_TO_POSITION_POWER = Math.min(RUN_TO_POSITION_POWER * maxPower, maxPower);
 
@@ -214,6 +225,27 @@ public class MotorGroup extends HardwareComponent {
     }
 
     public void update() {
-        // do nothing
+        if (disabled) {
+            telemetry.addData("DISABLED", this.getClass());
+            return;
+        }
+        for (DcMotorEx motor : motors) {
+            boolean overCurrent = motor.isOverCurrent();
+            boolean overStopCurrent = (motor.getCurrent(CurrentUnit.MILLIAMPS) > CURRENT_ALERT_STOPPED &&
+                    motor.getVelocity() < VELOCITY_STOP_THRESHOLD);
+            if (overCurrent || overStopCurrent) {
+                disable();
+                break;
+            }
+        }
+    }
+
+    public void disable() {
+        disabled = true;
+        for (DcMotorEx motor : motors) {
+            motor.setMotorDisable();
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
 }
