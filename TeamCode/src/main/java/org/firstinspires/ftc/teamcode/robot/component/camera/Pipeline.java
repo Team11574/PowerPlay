@@ -127,12 +127,12 @@ public class Pipeline extends OpenCvPipeline {
 
             parkingList.add(maxIndex + 1);
 
-            telemetry.addData("Array", areas);
-            telemetry.addData("Orange Area", areas.get(0));
-            telemetry.addData("Purple Area", areas.get(1));
-            telemetry.addData("Green Area", areas.get(2));
+            //telemetry.addData("Array", areas);
+            //telemetry.addData("Orange Area", areas.get(0));
+            //telemetry.addData("Purple Area", areas.get(1));
+            //telemetry.addData("Green Area", areas.get(2));
             telemetry.addData("Max Area", maxArea);
-            telemetry.addData("Max Index+1", maxIndex + 1);
+            telemetry.addData("Zone", maxIndex + 1);
             telemetry.update();
 
             imageROI.release();

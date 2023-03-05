@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.TimeUnit;
 
 @Autonomous(name = "AUTO Right 3 Cone", group = "auto", preselectTeleOp = "Tele")
@@ -22,74 +23,79 @@ public class AutoRight3Cone extends RobotLinearOpMode {
     Scheduler scheduler;
     TrajectorySequence[] spots;
     TrajectorySequence initialPos;
+    TrajectorySequence readjustPos;
     TrajectorySequence moveLeft;
     TrajectorySequence moveRight;
     ElapsedTime timer;
+    int parkingSpot = 2;
 
     @Override
     public void runOpMode() {
-        //super.runOpMode();
+        try {
+            //super.runOpMode();
 
-        // drive.trajectorySequenceBuilder(new Pose2d(36, -61.5, Math.toRadians(90)))
-        // Forward 57, left 2, rotate 160 degrees
+            // drive.trajectorySequenceBuilder(new Pose2d(36, -61.5, Math.toRadians(90)))
+            // Forward 57, left 2, rotate 160 degrees
 
-        multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-
-        this.robot = new Robot(hardwareMap, multiTelemetry, true);
-
-        drivetrain = robot.drivetrain;
+            multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
-        scheduler = new Scheduler();
+            this.robot = new Robot(hardwareMap, multiTelemetry, true);
 
-        timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+            drivetrain = robot.drivetrain;
 
-        //Pose2d startPos = new Pose2d(36, 62.5, Math.toRadians(270));
-        Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
-        //Pose2d startPos = new Pose2d(-36, 5.5, Math.toRadians(270));
-        //Pose2d startPos = new Pose2d(0, 0, 0);//Math.toRadians(270));
-        drivetrain.setPoseEstimate(startPos);
-        initialPos = drivetrain.trajectorySequenceBuilder(startPos)
-                .lineToLinearHeading(new Pose2d(36, -1, Math.toRadians(182)))
-                .lineToLinearHeading(new Pose2d(33, -1, Math.toRadians(182)))
-                .build();
-        // first cone stuff
-        moveLeft = drivetrain.trajectorySequenceBuilder(initialPos.end())
-                .strafeLeft(13)
-                .build();
 
-        moveRight = drivetrain.trajectorySequenceBuilder(moveLeft.end())
-                .strafeRight(13)
-                .build();
+            scheduler = new Scheduler();
 
-        TrajectorySequence readjustPos = drivetrain.trajectorySequenceBuilder(initialPos.end())
-                //.strafeLeft(3)
-                .lineToLinearHeading(new Pose2d(36, -12, Math.toRadians(90)))
-                //.back(4)
-                .build();
+            timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
-        TrajectorySequence spot1 = drivetrain.trajectorySequenceBuilder(readjustPos.end())
-                .strafeLeft(24)
-                //.back(21.5)
-                .build();
+            //Pose2d startPos = new Pose2d(36, 62.5, Math.toRadians(270));
+            Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
+            //Pose2d startPos = new Pose2d(-36, 5.5, Math.toRadians(270));
+            //Pose2d startPos = new Pose2d(0, 0, 0);//Math.toRadians(270));
+            drivetrain.setPoseEstimate(startPos);
+            initialPos = drivetrain.trajectorySequenceBuilder(startPos)
+                    .lineToLinearHeading(new Pose2d(36, 1, Math.toRadians(182)))
+                    .lineToLinearHeading(new Pose2d(33, 1, Math.toRadians(182)))
+                    .build();
+            // first cone stuff
+            moveLeft = drivetrain.trajectorySequenceBuilder(initialPos.end())
+                    .strafeLeft(14)
+                    .build();
 
-        TrajectorySequence spot2 = drivetrain.trajectorySequenceBuilder(readjustPos.end())
-                .back(2)
-                //.back(21.5)
-                .build();
+            moveRight = drivetrain.trajectorySequenceBuilder(moveLeft.end())
+                    .strafeRight(14)
+                    .build();
 
-        TrajectorySequence spot3 = drivetrain.trajectorySequenceBuilder(readjustPos.end())
-                .strafeRight(22)
-                //.back(21.5)
-                .build();
+            readjustPos = drivetrain.trajectorySequenceBuilder(initialPos.end())
+                    //.strafeLeft(3)
+                    .lineToLinearHeading(new Pose2d(36, -12, Math.toRadians(90)))
+                    //.back(4)
+                    .build();
 
-        spots = new TrajectorySequence[]{spot1, spot2, spot3};
+            TrajectorySequence spot1 = drivetrain.trajectorySequenceBuilder(readjustPos.end())
+                    .strafeLeft(24)
+                    //.back(21.5)
+                    .build();
 
-        waitForStart();
-        robot.autoCamera.terminateCamera();
+            TrajectorySequence spot2 = drivetrain.trajectorySequenceBuilder(readjustPos.end())
+                    .back(2)
+                    //.back(21.5)
+                    .build();
 
-        int parkingSpot = robot.getParkingSpot();
+            TrajectorySequence spot3 = drivetrain.trajectorySequenceBuilder(readjustPos.end())
+                    .strafeRight(22)
+                    //.back(21.5)
+                    .build();
+
+            spots = new TrajectorySequence[]{spot1, spot2, spot3};
+
+            waitForStart();
+            robot.autoCamera.terminateCamera();
+            parkingSpot = robot.getParkingSpot();
+        } catch (ConcurrentModificationException e) {
+            multiTelemetry.addData("Concurrent Mod Exception:", e.toString());
+        }
 
         if (isStopRequested()) return;
 
@@ -98,7 +104,11 @@ public class AutoRight3Cone extends RobotLinearOpMode {
         moveToPoleAndBack(Lever.LeverPosition.FIFTH, true);
         moveToPoleAndBack(Lever.LeverPosition.FOURTH, false);
 
-        drivetrain.followTrajectorySequence(readjustPos);
+        drivetrain.followTrajectorySequenceAsync(readjustPos);
+        while (drivetrain.isBusy()) {
+            drivetrain.update();
+            robot.update();
+        }
         park(parkingSpot);
 
         multiTelemetry.addLine("Yippee!");
