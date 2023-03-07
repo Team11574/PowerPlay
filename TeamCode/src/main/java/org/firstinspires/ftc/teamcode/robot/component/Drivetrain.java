@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.component;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -28,6 +30,14 @@ public class Drivetrain extends SampleMecanumDrive {
 
     public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] motors) {
         this(hardwareMap, telemetry, motors[0], motors[1], motors[2], motors[3]);
+    }
+
+    /**
+     * Find what field tile the robot is in by ID with format /[1-6][A-F])/g
+     * Maybe move to a TileCalculation file?
+     */
+    public void getCurrentTileID() {
+
     }
     
 
