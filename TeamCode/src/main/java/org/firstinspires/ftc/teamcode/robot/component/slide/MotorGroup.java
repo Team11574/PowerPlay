@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
+import static org.firstinspires.ftc.teamcode.util.Generic.withinThreshold;
 
 import java.util.ArrayList;
 
@@ -101,9 +102,11 @@ public class MotorGroup extends HardwareComponent {
         return sum / motors.length;
     }
 
+    /*
     public static boolean withinThreshold(double currentValue, double targetValue, double threshold) {
         return Math.abs(currentValue - targetValue) <= threshold;
     }
+     */
 
     public boolean atSetPosition() { return atSetPosition(S_SET_POSITION_THRESHOLD); }
 

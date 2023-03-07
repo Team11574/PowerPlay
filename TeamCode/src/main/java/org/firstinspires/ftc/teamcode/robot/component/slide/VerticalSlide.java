@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_ENCODER_CENTER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_PIDF;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_TICKS_PER_IN;
+import static org.firstinspires.ftc.teamcode.util.Generic.withinThreshold;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
