@@ -46,15 +46,15 @@ public class TileCalculation {
         EF1,EF12,EF2,EF23,EF3,EF34,EF4,EF45,EF5,EF56,EF6,
         F1, F12, F2, F23, F3, F34, F4, F45, F5, F56, F6;
 
-        static int ROWS = 11;
-        static int COLS = 11;
+        static final int ROWS = 11;
+        static final int COLS = 11;
 
         public static FieldElement getElement(int row, int col) {
-            return FieldElement.values()[(row-1) * ROWS + (col-1)];
+            return FieldElement.values()[(row-1) * COLS + (col-1)];
         }
 
         public int getRow() {
-            return this.ordinal() / ROWS + 1;
+            return this.ordinal() / COLS + 1;
         }
 
         public int getCol() {
@@ -97,7 +97,8 @@ public class TileCalculation {
                 return Junction.GROUND;
             }
             // LOW
-            if (Arrays.asList(AB23, AB45,
+            if (Arrays.asList(
+                    AB23, AB45,
                     BC12, BC56,
                     DE12, DE56,
                     EF23, EF45
@@ -130,10 +131,6 @@ public class TileCalculation {
         LEFT,
         RIGHT,
     }
-
-    // t = new TileCalculation
-    // t.queueMove(UP) // DOWN, LEFT, RIGHT
-    // t.queueMoveToJunction(TOP_LEFT) // TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
 
     enum Junction {
         TOP_LEFT,
@@ -172,7 +169,7 @@ public class TileCalculation {
                 // Junction is already a direction, not a height
                 return junction;
             }
-            return HIGH;
+            return null;
         }
     }
 
@@ -184,8 +181,8 @@ public class TileCalculation {
         E1, E2, E3, E4, E5, E6,
         F1, F2, F3, F4, F5, F6;
 
-        static int ROWS = 6;
-        static int COLS = 6;
+        static final int ROWS = 6;
+        static final int COLS = 6;
 
         /**
          * Get a tile by row, column
@@ -194,7 +191,7 @@ public class TileCalculation {
          * @return Tile associated with row, column
          */
         public static Tile getTile(int row, int col) {
-            return Tile.values()[(row-1) * ROWS + (col-1)];
+            return Tile.values()[(row-1) * COLS + (col-1)];
         }
 
         public int[] getRowCol() {
@@ -202,7 +199,7 @@ public class TileCalculation {
         }
 
         public int getRow() {
-            return this.ordinal() / ROWS + 1;
+            return this.ordinal() / COLS + 1;
         }
 
         public int getCol() {
