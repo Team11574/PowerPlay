@@ -5,15 +5,19 @@ import static org.firstinspires.ftc.teamcode.util.Generic.clamp;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 
 import org.firstinspires.ftc.teamcode.robot.component.slide.MotorGroup;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+import java.util.Queue;
 import java.util.Vector;
 
 public class TileCalculation {
     Drivetrain drivetrain;
     Pose2d lastPose;
+    Tile targetTile;
+    Queue<Trajectory> trajectoryQueue;
     double MIN_X = -72; // in
     double MIN_Y = -72; // in
     double MAX_X = 72; // in
@@ -27,6 +31,28 @@ public class TileCalculation {
     public TileCalculation(Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
         lastPose = drivetrain.getPoseEstimate();
+        targetTile = getIDByVector();
+    }
+
+    enum Field {
+        A1, A12, A2, A23, A3, A34, A4, A45, A5, A56, A6,
+        AB1,AB12,AB2,AB23,AB3,AB34,AB4,AB45,AB5,AB56,AB6,
+        B1, B12, B2, B23, B3, B34, B4, B45, B5, B56, B6,
+        BC1,BC12,BC2,BC23,BC3,BC34,BC4,BC45,BC5,BC56,BC6,
+        C1, C12, C2, C23, C3, C34, C4, C45, C5, C56, C6,
+        CD1,CD12,CD2,CD23,CD3,CD34,CD4,CD45,CD5,CD56,CD6,
+        D1, D12, D2, D23, D3, D34, D4, D45, D5, D56, D6,
+        DE1,DE12,DE2,DE23,DE3,DE34,DE4,DE45,DE5,DE56,DE6,
+        E1, E12, E2, E23, E3, E34, E4, E45, E5, E56, E6,
+        EF1,EF12,EF2,EF23,EF3,EF34,EF4,EF45,EF5,EF56,EF6,
+        F1, F12, F2, F23, F3, F34, F4, F45, F5, F56, F6,
+    }
+
+    enum Move {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT,
     }
 
     enum Tile {
@@ -169,6 +195,74 @@ public class TileCalculation {
         );
     }
 
+    // queueMoveLeft();
+    // queueMove(TileCalculation.Move.LEFT);
+
+    public void queueAdd(Trajectory traj) {
+        trajectoryQueue.add(traj);
+    }
+
+    public void queueMove(Move direction) {
+        Tile nextTile;
+        Trajectory newTrajectorySegment1;
+        Trajectory newTrajectorySegment2;
+        Trajectory lastTrajectory;
+        double startHeading;
+        double endHeading;
+        Pose2d startPose;
+        switch (direction) {
+            case UP:
+                nextTile = targetTile.prevRow();
+                startHeading = Math.toRadians(90);
+                endHeading = Math.toRadians(90);
+                break;
+            case DOWN:
+                nextTile = targetTile.nextRow();
+                startHeading = Math.toRadians(270);
+                endHeading = Math.toRadians(270);
+                break;
+            case LEFT:
+                nextTile = targetTile.prevCol();
+                startHeading = Math.toRadians(180);
+                endHeading = Math.toRadians(180);
+                break;
+            case RIGHT:
+                nextTile = targetTile.nextCol();
+                startHeading = Math.toRadians(0);
+                endHeading = Math.toRadians(0);
+                break;
+            default:
+                return;
+        }
+        if (nextTile == targetTile) {
+            return;
+        }
+        // Remove the last half-square trajectory
+        lastTrajectory = trajectoryQueue.poll();
+        if (lastTrajectory != null) {
+            startHeading = lastTrajectory.end().getHeading();
+        }
+        if (trajectoryQueue.peek() != null) {
+            startPose = trajectoryQueue.peek().end();
+        } else {
+            startPose = drivetrain.getPoseEstimate();
+        }
+
+        // Add new full-square trajectory
+        newTrajectorySegment1 = drivetrain.trajectoryBuilder(startPose, startHeading)
+                .splineToConstantHeading(
+                        midpoint(getVectorByID(nextTile), getVectorByID(targetTile)),
+                        endHeading)
+                .build();
+        newTrajectorySegment2 = drivetrain.trajectoryBuilder(newTrajectorySegment1.end())
+                .splineToConstantHeading(
+                        getVectorByID(nextTile),
+                        endHeading)
+                .build();
+        queueAdd(newTrajectorySegment1);
+        queueAdd(newTrajectorySegment2);
+    }
+
     /**
      * Create a smooth trajectory between the current tile and a given end tile.
      * @param end Tile ID to end at.
@@ -184,7 +278,9 @@ public class TileCalculation {
      * @param end Tile ID to end at.
      * @return TrajectorySequence trajectory to follow.
      */
+    // UNUSED
     public TrajectorySequence buildTrajectoryToTile(Tile start, Tile end) {
+        // Suppose start = B1, end = E3
         // TODO: Complete
         return null;
     }

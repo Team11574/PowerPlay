@@ -13,7 +13,9 @@ public class MeepMeepTesting {
         double deltaX = 0.5;
 
         //Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
-        Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
+        // Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
+        Pose2d startPos = new Pose2d(36, 32.5, Math.toRadians(270));
+
 
         // Forward 57, left 2, rotate 160 degrees
 
@@ -23,6 +25,14 @@ public class MeepMeepTesting {
                 .setDimensions(16.5, 17)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPos)
+                                .setTangent(Math.toRadians(90))
+                                .splineToConstantHeading(new Vector2d(36, 60), Math.toRadians(90))
+                                .setTangent(Math.toRadians(180))
+                                //.spl
+                                //.splineToConstantHeading(new Vector2d(36, -36), Math.toRadians(90))
+                                //.splineToConstantHeading(new Vector2d(36, 0), Math.toRadians(90))
+                                //.splineToConstantHeading(new Vector2d(24, 12), Math.toRadians(180))
+                                //.splineToConstantHeading(new Vector2d(12, 12), Math.toRadians(180))
                                 /*
                                 .forward(58)
                                 .back(3)
@@ -40,8 +50,9 @@ public class MeepMeepTesting {
                                 .lineToLinearHeading(new Pose2d(startPos.component1() - 1.5, startPos.component2() + 58.5, Math.toRadians(171)))
                                 .lineToLinearHeading(new Pose2d(36, -12, Math.toRadians(90)))
                                 .strafeRight(21)
-                                */
+
                                 .lineToLinearHeading(new Pose2d(36, 0, Math.toRadians(180)))
+                                 */
                                 .build()
                         /*
                         .strafeLeft(24)
