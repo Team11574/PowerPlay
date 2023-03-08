@@ -8,12 +8,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 
-import org.firstinspires.ftc.teamcode.robot.component.slide.MotorGroup;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
 import java.util.ArrayList;
-import java.util.Queue;
-import java.util.Vector;
+import java.util.Arrays;
 
 public class TileCalculation {
     Drivetrain drivetrain;
@@ -27,7 +23,7 @@ public class TileCalculation {
     double CENTER_THRESHOLD = 1; // in
 
     /**
-     * Create TileCalculations object to regulat movement between tiles.
+     * Create TileCalculations object to regulate movement between tiles.
      * @param drivetrain The robot's drivetrain to create TrajectorySequences.
      */
     public TileCalculation(Drivetrain drivetrain) {
@@ -37,7 +33,7 @@ public class TileCalculation {
         trajectoryQueue = new ArrayList<>();
     }
 
-    enum Field {
+    enum FieldElement {
         A1, A12, A2, A23, A3, A34, A4, A45, A5, A56, A6,
         AB1,AB12,AB2,AB23,AB3,AB34,AB4,AB45,AB5,AB56,AB6,
         B1, B12, B2, B23, B3, B34, B4, B45, B5, B56, B6,
@@ -48,7 +44,84 @@ public class TileCalculation {
         DE1,DE12,DE2,DE23,DE3,DE34,DE4,DE45,DE5,DE56,DE6,
         E1, E12, E2, E23, E3, E34, E4, E45, E5, E56, E6,
         EF1,EF12,EF2,EF23,EF3,EF34,EF4,EF45,EF5,EF56,EF6,
-        F1, F12, F2, F23, F3, F34, F4, F45, F5, F56, F6,
+        F1, F12, F2, F23, F3, F34, F4, F45, F5, F56, F6;
+
+        static int ROWS = 11;
+        static int COLS = 11;
+
+        public static FieldElement getElement(int row, int col) {
+            return FieldElement.values()[(row-1) * ROWS + (col-1)];
+        }
+
+        public int getRow() {
+            return this.ordinal() / ROWS + 1;
+        }
+
+        public int getCol() {
+            return this.ordinal() % COLS + 1;
+        }
+
+        public FieldElement nextRow() {
+            int nextRow = clamp(this.getRow() + 1, 0, ROWS);
+            return FieldElement.getElement(nextRow, this.getCol());
+        }
+
+        public FieldElement prevRow() {
+            int prevRow = clamp(this.getRow() - 1, 0, ROWS);
+            return FieldElement.getElement(prevRow, this.getCol());
+        }
+
+        public FieldElement nextCol() {
+            int nextCol = clamp(this.getCol() + 1, 0, COLS);
+            return FieldElement.getElement(this.getRow(), nextCol);
+        }
+
+        public FieldElement prevCol() {
+            int prevCol = clamp(this.getCol() - 1, 0, COLS);
+            return FieldElement.getElement(this.getRow(), prevCol);
+        }
+
+        /**
+         * Find junction height by junction ID
+         * @param ID must be of style /[A-F]{2}[1-6]{2}/
+         * @return Junction height (GROUND, LOW, MEDIUM, or HIGH) of the junction, or null
+         * if the ID is not a junction.
+         */
+        public static Junction getJunctionHeightByID(FieldElement ID) {
+            // GROUND
+            if (Arrays.asList(
+                    AB12, AB34, AB56,
+                    CD12, CD34, CD56,
+                    EF12, EF34, EF56
+            ).contains(ID)) {
+                return Junction.GROUND;
+            }
+            // LOW
+            if (Arrays.asList(AB23, AB45,
+                    BC12, BC56,
+                    DE12, DE56,
+                    EF23, EF45
+            ).contains(ID)) {
+                return Junction.LOW;
+            }
+
+            // MEDIUM
+            if (Arrays.asList(
+                    BC23, BC45,
+                    DE23, DE45
+            ).contains(ID)) {
+                return Junction.MEDIUM;
+            }
+            // HIGH
+            if (Arrays.asList(
+                    BC34,
+                    CD23, CD45,
+                    DE34
+            ).contains(ID)) {
+                return Junction.HIGH;
+            }
+            return null;
+        }
     }
 
     enum Move {
@@ -56,6 +129,51 @@ public class TileCalculation {
         DOWN,
         LEFT,
         RIGHT,
+    }
+
+    // t = new TileCalculation
+    // t.queueMove(UP) // DOWN, LEFT, RIGHT
+    // t.queueMoveToJunction(TOP_LEFT) // TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
+
+    enum Junction {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        GROUND,
+        LOW,
+        MEDIUM,
+        HIGH;
+
+        public Junction getHeightByDirection(Tile tile) {
+            return getHeightByDirection(this, tile);
+        }
+        public static Junction getHeightByDirection(Junction junction, Tile tile) {
+            if (junction.ordinal() > 3) {
+                // junction is already a height, not a direction
+                return junction;
+            }
+            FieldElement fieldTile = FieldElement.valueOf(tile.name());
+            FieldElement fieldJunction = null;
+            if (junction == TOP_LEFT) {
+                fieldJunction = fieldTile.prevRow().prevCol();
+            } else if (junction == TOP_RIGHT) {
+                fieldJunction = fieldTile.prevRow().nextCol();
+            } else if (junction == BOTTOM_LEFT) {
+                fieldJunction = fieldTile.nextRow().prevCol();
+            } else if (junction == BOTTOM_RIGHT) {
+                fieldJunction = fieldTile.nextRow().nextCol();
+            }
+            return FieldElement.getJunctionHeightByID(fieldJunction);
+        }
+
+        public static Junction getDirectionByHeight(Junction junction, Tile tile) {
+            if (junction.ordinal() <= 3) {
+                // Junction is already a direction, not a height
+                return junction;
+            }
+            return HIGH;
+        }
     }
 
     enum Tile {
@@ -66,6 +184,9 @@ public class TileCalculation {
         E1, E2, E3, E4, E5, E6,
         F1, F2, F3, F4, F5, F6;
 
+        static int ROWS = 6;
+        static int COLS = 6;
+
         /**
          * Get a tile by row, column
          * @param row Tile row (1-6)
@@ -73,7 +194,7 @@ public class TileCalculation {
          * @return Tile associated with row, column
          */
         public static Tile getTile(int row, int col) {
-            return Tile.values()[(row-1) * 6 + (col-1)];
+            return Tile.values()[(row-1) * ROWS + (col-1)];
         }
 
         public int[] getRowCol() {
@@ -81,30 +202,30 @@ public class TileCalculation {
         }
 
         public int getRow() {
-            return this.ordinal() / 6 + 1;
+            return this.ordinal() / ROWS + 1;
         }
 
         public int getCol() {
-            return this.ordinal() % 6 + 1;
+            return this.ordinal() % COLS + 1;
         }
 
         public Tile nextRow() {
-            int nextRow = clamp(this.getRow() + 1, 0, 6);
+            int nextRow = clamp(this.getRow() + 1, 0, ROWS);
             return Tile.getTile(nextRow, this.getCol());
         }
 
         public Tile prevRow() {
-            int prevRow = clamp(this.getRow() - 1, 0, 6);
+            int prevRow = clamp(this.getRow() - 1, 0, ROWS);
             return Tile.getTile(prevRow, this.getCol());
         }
 
         public Tile nextCol() {
-            int nextCol = clamp(this.getCol() + 1, 0, 6);
+            int nextCol = clamp(this.getCol() + 1, 0, COLS);
             return Tile.getTile(this.getRow(), nextCol);
         }
 
         public Tile prevCol() {
-            int prevCol = clamp(this.getCol() - 1, 0, 6);
+            int prevCol = clamp(this.getCol() - 1, 0, COLS);
             return Tile.getTile(this.getRow(), prevCol);
         }
     }
@@ -195,13 +316,19 @@ public class TileCalculation {
                 withinThreshold(currentPos.getY(), targetPos.getY(), threshold);
     }
 
-    // queueMoveLeft();
-    // queueMove(TileCalculation.Move.LEFT);
-
+    /**
+     * Add a trajectory to the queue.
+     * @param traj Trajectory to add.
+     */
     public void queueAdd(Trajectory traj) {
-        //trajectoryQueue.add(traj);
+        trajectoryQueue.add(traj);
     }
 
+    /**
+     * Queue a trajectory movement in a direction, ending in the center of the next tile.
+     * Continuous.
+     * @param direction Move direction to move in (UP, DOWN, LEFT, or RIGHT)
+     */
     public void queueMove(Move direction) {
         Tile nextTile;
         Trajectory newTrajectorySegment1;
@@ -262,6 +389,63 @@ public class TileCalculation {
         queueAdd(newTrajectorySegment2);
     }
 
+    public void queueMoveToJunction(Junction junction) {
+        if (junction.ordinal() > 3) {
+            // Ordinal is GROUND, LOW, MEDIUM, or HIGH
+            // Find junction direction of this height?
+            return;
+        }
+        Junction height = junction.getHeightByDirection(targetTile);
+        double[][] heightDistance = { // in
+                {5, 5},
+                {5, 5},
+                {5, 5},
+                {5, 5},
+        };
+
+        double[] endHeadings = { // Radians
+                // Top Left
+                Math.toRadians(135),
+                // Top Right
+                Math.toRadians(45),
+                // Bottom Left
+                Math.toRadians(225),
+                // Bottom Right
+                Math.toRadians(315)
+        };
+        double[][] factors = { // X, Y
+                // Top Left
+                {-1, 1},
+                // Top Right
+                {1, 1},
+                // Bottom Left
+                {-1, -1},
+                // Bottom Right
+                {1, -1}
+        };
+
+        Pose2d startPose;
+        if (trajectoryQueue.size() > 0) {
+            startPose = trajectoryQueue.get(trajectoryQueue.size() - 1).end();
+        } else {
+            startPose = drivetrain.getPoseEstimate();
+        }
+        double endX = startPose.getX()
+                + factors[junction.ordinal()][0]
+                * heightDistance[height.ordinal() - 4][0];
+        double endY = startPose.getY()
+                + factors[junction.ordinal()][1]
+                * heightDistance[height.ordinal() - 4][1];
+        Pose2d endPose = new Pose2d(endX, endY, endHeadings[junction.ordinal()]);
+        Trajectory moveToJunction = drivetrain.trajectoryBuilder(startPose)
+                .lineToLinearHeading(endPose)
+                .build();
+        trajectoryQueue.add(moveToJunction);
+    }
+
+    /**
+     * Queue a trajectory to center the robot on the tile. Discontinuous.
+     */
     public void queueCenter() {
         if (trajectoryQueue.size() > 0) {
             return;
@@ -272,9 +456,38 @@ public class TileCalculation {
         queueAdd(centerTrajectory);
     }
 
-    public void clearQueue() {
+    /**
+     * Clear the trajectory queue.
+     */
+    public void queueClear() {
         // TODO: Consider implementing cancellation of trajectories and cancel current movement here
         trajectoryQueue.clear();
+    }
+
+    /**
+     * Pop a single item off of the trajectory queue. Can return null.
+     * @return Trajectory that was removed.
+     */
+    public Trajectory queuePop() {
+        if (trajectoryQueue.size() > 0) {
+            return trajectoryQueue.remove(trajectoryQueue.size() - 1);
+        }
+        return null;
+    }
+
+    /**
+     * Pop the last n items off of the trajectory queue, and return as an ArrayList.
+     * The list is guaranteed to be n items long, though some of the items can be null
+     * if the trajectory queue started as less than n items long.
+     * @param last Integer of the last n trajectories to remove.
+     * @return ArrayList<Trajectory> the list of removed trajectory.
+     */
+    public ArrayList<Trajectory> queuePop(int last) {
+        ArrayList<Trajectory> trajList = new ArrayList<>();
+        for (int i = 0; i < last; i++) {
+            trajList.add(queuePop());
+        }
+        return trajList;
     }
 
     public void update() {
