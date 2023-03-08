@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import org.firstinspires.ftc.teamcode.robot.component.slide.MotorGroup;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Vector;
 
@@ -18,7 +19,7 @@ public class TileCalculation {
     Drivetrain drivetrain;
     Pose2d lastPose;
     Tile targetTile;
-    Queue<Trajectory> trajectoryQueue;
+    ArrayList<Trajectory> trajectoryQueue;
     double MIN_X = -72; // in
     double MIN_Y = -72; // in
     double MAX_X = 72; // in
@@ -33,6 +34,7 @@ public class TileCalculation {
         this.drivetrain = drivetrain;
         lastPose = drivetrain.getPoseEstimate();
         targetTile = getIDByVector();
+        trajectoryQueue = new ArrayList<>();
     }
 
     enum Field {
@@ -66,12 +68,12 @@ public class TileCalculation {
 
         /**
          * Get a tile by row, column
-         * @param row Tile row (0-5)
-         * @param col Tile column (0-5)
+         * @param row Tile row (1-6)
+         * @param col Tile column (1-6)
          * @return Tile associated with row, column
          */
         public static Tile getTile(int row, int col) {
-            return Tile.values()[row * 6 + col];
+            return Tile.values()[(row-1) * 6 + (col-1)];
         }
 
         public int[] getRowCol() {
@@ -79,11 +81,11 @@ public class TileCalculation {
         }
 
         public int getRow() {
-            return this.ordinal() / 6;
+            return this.ordinal() / 6 + 1;
         }
 
         public int getCol() {
-            return this.ordinal() % 6;
+            return this.ordinal() % 6 + 1;
         }
 
         public Tile nextRow() {
@@ -109,16 +111,18 @@ public class TileCalculation {
 
     /**
      * Find what field tile a Vector2d is in by an ID with format /[A-F][1-6]/
+     * col increases as x increases.
+     * row increases as y decreases.
      * @param pos The Vector2d (x, y) position.
      * @return Tile The Tile ID that the Vector2d is in.
      */
     public Tile getIDByVector(Vector2d pos) {
         // Clamp x and y within min/max bounds
         double x =  clamp(pos.getX(), MIN_X, MAX_X);
-        double y = clamp(pos.getY(), MIN_Y, MAX_Y);;
+        double y = -clamp(pos.getY(), MIN_Y, MAX_Y);
         // Get row/col based on x and y
-        int row = ((int) x + 72 - 12) / 24;
-        int col = ((int) y  + 72 - 12) / 24;
+        int row = ((int) y + 72 - 12) / 24 + 1;
+        int col = ((int) x  + 72 - 12) / 24 + 1;
         return Tile.getTile(row, col);
     }
 
@@ -147,9 +151,17 @@ public class TileCalculation {
     public Vector2d getVectorByID(Tile ID) {
         int row = ID.getRow();
         int col = ID.getCol();
-        int x = row * 24 + 12 - 72;
-        int y = col * 24 + 12 - 72;
+        int y = -((row-1) * 24 + 12 - 72);
+        int x = (col-1) * 24 + 12 - 72;
         return new Vector2d(x, y);
+    }
+
+    /**
+     * Find the Roadrunner vector position of the center the current robot's tile.
+     * @return Vector2d The (x, y) position of the center of the tile.
+     */
+    public Vector2d getVectorByID() {
+        return getVectorByID(getIDByVector());
     }
 
     /**
@@ -187,7 +199,7 @@ public class TileCalculation {
     // queueMove(TileCalculation.Move.LEFT);
 
     public void queueAdd(Trajectory traj) {
-        trajectoryQueue.add(traj);
+        //trajectoryQueue.add(traj);
     }
 
     public void queueMove(Move direction) {
@@ -226,14 +238,13 @@ public class TileCalculation {
             return;
         }
         // Remove the last half-square trajectory
-        lastTrajectory = trajectoryQueue.poll();
-        if (lastTrajectory != null) {
-            startHeading = lastTrajectory.end().getHeading();
-        }
-        if (trajectoryQueue.peek() != null) {
-            startPose = trajectoryQueue.peek().end();
-        } else {
+        if (trajectoryQueue.size() < 2) {
             startPose = drivetrain.getPoseEstimate();
+        } else {
+
+            lastTrajectory = trajectoryQueue.remove(trajectoryQueue.size() - 1);
+            startHeading = lastTrajectory.end().getHeading();
+            startPose = trajectoryQueue.get(trajectoryQueue.size() - 1).end();
         }
 
         // Add new full-square trajectory
@@ -251,26 +262,19 @@ public class TileCalculation {
         queueAdd(newTrajectorySegment2);
     }
 
-    /**
-     * Create a smooth trajectory between the current tile and a given end tile.
-     * @param end Tile ID to end at.
-     * @return TrajectorySequence trajectory to follow.
-     */
-    public TrajectorySequence buildTrajectoryToTile(Tile end) {
-        return buildTrajectoryToTile(getIDByVector(), end);
+    public void queueCenter() {
+        if (trajectoryQueue.size() > 0) {
+            return;
+        }
+        Trajectory centerTrajectory = drivetrain.trajectoryBuilder(drivetrain.getPoseEstimate())
+                .lineToConstantHeading(getVectorByID())
+                .build();
+        queueAdd(centerTrajectory);
     }
 
-    /**
-     * Create a smooth trajectory between the a start tile and a given end tile.
-     * @param start Tile ID to start at.
-     * @param end Tile ID to end at.
-     * @return TrajectorySequence trajectory to follow.
-     */
-    // UNUSED
-    public TrajectorySequence buildTrajectoryToTile(Tile start, Tile end) {
-        // Suppose start = B1, end = E3
-        // TODO: Complete
-        return null;
+    public void clearQueue() {
+        // TODO: Consider implementing cancellation of trajectories and cancel current movement here
+        trajectoryQueue.clear();
     }
 
     public void update() {

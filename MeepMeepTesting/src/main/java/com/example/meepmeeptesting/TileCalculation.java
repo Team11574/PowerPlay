@@ -20,7 +20,8 @@ public class TileCalculation {
     DriveShim drivetrain;
     Pose2d lastPose;
     Tile targetTile;
-    ArrayList<Trajectory> trajectoryQueue;
+    //ArrayList<Trajectory> trajectoryQueue;
+    ArrayList<returnThingy> trajectoryQueue;
     double MIN_X = -72; // in
     double MIN_Y = -72; // in
     double MAX_X = 72; // in
@@ -192,7 +193,7 @@ public class TileCalculation {
     // queueMove(TileCalculation.Move.LEFT);
 
     public void queueAdd(Trajectory traj) {
-        trajectoryQueue.add(traj);
+        //trajectoryQueue.add(traj);
     }
 
     public returnThingy queueMove(Move direction) {
@@ -234,12 +235,17 @@ public class TileCalculation {
         if (trajectoryQueue.size() < 2) {
             startPose = drivetrain.getPoseEstimate();
         } else {
+            /*
             lastTrajectory = trajectoryQueue.remove(trajectoryQueue.size() - 1);
             startHeading = lastTrajectory.end().getHeading();
             startPose = trajectoryQueue.get(trajectoryQueue.size() - 1).end();
+             */
+            startHeading = trajectoryQueue.remove(trajectoryQueue.size() - 1).startHeading;
+            startPose = trajectoryQueue.get(trajectoryQueue.size() - 1).startPose;
         }
-
-        return new returnThingy(nextTile, startHeading, endHeading, startPose);
+        returnThingy toReturn = new returnThingy(nextTile, startHeading, endHeading, startPose);
+        trajectoryQueue.add(toReturn);
+        return toReturn;
 
 
         // Add new full-square trajectory

@@ -49,9 +49,12 @@ public class MeepMeepTesting {
                             .splineToConstantHeading(
                                     midpoint(t.getVectorByID(r.nextTile), t.getVectorByID(target1)),
                                     r.endHeading)
+                            /*
                             .splineToConstantHeading(
                                     t.getVectorByID(r.nextTile),
                                     r.endHeading)
+
+                             */
                             .setTangent(r2.startHeading)
                             .splineToConstantHeading(
                                     midpoint(t.getVectorByID(r2.nextTile), t.getVectorByID(target2)),
