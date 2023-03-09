@@ -59,11 +59,14 @@ public class Tele extends RobotOpMode {
                 queueMovement(pad1.left_stick_octant());
             else
                 queueMovement(queueMoveDirection);
-            
+
             queueMoveDirection = -1;
             double velY = -pad1.gamepad.left_stick_y;
             double velX = pad1.gamepad.left_stick_x;
             double theta = pad1.gamepad.right_stick_x;
+
+            if (velX + velY != 0)
+                t.queueClear();
 
             double normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
             double frontRight_Power = (velY - velX - theta) / normalFactor;
@@ -73,6 +76,10 @@ public class Tele extends RobotOpMode {
 
             drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
         }
+
+        if (pad1.left_stick_button_pressed)
+            if (!t.isCentered())
+                t.queueCenter();
 
         // HOLD TRIGGER to flip
         if (!overrideMain) {
