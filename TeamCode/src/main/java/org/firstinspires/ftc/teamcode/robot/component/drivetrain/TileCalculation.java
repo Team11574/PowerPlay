@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot.component.drivetrain;
 
+import static org.firstinspires.ftc.teamcode.util.Generic.clamp;
 import static org.firstinspires.ftc.teamcode.util.Generic.midpoint;
 import static org.firstinspires.ftc.teamcode.util.Generic.withinThreshold;
-import static org.firstinspires.ftc.teamcode.util.Generic.clamp;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -24,6 +24,7 @@ public class TileCalculation {
 
     /**
      * Create TileCalculations object to regulate movement between tiles.
+     *
      * @param drivetrain The robot's drivetrain to create TrajectorySequences.
      */
     public TileCalculation(Drivetrain drivetrain) {
@@ -35,22 +36,22 @@ public class TileCalculation {
 
     enum FieldElement {
         A1, A12, A2, A23, A3, A34, A4, A45, A5, A56, A6,
-        AB1,AB12,AB2,AB23,AB3,AB34,AB4,AB45,AB5,AB56,AB6,
+        AB1, AB12, AB2, AB23, AB3, AB34, AB4, AB45, AB5, AB56, AB6,
         B1, B12, B2, B23, B3, B34, B4, B45, B5, B56, B6,
-        BC1,BC12,BC2,BC23,BC3,BC34,BC4,BC45,BC5,BC56,BC6,
+        BC1, BC12, BC2, BC23, BC3, BC34, BC4, BC45, BC5, BC56, BC6,
         C1, C12, C2, C23, C3, C34, C4, C45, C5, C56, C6,
-        CD1,CD12,CD2,CD23,CD3,CD34,CD4,CD45,CD5,CD56,CD6,
+        CD1, CD12, CD2, CD23, CD3, CD34, CD4, CD45, CD5, CD56, CD6,
         D1, D12, D2, D23, D3, D34, D4, D45, D5, D56, D6,
-        DE1,DE12,DE2,DE23,DE3,DE34,DE4,DE45,DE5,DE56,DE6,
+        DE1, DE12, DE2, DE23, DE3, DE34, DE4, DE45, DE5, DE56, DE6,
         E1, E12, E2, E23, E3, E34, E4, E45, E5, E56, E6,
-        EF1,EF12,EF2,EF23,EF3,EF34,EF4,EF45,EF5,EF56,EF6,
+        EF1, EF12, EF2, EF23, EF3, EF34, EF4, EF45, EF5, EF56, EF6,
         F1, F12, F2, F23, F3, F34, F4, F45, F5, F56, F6;
 
         static final int ROWS = 11;
         static final int COLS = 11;
 
         public static FieldElement getElement(int row, int col) {
-            return FieldElement.values()[(row-1) * COLS + (col-1)];
+            return FieldElement.values()[(row - 1) * COLS + (col - 1)];
         }
 
         public int getRow() {
@@ -83,6 +84,7 @@ public class TileCalculation {
 
         /**
          * Find junction height by junction ID
+         *
          * @param ID must be of style /[A-F]{2}[1-6]{2}/
          * @return Junction height (GROUND, LOW, MEDIUM, or HIGH) of the junction, or null
          * if the ID is not a junction.
@@ -125,14 +127,14 @@ public class TileCalculation {
         }
     }
 
-    enum Move {
+    public enum Move {
         UP,
         DOWN,
         LEFT,
         RIGHT,
     }
 
-    enum Junction {
+    public enum Junction {
         TOP_LEFT,
         TOP_RIGHT,
         BOTTOM_LEFT,
@@ -145,6 +147,7 @@ public class TileCalculation {
         public Junction getHeightByDirection(Tile tile) {
             return getHeightByDirection(this, tile);
         }
+
         public static Junction getHeightByDirection(Junction junction, Tile tile) {
             if (junction.ordinal() > 3) {
                 // junction is already a height, not a direction
@@ -186,12 +189,13 @@ public class TileCalculation {
 
         /**
          * Get a tile by row, column
+         *
          * @param row Tile row (1-6)
          * @param col Tile column (1-6)
          * @return Tile associated with row, column
          */
         public static Tile getTile(int row, int col) {
-            return Tile.values()[(row-1) * COLS + (col-1)];
+            return Tile.values()[(row - 1) * COLS + (col - 1)];
         }
 
         public int[] getRowCol() {
@@ -231,21 +235,23 @@ public class TileCalculation {
      * Find what field tile a Vector2d is in by an ID with format /[A-F][1-6]/
      * col increases as x increases.
      * row increases as y decreases.
+     *
      * @param pos The Vector2d (x, y) position.
      * @return Tile The Tile ID that the Vector2d is in.
      */
     public Tile getIDByVector(Vector2d pos) {
         // Clamp x and y within min/max bounds
-        double x =  clamp(pos.getX(), MIN_X, MAX_X);
+        double x = clamp(pos.getX(), MIN_X, MAX_X);
         double y = -clamp(pos.getY(), MIN_Y, MAX_Y);
         // Get row/col based on x and y
         int row = ((int) y + 72 - 12) / 24 + 1;
-        int col = ((int) x  + 72 - 12) / 24 + 1;
+        int col = ((int) x + 72 - 12) / 24 + 1;
         return Tile.getTile(row, col);
     }
 
     /**
      * Find what field tile the robot is currently in by an ID with format /[A-F][1-6]/
+     *
      * @return Tile The Tile ID that the robot is currently in.
      */
     public Tile getIDByVector() {
@@ -254,6 +260,7 @@ public class TileCalculation {
 
     /**
      * Find what field tile the given Pose2d x and y is in by an ID with format /[A-F][1-6]/
+     *
      * @param pose The Pose2d to convert to a Vector2d.
      * @return Tile The Tile ID that the Pose2d is in.
      */
@@ -263,19 +270,21 @@ public class TileCalculation {
 
     /**
      * Find the Roadrunner vector position of the center of a tile by ID.
+     *
      * @param ID The tile ID to use.
      * @return Vector2d The (x, y) position of the center of the tile.
      */
     public Vector2d getVectorByID(Tile ID) {
         int row = ID.getRow();
         int col = ID.getCol();
-        int y = -((row-1) * 24 + 12 - 72);
-        int x = (col-1) * 24 + 12 - 72;
+        int y = -((row - 1) * 24 + 12 - 72);
+        int x = (col - 1) * 24 + 12 - 72;
         return new Vector2d(x, y);
     }
 
     /**
      * Find the Roadrunner vector position of the center the current robot's tile.
+     *
      * @return Vector2d The (x, y) position of the center of the tile.
      */
     public Vector2d getVectorByID() {
@@ -285,6 +294,7 @@ public class TileCalculation {
     /**
      * Determine if the robot is at (or near) the center of its current tile
      * with threshold CENTER_THRESHOLD.
+     *
      * @return boolean Returns true if the robot is centered.
      */
     public boolean isCentered() {
@@ -293,6 +303,7 @@ public class TileCalculation {
 
     /**
      * Determine if the robot is at (or near) the center of its current tile.
+     *
      * @param threshold Number of inches as threshold to be considered centered.
      * @return boolean Returns true if the robot is centered.
      */
@@ -302,8 +313,9 @@ public class TileCalculation {
 
     /**
      * Determine if the robot is at (or near) the center of a tile.
+     *
      * @param threshold Number of inches as threshold to be considered centered.
-     * @param ID The Tile ID to check for centering.
+     * @param ID        The Tile ID to check for centering.
      * @return boolean Returns true if the robot is centered.
      */
     public boolean isCentered(double threshold, Tile ID) {
@@ -315,6 +327,7 @@ public class TileCalculation {
 
     /**
      * Add a trajectory to the queue.
+     *
      * @param traj Trajectory to add.
      */
     public void queueAdd(Trajectory traj) {
@@ -324,6 +337,7 @@ public class TileCalculation {
     /**
      * Queue a trajectory movement in a direction, ending in the center of the next tile.
      * Continuous.
+     *
      * @param direction Move direction to move in (UP, DOWN, LEFT, or RIGHT)
      */
     public void queueMove(Move direction) {
@@ -463,6 +477,7 @@ public class TileCalculation {
 
     /**
      * Pop a single item off of the trajectory queue. Can return null.
+     *
      * @return Trajectory that was removed.
      */
     public Trajectory queuePop() {
@@ -476,6 +491,7 @@ public class TileCalculation {
      * Pop the last n items off of the trajectory queue, and return as an ArrayList.
      * The list is guaranteed to be n items long, though some of the items can be null
      * if the trajectory queue started as less than n items long.
+     *
      * @param last Integer of the last n trajectories to remove.
      * @return ArrayList<Trajectory> the list of removed trajectory.
      */

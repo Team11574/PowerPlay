@@ -46,7 +46,7 @@ public class GamepadPlus {
 
     public float get_partitioned_left_stick_y() {
         double theta = Math.atan2(gamepad.left_stick_y, gamepad.left_stick_x);
-        if (Math.abs(theta) < Math.PI/6) {
+        if (Math.abs(theta) < Math.PI / 6) {
             return 0;
         }
         return gamepad.left_stick_y;
@@ -54,15 +54,16 @@ public class GamepadPlus {
 
     public float get_partitioned_left_stick_x() {
         double theta = Math.atan2(gamepad.left_stick_y, gamepad.left_stick_x);
-        if (Math.abs(theta-Math.PI/2) < Math.PI/6) {
+        if (Math.abs(theta - Math.PI / 2) < Math.PI / 6) {
             return 0;
         }
+
         return gamepad.left_stick_x;
     }
 
     public float get_partitioned_right_stick_y() {
         double theta = Math.atan2(gamepad.right_stick_y, gamepad.right_stick_x);
-        if (Math.abs(theta) < Math.PI/6) {
+        if (Math.abs(theta) < Math.PI / 6) {
             return 0;
         }
         return gamepad.right_stick_y;
@@ -70,15 +71,57 @@ public class GamepadPlus {
 
     public float get_partitioned_right_stick_x() {
         double theta = Math.atan2(gamepad.right_stick_y, gamepad.right_stick_x);
-        if (Math.abs(theta-Math.PI/2) < Math.PI/6) {
+        if (Math.abs(theta - Math.PI / 2) < Math.PI / 6) {
             return 0;
         }
         return gamepad.right_stick_x;
     }
 
-    public boolean right_trigger_active() { return gamepad.right_trigger > 0; };
+    public double right_stick_angle() {
+        return Math.atan2(gamepad.right_stick_y, gamepad.right_stick_x);
+    }
 
-    public boolean left_trigger_active() { return gamepad.left_trigger > 0; };
+    public double left_stick_angle() {
+        return Math.atan2(gamepad.left_stick_y, gamepad.left_stick_x);
+    }
+
+    /**
+     * Returns the octant of the right stick,
+     * where 0 is from -pi/8 to pi/8, 1 is from pi/8 to 3pi/8, etc.
+     *
+     * @return the octant of the right stick
+     */
+    public int right_stick_octant() {
+        double shift = Math.PI / 8;
+        double theta = right_stick_angle();
+        if (theta < 0) {
+            theta += 2 * Math.PI;
+        }
+        return (int) Math.ceil((theta + shift) / (Math.PI / 4)) % 9;
+    }
+
+    /**
+     * Returns the octant of the left stick,
+     * where 0 is from -pi/8 to pi/8, 1 is from pi/8 to 3pi/8, etc.
+     *
+     * @return the octant of the left stick
+     */
+    public int left_stick_octant() {
+        double shift = Math.PI / 8;
+        double theta = left_stick_angle();
+        if (theta < 0) {
+            theta += 2 * Math.PI;
+        }
+        return (int) Math.ceil((theta + shift) / (Math.PI / 4)) % 9;
+    }
+
+    public boolean right_trigger_active() {
+        return gamepad.right_trigger > 0;
+    }
+
+    public boolean left_trigger_active() {
+        return gamepad.left_trigger > 0;
+    }
 
     public void update() {
         last_left_stick_x = gamepad.left_stick_x;
