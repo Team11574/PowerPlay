@@ -475,13 +475,38 @@ public class TileCalculation {
         trajectoryQueue.clear();
     }
 
+    public boolean queueHasTrajectory() {
+        return trajectoryQueue.size() > 0;
+    }
+
+    public Trajectory queuePeek() {
+        if (queueHasTrajectory()) {
+            return trajectoryQueue.get(trajectoryQueue.size() - 1);
+        }
+        return null;
+    }
+
+    public Trajectory queueGet(int index) {
+        if (queueHasTrajectory()) {
+            return trajectoryQueue.get(index);
+        }
+        return null;
+    }
+
+    public Trajectory queueRemove(int index) {
+        if (queueHasTrajectory()) {
+            return trajectoryQueue.remove(index);
+        }
+        return null;
+    }
+
     /**
      * Pop a single item off of the trajectory queue. Can return null.
      *
      * @return Trajectory that was removed.
      */
     public Trajectory queuePop() {
-        if (trajectoryQueue.size() > 0) {
+        if (queueHasTrajectory()) {
             return trajectoryQueue.remove(trajectoryQueue.size() - 1);
         }
         return null;

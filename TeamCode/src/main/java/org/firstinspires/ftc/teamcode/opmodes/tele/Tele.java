@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
@@ -28,6 +29,7 @@ public class Tele extends RobotOpMode {
 
     int queueMoveDirection = -1;
     TileCalculation t;
+    boolean trajectoryRunning = false;
 
     @Override
     public void init() {
@@ -65,8 +67,11 @@ public class Tele extends RobotOpMode {
             double velX = pad1.gamepad.left_stick_x;
             double theta = pad1.gamepad.right_stick_x;
 
-            if (velX + velY != 0)
+            if (velX + velY != 0) {
+                //trajectoryRunning = false;
+                // TODO: Can set trajectory running to false if we implement cancellable trajectories
                 t.queueClear();
+            }
 
             double normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
             double frontRight_Power = (velY - velX - theta) / normalFactor;
@@ -74,7 +79,32 @@ public class Tele extends RobotOpMode {
             double frontLeft_Power = (velY + velX + theta) / normalFactor;
             double backLeft_Power = (velY - velX + theta) / normalFactor;
 
-            drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+            if (!trajectoryRunning)
+                drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+        }
+
+        // 1. Have a trajectory and nothing has been started recently
+        // 2. Have a trajectory and the current trajectory is finished
+        // 3.
+
+
+        if (!drivetrain.isBusy() && !trajectoryRunning) {
+            if (t.queueHasTrajectory()) {
+                Trajectory trajectory = t.queueGet(0);
+                drivetrain.followTrajectoryAsync(trajectory);
+                trajectoryRunning = true;
+            }
+        }
+
+        if (!drivetrain.isBusy() && trajectoryRunning) {
+            if (t.queueHasTrajectory()) {
+                t.queueRemove(0);
+                Trajectory trajectory = t.queueGet(0);
+                drivetrain.followTrajectoryAsync(trajectory);
+                trajectoryRunning = true;
+            } else {
+                trajectoryRunning = false;
+            }
         }
 
         if (pad1.left_stick_button_pressed)
@@ -231,6 +261,10 @@ public class Tele extends RobotOpMode {
         pad1.update();
         pad2.update();
         scheduler.update();
+        t.update();
+        if (drivetrain.isBusy()) {
+            drivetrain.update();
+        }
     }
 
     public void fullTelemetry() {
