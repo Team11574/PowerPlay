@@ -137,14 +137,13 @@ public class Pipeline extends OpenCvPipeline {
 
             imageROI.release();
             return input;
-        }
-        catch (ConcurrentModificationException e) {
+        } catch (ConcurrentModificationException e) {
             e.printStackTrace();
             return input;
         }
     }
 
-    public double getArea(Mat input, List<Scalar> colorRange){
+    public double getArea(Mat input, List<Scalar> colorRange) {
         try {
             procFrame = input.clone();
 
@@ -232,4 +231,26 @@ public class Pipeline extends OpenCvPipeline {
     public void stop() {
         stopped = true;
     }
+
+    /*public double get_junction_distance(Mat input) {
+        // Detect edges of a yellow rectangle
+
+        // Convert to HSV
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+
+        // Threshold for yellow
+        Core.inRange(input, new Scalar(20, 100, 100), new Scalar(30, 255, 255), input);
+
+        // Find edges of yellow rectangle
+        Imgproc.Canny(input, input, 100, 200);
+
+        // Find center of yellow rectangle
+        Moments m = Imgproc.moments(input, true);
+        Point center = new Point(m.get_m10() / m.get_m00(), m.get_m01() / m.get_m00());
+
+        // Find distance from center of image to center of yellow rectangle
+        double distance = Math.sqrt(Math.pow(center.x - 120, 2) + Math.pow(center.y - 160, 2));
+
+        return 0;
+    }*/
 }
