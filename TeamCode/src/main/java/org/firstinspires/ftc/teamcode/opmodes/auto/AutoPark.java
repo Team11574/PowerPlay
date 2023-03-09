@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -25,7 +25,7 @@ public class AutoPark extends RobotLinearOpMode {
 
         drivetrain = robot.drivetrain;
 
-        Pose2d startPos = new Pose2d(0,0,0);
+        Pose2d startPos = new Pose2d(0, 0, 0);
         spot1 = drivetrain.trajectorySequenceBuilder(startPos)
                 .forward(28)
                 .strafeLeft(24)

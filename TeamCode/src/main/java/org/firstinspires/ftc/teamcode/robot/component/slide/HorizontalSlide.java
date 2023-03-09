@@ -16,12 +16,15 @@ public class HorizontalSlide extends MotorGroup {
     public HorizontalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor});
     }
+
     public HorizontalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition);
     }
+
     public HorizontalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors) {
         this(hardwareMap, telemetry, slideMotors, 0, Double.POSITIVE_INFINITY);
     }
+
     public HorizontalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition) {
         super(hardwareMap, telemetry, slideMotors, minEncoderPosition, maxEncoderPosition, HS_TICKS_PER_IN);
         this.motors = slideMotors;

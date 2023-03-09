@@ -1,18 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
-import com.acmerobotics.dashboard.DashboardCore;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
-import org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.DashboardUtil;
-import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 @Autonomous(name = "AUTO Testing", group = "testing")
 public class AutoTesting extends RobotLinearOpMode {
@@ -105,7 +101,6 @@ public class AutoTesting extends RobotLinearOpMode {
             // wait
             robot.update();
         }
-
 
 
         //drivetrain.followTrajectorySequence(backup);

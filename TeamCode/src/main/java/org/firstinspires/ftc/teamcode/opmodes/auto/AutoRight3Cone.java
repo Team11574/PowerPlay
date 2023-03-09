@@ -6,12 +6,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 import java.util.ConcurrentModificationException;
 import java.util.concurrent.TimeUnit;
@@ -114,6 +114,7 @@ public class AutoRight3Cone extends RobotLinearOpMode {
         multiTelemetry.addLine("Yippee!");
         multiTelemetry.update();
     }
+
     private void initialPositionAndCone() {
 
         //robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
@@ -175,7 +176,7 @@ public class AutoRight3Cone extends RobotLinearOpMode {
         );
 
         // Wait until retracted, vertical slide at ground, and moved in position
-        while (robot.isRetracting  || scheduler.hasGlobalQueries() || drivetrain.isBusy()) { // || !robot.verticalSlide.atSetPosition()) {
+        while (robot.isRetracting || scheduler.hasGlobalQueries() || drivetrain.isBusy()) { // || !robot.verticalSlide.atSetPosition()) {
             if (drivetrain.isBusy()) {
                 drivetrain.update();
             }

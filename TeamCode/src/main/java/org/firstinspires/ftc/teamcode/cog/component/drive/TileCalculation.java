@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.robot.component.drivetrain;
+package org.firstinspires.ftc.teamcode.cog.component.drive;
 
-import static org.firstinspires.ftc.teamcode.util.Generic.clamp;
-import static org.firstinspires.ftc.teamcode.util.Generic.midpoint;
-import static org.firstinspires.ftc.teamcode.util.Generic.withinThreshold;
+import static org.firstinspires.ftc.teamcode.cog.util.Generic.clamp;
+import static org.firstinspires.ftc.teamcode.cog.util.Generic.midpoint;
+import static org.firstinspires.ftc.teamcode.cog.util.Generic.withinThreshold;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;

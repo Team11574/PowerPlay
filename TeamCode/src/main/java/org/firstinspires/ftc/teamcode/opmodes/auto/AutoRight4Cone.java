@@ -6,12 +6,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -108,7 +108,7 @@ public class AutoRight4Cone extends RobotLinearOpMode {
 
         int parkingSpot = robot.getParkingSpot();
 
-        if(isStopRequested()) return;
+        if (isStopRequested()) return;
 
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         drivetrain.followTrajectorySequence(initialPos);

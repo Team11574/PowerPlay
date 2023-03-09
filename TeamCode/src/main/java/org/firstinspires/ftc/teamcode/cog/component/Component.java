@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.component;
+package org.firstinspires.ftc.teamcode.cog.component;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -11,7 +11,10 @@ public abstract class Component {
     protected HardwareMap hardwareMap;
     protected Telemetry telemetry;
 
-    public Component(){};
+    public Component() {
+    }
 
-    public Component(HardwareMap hardwareMap, Telemetry telemetry){};
+    public Component(HardwareMap hardwareMap, Telemetry telemetry) {
+    }
+
 }

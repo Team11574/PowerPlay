@@ -10,9 +10,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
+import org.firstinspires.ftc.teamcode.cog.control.GamepadPlus;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants;
-import org.firstinspires.ftc.teamcode.util.GamepadPlus;
 
 @TeleOp(name = "Motor Current Alert Testing", group = "testing")
 public class MotorCurrentAlertTesting extends RobotOpMode {

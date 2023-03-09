@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.robot.component.servo;
+package org.firstinspires.ftc.teamcode.cog.component.servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
+import org.firstinspires.ftc.teamcode.cog.component.HardwareComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class SetServo extends HardwareComponent {
     }
 
     public SetServo(HardwareMap hardwareMap, Telemetry telemetry, Servo clawServo,
-                double firstPos, double secondPos) {
+                    double firstPos, double secondPos) {
         this(hardwareMap, telemetry, clawServo, new double[]{firstPos, secondPos});
     }
 
@@ -77,7 +77,9 @@ public class SetServo extends HardwareComponent {
         return currentPositionIndex;
     }
 
-    public double getCurrentPosition() { return servo.getPosition(); }
+    public double getCurrentPosition() {
+        return servo.getPosition();
+    }
 
     public double getSetPositionAtIndex(int index) {
         if (index < 0) {

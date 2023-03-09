@@ -1,7 +1,5 @@
-package org.firstinspires.ftc.teamcode.robot.component.drivetrain;
+package org.firstinspires.ftc.teamcode.cog.component.drive;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

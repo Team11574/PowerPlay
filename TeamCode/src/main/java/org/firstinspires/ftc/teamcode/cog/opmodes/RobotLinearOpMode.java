@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.opmodes.base;
+package org.firstinspires.ftc.teamcode.cog.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.component.drivetrain.Drivetrain;
 
 public abstract class RobotLinearOpMode extends LinearOpMode {
     // Instance Variables

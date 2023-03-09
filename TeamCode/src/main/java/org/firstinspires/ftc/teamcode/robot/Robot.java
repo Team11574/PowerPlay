@@ -35,16 +35,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.component.Component;
-import org.firstinspires.ftc.teamcode.robot.component.drivetrain.Drivetrain;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.component.Component;
+import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.cog.component.servo.ContinuousServo;
 import org.firstinspires.ftc.teamcode.robot.component.camera.AutoCamera;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Claw;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Flipper;
 import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
-import org.firstinspires.ftc.teamcode.robot.component.servo.ContinuousServo;
 import org.firstinspires.ftc.teamcode.robot.component.slide.HorizontalSlide;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
-import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 public class Robot extends Component {
     // ===== Instance Variables =====
@@ -262,7 +262,7 @@ public class Robot extends Component {
 
     public void waitForDeposit() {
         // NOT ASYNC
-        while(isDepositing) {
+        while (isDepositing) {
             //verticalScheduler.update();
             update();
         }

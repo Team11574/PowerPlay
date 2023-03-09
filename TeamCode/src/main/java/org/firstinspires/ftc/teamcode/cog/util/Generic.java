@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.cog.util;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
@@ -15,7 +15,8 @@ public class Generic {
 
     /**
      * Find the Vector2d that is the midpoint between two Vector2d.
-     * @param first Vector2d first position.
+     *
+     * @param first  Vector2d first position.
      * @param second Vector2d second position.
      * @return Vector2d midpoint.
      */

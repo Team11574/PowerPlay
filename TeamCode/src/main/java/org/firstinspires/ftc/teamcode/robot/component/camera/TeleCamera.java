@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -19,7 +18,7 @@ public class TeleCamera extends CameraSuper {
         initializeHardware();
     }
 
-    protected void initializeHardware(){
+    protected void initializeHardware() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id",
                 hardwareMap.appContext.getPackageName());
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "camera");
@@ -45,6 +44,7 @@ public class TeleCamera extends CameraSuper {
 
     /**
      * Determine whether the camera can see a pole
+     *
      * @return nearPole, a boolean
      */
     public boolean isNearPole() {

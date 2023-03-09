@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.component.servo.SetServo;
+import org.firstinspires.ftc.teamcode.cog.component.servo.SetServo;
 
 public class Flipper extends SetServo {
     public Flipper(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,

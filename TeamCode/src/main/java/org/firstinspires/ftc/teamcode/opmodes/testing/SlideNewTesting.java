@@ -2,15 +2,12 @@ package org.firstinspires.ftc.teamcode.opmodes.testing;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 @Autonomous(name = "Slide New Testing", group = "testing")
 public class SlideNewTesting extends RobotLinearOpMode {

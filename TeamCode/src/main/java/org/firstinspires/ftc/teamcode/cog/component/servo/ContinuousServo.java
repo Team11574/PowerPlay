@@ -1,16 +1,15 @@
-package org.firstinspires.ftc.teamcode.robot.component.servo;
+package org.firstinspires.ftc.teamcode.cog.component.servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 
 public class ContinuousServo extends SetServo {
     //private Servo servo;
-    private double startPosition;
-    private double lowerBound;
-    private double upperBound;
+    private final double startPosition;
+    private final double lowerBound;
+    private final double upperBound;
     private double offsetFactor = 1;
 
     public ContinuousServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo, double startPos) {
@@ -23,10 +22,9 @@ public class ContinuousServo extends SetServo {
 
     public ContinuousServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
                            double startPos, double lowBound, double upBound) {
-        this(hardwareMap, telemetry, crServo, new double[] {startPos}, lowBound, upBound);
+        this(hardwareMap, telemetry, crServo, new double[]{startPos}, lowBound, upBound);
     }
-    
-    
+
 
     public ContinuousServo(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
                            double[] startPositions, double lowBound, double upBound) {
@@ -67,7 +65,9 @@ public class ContinuousServo extends SetServo {
         offsetFactor = factor;
     }
 
-    public double getOffsetFactor() { return offsetFactor; }
+    public double getOffsetFactor() {
+        return offsetFactor;
+    }
 
     public void offsetPosition(double offset) {
         offsetPosition(offset, true);

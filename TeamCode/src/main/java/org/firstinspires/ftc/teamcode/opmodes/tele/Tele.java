@@ -4,13 +4,13 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.cog.component.drive.TileCalculation;
+import org.firstinspires.ftc.teamcode.cog.control.GamepadPlus;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.component.drivetrain.Drivetrain;
-import org.firstinspires.ftc.teamcode.robot.component.drivetrain.TileCalculation;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
-import org.firstinspires.ftc.teamcode.util.GamepadPlus;
-import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 @TeleOp(name = "Tele", group = "tele")
 public class Tele extends RobotOpMode {

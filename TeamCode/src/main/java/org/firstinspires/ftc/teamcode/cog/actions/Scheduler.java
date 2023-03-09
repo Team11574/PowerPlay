@@ -1,10 +1,9 @@
-package org.firstinspires.ftc.teamcode.util.runnable;
+package org.firstinspires.ftc.teamcode.cog.actions;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -32,22 +31,22 @@ public class Scheduler {
         linearStartTimes = new ArrayList<>();
         timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     }
+
     /**
-     *
      * Schedule globally queued actions.
-     *
+     * <p>
      * All global scheduled actions will be checked every update cycle.
-     *
+     * <p>
      * Function and Consumer inputs are always null, they simple allow for cleaner
      * syntax by saying "when" and "then" as shown in the example below.
-     *
-     *
+     * <p>
+     * <p>
      * Scheduler.globalSchedule(
-     *     when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
-     *     then -> horizontalClaw.open()
+     * when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
+     * then -> horizontalClaw.open()
      * );
      *
-     * @param query The check function to query, must return a boolean.
+     * @param query  The check function to query, must return a boolean.
      * @param action The action function to run once the query returns true, must return void.
      */
     public void globalSchedule(Function<Void, Boolean> query, Consumer<Void> action) {
@@ -63,17 +62,17 @@ public class Scheduler {
 
     /**
      * Schedule LIFO queued actions.
-     *
+     * <p>
      * Function and Consumer inputs are always null, they simple allow for cleaner
      * syntax by saying "when" and "then" as shown in the example below.
-     *
-     *
+     * <p>
+     * <p>
      * Scheduler.linearSchedule(
-     *     when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
-     *     then -> horizontalClaw.open()
+     * when -> horizontalSlide.atSetPosition(SET_POSITION_THRESHOLD),
+     * then -> horizontalClaw.open()
      * );
      *
-     * @param query The check function to query, must return a boolean
+     * @param query  The check function to query, must return a boolean
      * @param action The action function to run once the query returns true, must return void
      */
     public void linearSchedule(Function<Void, Boolean> query, Consumer<Void> action) {
@@ -81,10 +80,9 @@ public class Scheduler {
     }
 
     /**
-     *
      * @param query
      * @param action
-     * @param wait Wait time in milliseconds
+     * @param wait   Wait time in milliseconds
      */
     public void linearSchedule(Function<Void, Boolean> query, Consumer<Void> action, double wait) {
         linearQueries.add(query);
@@ -97,8 +95,13 @@ public class Scheduler {
         return linearQueries.size() > 0;
     }
 
-    public int linearQueryLength() { return linearQueries.size(); }
-    public int globalQueryLength() { return globalQueries.size(); }
+    public int linearQueryLength() {
+        return linearQueries.size();
+    }
+
+    public int globalQueryLength() {
+        return globalQueries.size();
+    }
 
     public boolean hasGlobalQueries() {
         return globalQueries.size() > 0;

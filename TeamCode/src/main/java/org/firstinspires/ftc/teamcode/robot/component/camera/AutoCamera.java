@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -43,6 +42,7 @@ public class AutoCamera extends CameraSuper {
 
     /**
      * Get parking spot returned by pipeline
+     *
      * @return Parking spot, an integer 1-3
      */
     public int getParkingSpot() {

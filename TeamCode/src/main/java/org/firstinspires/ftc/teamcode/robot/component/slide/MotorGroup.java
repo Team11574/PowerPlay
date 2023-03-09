@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot.component.slide;
 
+import static org.firstinspires.ftc.teamcode.cog.util.Generic.withinThreshold;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.CURRENT_ALERT_STOPPED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_RUN_TO_POSITION_POWER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_SET_POSITION_THRESHOLD;
@@ -11,9 +12,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.robot.component.HardwareComponent;
+import org.firstinspires.ftc.teamcode.cog.component.HardwareComponent;
 import org.firstinspires.ftc.teamcode.robot.exceptions.UndefinedSetPositionException;
-import static org.firstinspires.ftc.teamcode.util.Generic.withinThreshold;
 
 import java.util.ArrayList;
 
@@ -37,12 +37,15 @@ public class MotorGroup extends HardwareComponent {
     public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx motor, double ticksPerInch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{motor}, ticksPerInch);
     }
+
     public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx motor, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{motor}, minEncoderPosition, maxEncoderPosition, ticksPerInch);
     }
+
     public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] motors, double ticksPerInch) {
         this(hardwareMap, telemetry, motors, 0, Double.POSITIVE_INFINITY, ticksPerInch);
     }
+
     public MotorGroup(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] motors, double minEncoderPosition, double maxEncoderPosition, double ticksPerInch) {
         super(hardwareMap, telemetry);
         this.setPositions = new ArrayList<>();
@@ -108,7 +111,9 @@ public class MotorGroup extends HardwareComponent {
     }
      */
 
-    public boolean atSetPosition() { return atSetPosition(S_SET_POSITION_THRESHOLD); }
+    public boolean atSetPosition() {
+        return atSetPosition(S_SET_POSITION_THRESHOLD);
+    }
 
     public boolean atSetPosition(double threshold) {
         double sum = 0;
@@ -145,7 +150,7 @@ public class MotorGroup extends HardwareComponent {
         setTargetPosition(setPositions.get(setPosition));
     }
 
-    public boolean goToPositionConstant(VerticalSlide.SetPosition index){
+    public boolean goToPositionConstant(VerticalSlide.SetPosition index) {
         return goToPositionConstant(index.ordinal());
     }
 
@@ -200,7 +205,6 @@ public class MotorGroup extends HardwareComponent {
         }
         setPositions.set(positionIndex, positionValue);
     }
-
 
 
     public void setSetPositionLength(int positionIndex, double positionValue) throws UndefinedSetPositionException {

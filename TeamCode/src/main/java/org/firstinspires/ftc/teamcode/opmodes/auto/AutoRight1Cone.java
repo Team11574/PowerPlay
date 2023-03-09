@@ -5,11 +5,11 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotLinearOpMode;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotLinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.runnable.Scheduler;
 
 @Autonomous(name = "AUTO Right 1 Cone", group = "auto", preselectTeleOp = "Tele")
 public class AutoRight1Cone extends RobotLinearOpMode {
@@ -50,7 +50,7 @@ public class AutoRight1Cone extends RobotLinearOpMode {
             .build()
          */
 
-        Pose2d startPos = new Pose2d(0,0,0);
+        Pose2d startPos = new Pose2d(0, 0, 0);
 
         drivetrain.setPoseEstimate(startPos);
 
@@ -60,7 +60,7 @@ public class AutoRight1Cone extends RobotLinearOpMode {
                 //new Pose2d(36, -61.5, Math.toRadians(90)))
                 .forward(56.5)
                 .back(5.5)
-                .strafeLeft(12+deltaX)
+                .strafeLeft(12 + deltaX)
                 .build();
 
         /*
@@ -70,17 +70,17 @@ public class AutoRight1Cone extends RobotLinearOpMode {
          */
 
         spot1 = drivetrain.trajectorySequenceBuilder(cone.end())
-                .strafeLeft(12-deltaX)
+                .strafeLeft(12 - deltaX)
                 .back(21.5)
                 .build();
 
         spot2 = drivetrain.trajectorySequenceBuilder(cone.end())
-                .strafeRight(12-deltaX)
+                .strafeRight(12 - deltaX)
                 .back(21.5)
                 .build();
 
         spot3 = drivetrain.trajectorySequenceBuilder(cone.end())
-                .strafeRight(34.5-deltaX)
+                .strafeRight(34.5 - deltaX)
                 .back(21.5)
                 .build();
 
@@ -170,7 +170,7 @@ public class AutoRight1Cone extends RobotLinearOpMode {
 
     void runCone() {
         robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
-        while(!robot.verticalSlide.atSetPosition()) {
+        while (!robot.verticalSlide.atSetPosition()) {
             robot.update();
         }
         robot.depositCone();

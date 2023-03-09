@@ -6,11 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.opmodes.base.RobotOpMode;
+import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.cog.control.GamepadPlus;
+import org.firstinspires.ftc.teamcode.cog.opmodes.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.component.drivetrain.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
-import org.firstinspires.ftc.teamcode.util.GamepadPlus;
 
 @TeleOp(name = "TeleTesting", group = "tele")
 public class TeleTesting extends RobotOpMode {

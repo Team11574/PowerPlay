@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.component.slide;
 
+import static org.firstinspires.ftc.teamcode.cog.util.Generic.withinThreshold;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_SET_POSITION_THRESHOLD;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_ENCODER_CENTER;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_PIDF;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_TICKS_PER_IN;
-import static org.firstinspires.ftc.teamcode.util.Generic.withinThreshold;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -24,12 +23,15 @@ public class VerticalSlide extends MotorGroup {
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, limitSwitch);
     }
+
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, double minEncoderPosition, double maxEncoderPosition, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, minEncoderPosition, maxEncoderPosition, limitSwitch);
     }
+
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, slideMotors, 0, Double.POSITIVE_INFINITY, limitSwitch);
     }
+
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx[] slideMotors, double minEncoderPosition, double maxEncoderPosition, DigitalChannel limitSwitch) {
         super(hardwareMap, telemetry, slideMotors, minEncoderPosition, maxEncoderPosition, VS_TICKS_PER_IN);
         this.motors = slideMotors;
@@ -107,7 +109,9 @@ public class VerticalSlide extends MotorGroup {
     }
 
     @Override
-    public boolean atSetPosition() { return atSetPosition(S_SET_POSITION_THRESHOLD); }
+    public boolean atSetPosition() {
+        return atSetPosition(S_SET_POSITION_THRESHOLD);
+    }
 
     @Override
     public boolean atSetPosition(double threshold) {
@@ -133,15 +137,15 @@ public class VerticalSlide extends MotorGroup {
         // If switch is pressed
         if (getLimitState()) {
             // If going upwards and at the top, stop
-            if (getPosition() > VS_ENCODER_CENTER ) {// && getDirection() > 0) {
+            if (getPosition() > VS_ENCODER_CENTER) {// && getDirection() > 0) {
                 stopDirection = 1;
                 // stop()
-            // If going downwards and at the bottom, stop
+                // If going downwards and at the bottom, stop
             } else if (getPosition() <= VS_ENCODER_CENTER) { // && getDirection() < 0) {
                 if (motors[0].getMode() == DcMotorEx.RunMode.RUN_USING_ENCODER) {
                     hardReset();
                 } else if (motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION &&
-                            getPosition() > getTargetPosition()) {
+                        getPosition() > getTargetPosition()) {
                     hardReset();
                 }
                 stopDirection = -1;
