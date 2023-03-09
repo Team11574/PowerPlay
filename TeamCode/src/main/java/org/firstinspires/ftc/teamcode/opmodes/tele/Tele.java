@@ -26,6 +26,9 @@ public class Tele extends RobotOpMode {
     boolean levellingEnabled = true;
     boolean yRetraction = false;
 
+    int queueMoveDirection = -1;
+    TileCalculation t;
+
     @Override
     public void init() {
         //super.init();
@@ -36,6 +39,7 @@ public class Tele extends RobotOpMode {
         pad2 = new GamepadPlus(gamepad2);
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         scheduler = new Scheduler();
+        t = new TileCalculation(robot.drivetrain);
     }
 
     @Override
@@ -46,39 +50,17 @@ public class Tele extends RobotOpMode {
 
         if (pad1.right_trigger_active()) {
             int move_direction = pad1.left_stick_octant();
-            TileCalculation t = new TileCalculation(robot.drivetrain);
-            if (move_direction % 2 == 0) {
-                switch (move_direction / 2) {
-                    case 0:
-                        t.queueMove(TileCalculation.Move.RIGHT);
-                        break;
-                    case 1:
-                        t.queueMove(TileCalculation.Move.UP);
-                        break;
-                    case 2:
-                        t.queueMove(TileCalculation.Move.LEFT);
-                        break;
-                    case 3:
-                        t.queueMove(TileCalculation.Move.DOWN);
-                        break;
-                }
-            } else {
-                switch ((move_direction + 1) / 2) {
-                    case 1:
-                        t.queueMoveToJunction(TileCalculation.Junction.TOP_RIGHT);
-                        break;
-                    case 2:
-                        t.queueMoveToJunction(TileCalculation.Junction.TOP_LEFT);
-                        break;
-                    case 3:
-                        t.queueMoveToJunction(TileCalculation.Junction.BOTTOM_LEFT);
-                        break;
-                    case 4:
-                        t.queueMoveToJunction(TileCalculation.Junction.BOTTOM_RIGHT);
-                        break;
-                }
-            }
+            if (move_direction != -1)
+                queueMoveDirection = move_direction;
+            else
+                queueMovement(queueMoveDirection);
         } else {
+            if (pad1.left_stick_octant() != -1)
+                queueMovement(pad1.left_stick_octant());
+            else
+                queueMovement(queueMoveDirection);
+            
+            queueMoveDirection = -1;
             double velY = -pad1.gamepad.left_stick_y;
             double velX = pad1.gamepad.left_stick_x;
             double theta = pad1.gamepad.right_stick_x;
@@ -202,6 +184,40 @@ public class Tele extends RobotOpMode {
         }
 
         fullTelemetry();
+    }
+
+    void queueMovement(int move_direction) {
+        if (move_direction % 2 == 0) {
+            switch (move_direction / 2) {
+                case 0:
+                    t.queueMove(TileCalculation.Move.RIGHT);
+                    break;
+                case 1:
+                    t.queueMove(TileCalculation.Move.UP);
+                    break;
+                case 2:
+                    t.queueMove(TileCalculation.Move.LEFT);
+                    break;
+                case 3:
+                    t.queueMove(TileCalculation.Move.DOWN);
+                    break;
+            }
+        } else {
+            switch ((move_direction + 1) / 2) {
+                case 1:
+                    t.queueMoveToJunction(TileCalculation.Junction.TOP_RIGHT);
+                    break;
+                case 2:
+                    t.queueMoveToJunction(TileCalculation.Junction.TOP_LEFT);
+                    break;
+                case 3:
+                    t.queueMoveToJunction(TileCalculation.Junction.BOTTOM_LEFT);
+                    break;
+                case 4:
+                    t.queueMoveToJunction(TileCalculation.Junction.BOTTOM_RIGHT);
+                    break;
+            }
+        }
     }
 
     public void update() {

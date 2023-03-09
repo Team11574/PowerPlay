@@ -92,6 +92,9 @@ public class GamepadPlus {
      * @return the octant of the right stick
      */
     public int right_stick_octant() {
+        if (gamepad.right_stick_x == 0 && gamepad.right_stick_y == 0) {
+            return -1;
+        }
         double shift = Math.PI / 8;
         double theta = right_stick_angle();
         if (theta < 0) {
@@ -107,6 +110,9 @@ public class GamepadPlus {
      * @return the octant of the left stick
      */
     public int left_stick_octant() {
+        if (gamepad.left_stick_x == 0 && gamepad.left_stick_y == 0) {
+            return -1;
+        }
         double shift = Math.PI / 8;
         double theta = left_stick_angle();
         if (theta < 0) {
