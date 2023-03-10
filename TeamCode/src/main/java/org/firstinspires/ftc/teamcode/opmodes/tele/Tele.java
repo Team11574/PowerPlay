@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
 import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.cog.component.drive.PoseStorage;
 import org.firstinspires.ftc.teamcode.cog.component.drive.TileCalculation;
 import org.firstinspires.ftc.teamcode.cog.control.GamepadPlus;
 import org.firstinspires.ftc.teamcode.cog.opmodes.RobotOpMode;
@@ -37,6 +38,7 @@ public class Tele extends RobotOpMode {
         this.robot = new Robot(hardwareMap, telemetry);
         robot.verticalClaw.open();
         this.drivetrain = robot.drivetrain;
+        drivetrain.setPoseEstimate(PoseStorage.lastPose);
         pad1 = new GamepadPlus(gamepad1);
         pad2 = new GamepadPlus(gamepad2);
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -97,19 +99,20 @@ public class Tele extends RobotOpMode {
         }
 
         if (!drivetrain.isBusy() && trajectoryRunning) {
-            if (t.queueHasTrajectory()) {
+            if (t.queueLength() >= 2) {
                 t.queueRemove(0);
                 Trajectory trajectory = t.queueGet(0);
                 drivetrain.followTrajectoryAsync(trajectory);
                 trajectoryRunning = true;
+            } else if (t.queueLength() == 1) {
+                t.queueRemove(0);
             } else {
                 trajectoryRunning = false;
             }
         }
 
         if (pad1.left_stick_button_pressed)
-            if (!t.isCentered())
-                t.queueCenter();
+            t.queueCenter();
 
         // HOLD TRIGGER to flip
         if (!overrideMain) {
@@ -292,6 +295,9 @@ public class Tele extends RobotOpMode {
         multiTelemetry.addData("Turret pos", robot.turret.getPosition());
         multiTelemetry.addData("Lever pos", robot.lever.getPosition());
         multiTelemetry.addData("Hinge pos", robot.hinge.getPosition());
+        multiTelemetry.addLine();
+        multiTelemetry.addData("Pose", drivetrain.getPoseEstimate());
+
         multiTelemetry.update();
     }
 }

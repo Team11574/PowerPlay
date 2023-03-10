@@ -458,12 +458,25 @@ public class TileCalculation {
      * Queue a trajectory to center the robot on the tile. Discontinuous.
      */
     public void queueCenter() {
+        queueCenter(CENTER_THRESHOLD);
+    }
+
+    /**
+     * Queue a trajectory to center the robot on the tile. Discontinuous.
+     *
+     * @param threshold The threshold (in inches) to be considered centered.
+     */
+    public void queueCenter(double threshold) {
         if (trajectoryQueue.size() > 0) {
             return;
         }
+        // No need to center the robot if already centered
+        if (isCentered(threshold))
+            return;
+
         Trajectory centerTrajectory = drivetrain.trajectoryBuilder(drivetrain.getPoseEstimate())
-                .lineToConstantHeading(getVectorByID())
-                .build();
+            .lineToConstantHeading(getVectorByID())
+            .build();
         queueAdd(centerTrajectory);
     }
 
@@ -477,6 +490,10 @@ public class TileCalculation {
 
     public boolean queueHasTrajectory() {
         return trajectoryQueue.size() > 0;
+    }
+
+    public int queueLength() {
+        return trajectoryQueue.size();
     }
 
     public Trajectory queuePeek() {
