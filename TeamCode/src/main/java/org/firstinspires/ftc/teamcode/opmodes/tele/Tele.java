@@ -50,20 +50,19 @@ public class Tele extends RobotOpMode {
     public void loop() {
         //super.loop();
         robot.update();
+        drivetrain.updatePoseEstimate();
         update();
 
         if (pad1.right_trigger_active()) {
             int move_direction = pad1.left_stick_octant();
             if (move_direction != -1)
                 queueMoveDirection = move_direction;
-            else
+            else if (queueMoveDirection != -1) {
                 queueMovement(queueMoveDirection);
+                queueMoveDirection = move_direction;
+            }
+            multiTelemetry.addData("Direction: ", move_direction);
         } else {
-            if (pad1.left_stick_octant() != -1)
-                queueMovement(pad1.left_stick_octant());
-            else
-                queueMovement(queueMoveDirection);
-
             queueMoveDirection = -1;
             double velY = -pad1.gamepad.left_stick_y;
             double velX = pad1.gamepad.left_stick_x;
@@ -90,6 +89,23 @@ public class Tele extends RobotOpMode {
         // 3.
 
 
+        if (t.queueLength() >= 2) {
+            if (trajectoryRunning)
+                t.queueRemove(0);
+            Trajectory trajectory = t.queueGet(0);
+            drivetrain.followTrajectoryAsync(trajectory);
+            trajectoryRunning = true;
+        }
+        if (t.queueLength() == 1) {
+            Trajectory trajectory = t.queueRemove(0);
+            drivetrain.followTrajectoryAsync(trajectory);
+            trajectoryRunning = true;
+        }
+        if (!drivetrain.isBusy()) {
+            trajectoryRunning = false;
+        }
+
+        /*
         if (!drivetrain.isBusy() && !trajectoryRunning) {
             if (t.queueHasTrajectory()) {
                 Trajectory trajectory = t.queueGet(0);
@@ -110,6 +126,8 @@ public class Tele extends RobotOpMode {
                 trajectoryRunning = false;
             }
         }
+
+         */
 
         if (pad1.left_stick_button_pressed)
             t.queueCenter();
@@ -264,7 +282,8 @@ public class Tele extends RobotOpMode {
         pad1.update();
         pad2.update();
         scheduler.update();
-        t.update();
+        if (!trajectoryRunning && !drivetrain.isBusy())
+            t.update();
         if (drivetrain.isBusy()) {
             drivetrain.update();
         }
