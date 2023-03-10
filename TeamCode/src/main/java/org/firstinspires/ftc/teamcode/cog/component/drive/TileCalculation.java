@@ -385,13 +385,14 @@ public class TileCalculation {
             startPose = trajectoryQueue.get(trajectoryQueue.size() - 1).end();
         }
 
+
         // Add new full-square trajectory
         newTrajectorySegment1 = drivetrain.trajectoryBuilder(startPose, startHeading)
                 .splineToConstantHeading(
                         midpoint(getVectorByID(nextTile), getVectorByID(targetTile)),
                         endHeading)
                 .build();
-        newTrajectorySegment2 = drivetrain.trajectoryBuilder(newTrajectorySegment1.end())
+        newTrajectorySegment2 = drivetrain.trajectoryBuilder(newTrajectorySegment1.end(), endHeading)
                 .splineToConstantHeading(
                         getVectorByID(nextTile),
                         endHeading)
@@ -547,5 +548,6 @@ public class TileCalculation {
 
     public void update() {
         lastPose = drivetrain.getPoseEstimate();
+        targetTile = getIDByVector();
     }
 }

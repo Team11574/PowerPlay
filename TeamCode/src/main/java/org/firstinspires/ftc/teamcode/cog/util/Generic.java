@@ -22,7 +22,7 @@ public class Generic {
      */
     public static Vector2d midpoint(Vector2d first, Vector2d second) {
         return new Vector2d(
-                (first.getX() + second.getY()) / 2,
+                (first.getX() + second.getX()) / 2,
                 (first.getY() + second.getY()) / 2
         );
     }

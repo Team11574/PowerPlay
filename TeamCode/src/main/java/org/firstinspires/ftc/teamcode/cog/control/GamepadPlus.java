@@ -78,11 +78,11 @@ public class GamepadPlus {
     }
 
     public double right_stick_angle() {
-        return Math.atan2(gamepad.right_stick_y, gamepad.right_stick_x);
+        return Math.atan2(-gamepad.right_stick_y, gamepad.right_stick_x);
     }
 
     public double left_stick_angle() {
-        return Math.atan2(gamepad.left_stick_y, gamepad.left_stick_x);
+        return Math.atan2(-gamepad.left_stick_y, gamepad.left_stick_x);
     }
 
     /**
@@ -100,7 +100,7 @@ public class GamepadPlus {
         if (theta < 0) {
             theta += 2 * Math.PI;
         }
-        return (int) Math.ceil((theta + shift) / (Math.PI / 4)) % 9;
+        return (int) Math.ceil((theta + shift) / (Math.PI / 4) - 1) % 8;
     }
 
     /**
@@ -118,7 +118,7 @@ public class GamepadPlus {
         if (theta < 0) {
             theta += 2 * Math.PI;
         }
-        return (int) Math.ceil((theta + shift) / (Math.PI / 4)) % 9;
+        return (int) Math.ceil((theta + shift) / (Math.PI / 4) - 1) % 8;
     }
 
     public boolean right_trigger_active() {
