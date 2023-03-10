@@ -11,6 +11,7 @@
 -dontwarn com.vuforia.**
 -dontwarn com.sun.**
 -dontwarn org.tensorflow.**
+-dontwarn incognito.**
 
 # Op modes
 -keep public class * extends com.qualcomm.robotcore.eventloop.opmode.OpMode
