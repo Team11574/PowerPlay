@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.cog.control.GamepadPlus;
 import org.firstinspires.ftc.teamcode.cog.opmodes.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @TeleOp(name = "Tele", group = "tele")
 public class Tele extends RobotOpMode {
@@ -89,20 +90,24 @@ public class Tele extends RobotOpMode {
         // 3.
 
 
-        if (t.queueLength() >= 2) {
-            if (trajectoryRunning)
-                t.queueRemove(0);
-            Trajectory trajectory = t.queueGet(0);
-            drivetrain.followTrajectoryAsync(trajectory);
-            trajectoryRunning = true;
+        if (t.queueHasTrajectory()) {
+            if (!trajectoryRunning) {
+                TrajectorySequence sequence = t.build();
+                if (sequence != null) {
+                    drivetrain.followTrajectorySequenceAsync(sequence);
+                    trajectoryRunning = true;
+                }
+            } else {
+                TrajectorySequence sequence = t.build();
+                if (sequence != null) {
+                    drivetrain.modifyTrajectorySequenceAsync(sequence);
+                }
+            }
         }
-        if (t.queueLength() == 1) {
-            Trajectory trajectory = t.queueRemove(0);
-            drivetrain.followTrajectoryAsync(trajectory);
-            trajectoryRunning = true;
-        }
+
         if (!drivetrain.isBusy()) {
             trajectoryRunning = false;
+            t.reset();
         }
 
         /*

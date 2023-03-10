@@ -211,6 +211,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         trajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
     }
 
+    public void modifyTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
+        trajectorySequenceRunner.modifyTrajectorySequenceAsync(trajectorySequence);
+    }
+
     public void followTrajectorySequence(TrajectorySequence trajectorySequence) {
         followTrajectorySequenceAsync(trajectorySequence);
         waitForIdle();

@@ -93,6 +93,11 @@ public class TrajectorySequenceRunner {
         lastSegmentIndex = -1;
     }
 
+    // ADDED BY US
+    public void modifyTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
+        currentTrajectorySequence = trajectorySequence;
+    }
+
     public @Nullable
     DriveSignal update(Pose2d poseEstimate, Pose2d poseVelocity) {
         Pose2d targetPose = null;
