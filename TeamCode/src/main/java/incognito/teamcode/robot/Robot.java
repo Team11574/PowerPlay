@@ -8,18 +8,18 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import incognito.cog.actions.Scheduler;
-import incognito.cog.component.Component;
+import incognito.cog.component.camera.AutoCamera;
 import incognito.cog.component.drive.Drivetrain;
 import incognito.cog.component.servo.ContinuousServo;
+import incognito.cog.robot.RobotCog;
 import incognito.teamcode.config.SlideConstants;
-import incognito.teamcode.robot.component.camera.AutoCamera;
 import incognito.teamcode.robot.component.claw.Claw;
 import incognito.teamcode.robot.component.claw.Flipper;
 import incognito.teamcode.robot.component.claw.Lever;
 import incognito.teamcode.robot.component.slide.HorizontalSlide;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
-public class Robot extends Component {
+public class Robot extends RobotCog {
     // ===== Instance Variables =====
 
     boolean cameraEnabled;

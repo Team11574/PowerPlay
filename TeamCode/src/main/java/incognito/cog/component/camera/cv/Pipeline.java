@@ -1,4 +1,4 @@
-package incognito.teamcode.robot.component.camera;
+package incognito.cog.component.camera.cv;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -7,12 +7,15 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+
+import incognito.teamcode.config.CameraConstants;
 
 public class Pipeline extends OpenCvPipeline {
     Telemetry telemetry;
@@ -38,8 +41,7 @@ public class Pipeline extends OpenCvPipeline {
 
     List<Scalar> colorRange;
 
-    int i;
-    int j;
+    int i, j, k;
     int maxIndex;
 
     double area;
@@ -51,6 +53,16 @@ public class Pipeline extends OpenCvPipeline {
     // Number of frames to include in parking decision
     final int SAMPLES = 10;
 
+    Mat yellowROI;
+    Mat yellowMask;
+    List<MatOfPoint> yellowContours;
+    MatOfPoint yellowContour;
+    Moments moments;
+
+    ArrayList<Double> junctionDistances;
+
+    Scalar yellowLower = new Scalar(20, 100, 100);
+    Scalar yellowUpper = new Scalar(30, 255, 255);
 
     public Pipeline(Telemetry telem) {
         telemetry = telem;
@@ -228,25 +240,29 @@ public class Pipeline extends OpenCvPipeline {
         stopped = true;
     }
 
-    /*public double get_junction_distance(Mat input) {
-        // Detect edges of a yellow rectangle
+    public double getJunctionDistance(Mat input) {
+        // Use moments to find the center of yellow blobs
 
-        // Convert to HSV
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+        imageROI = input.clone();
+        // TODO: Adjust ROI w/ imageROI.adjustROI()
 
-        // Threshold for yellow
-        Core.inRange(input, new Scalar(20, 100, 100), new Scalar(30, 255, 255), input);
+        Core.inRange(imageROI, yellowLower, yellowUpper, yellowMask);
 
-        // Find edges of yellow rectangle
-        Imgproc.Canny(input, input, 100, 200);
+        Imgproc.findContours(yellowMask, yellowContours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        // Find center of yellow rectangle
-        Moments m = Imgproc.moments(input, true);
-        Point center = new Point(m.get_m10() / m.get_m00(), m.get_m01() / m.get_m00());
+        imageROI.release();
+        yellowMask.release();
 
-        // Find distance from center of image to center of yellow rectangle
-        double distance = Math.sqrt(Math.pow(center.x - 120, 2) + Math.pow(center.y - 160, 2));
+        for (k = 0; k < yellowContours.size(); k++) {
+            yellowContour = yellowContours.get(k);
+            moments = Imgproc.moments(yellowContour, true);
+            double x = moments.get_m10() / moments.get_m00();
+            double y = moments.get_m01() / moments.get_m00();
+            junctionDistances.add(Math.sqrt(Math.pow(x - 160, 2) + Math.pow(y - 120, 2)));
+            yellowContour.release();
+        }
 
-        return 0;
-    }*/
+        return Collections.min(junctionDistances);
+
+    }
 }

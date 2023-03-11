@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import java.util.ArrayList;
 
 import incognito.cog.component.HardwareComponent;
-import incognito.teamcode.robot.exceptions.UndefinedSetPositionException;
+import incognito.cog.exceptions.UndefinedSetPositionException;
 
 public class MotorGroup extends HardwareComponent {
     double MIN_ENCODER_POSITION;

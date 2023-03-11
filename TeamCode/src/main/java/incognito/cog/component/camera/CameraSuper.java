@@ -1,4 +1,4 @@
-package incognito.teamcode.robot.component.camera;
+package incognito.cog.component.camera;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -6,6 +6,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import incognito.cog.component.HardwareComponent;
+import incognito.cog.component.camera.cv.Pipeline;
 
 public class CameraSuper extends HardwareComponent {
 

@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import incognito.teamcode.robot.exceptions.UndefinedSetPositionException;
+import incognito.cog.exceptions.UndefinedSetPositionException;
 
 public class VerticalSlide extends MotorGroup {
     // Instance Variables

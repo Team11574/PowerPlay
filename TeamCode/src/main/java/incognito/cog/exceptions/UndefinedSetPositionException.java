@@ -1,4 +1,4 @@
-package incognito.teamcode.robot.exceptions;
+package incognito.cog.exceptions;
 
 public class UndefinedSetPositionException extends Exception {
 }

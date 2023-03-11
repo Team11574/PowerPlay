@@ -1,4 +1,4 @@
-package incognito.teamcode.robot.component.camera;
+package incognito.teamcode.config;
 
 import com.acmerobotics.dashboard.config.Config;
 

@@ -1,4 +1,4 @@
-package incognito.teamcode.robot.component.camera;
+package incognito.cog.component.camera;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
+import incognito.cog.component.camera.cv.TelePipeline;
 
 public class TeleCamera extends CameraSuper {
     // Instance Variables

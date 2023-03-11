@@ -1,29 +1,23 @@
 package incognito.cog.actions;
 
-import incognito.teamcode.robot.Robot;
-
-import java.util.ArrayList;
-import java.util.function.Consumer;
+import incognito.cog.callbacks.CallbackManagerRunnable;
 
 public class Action {
     public boolean resolved = false;
-    private Consumer<Robot> action;
+    private final Runnable action;
     public String name;
 
-    private ArrayList<Consumer<Robot>> callbacks = new ArrayList<>();
+    private final CallbackManagerRunnable<Event> callbacks = new CallbackManagerRunnable<Event>(Event.values());
 
-    Action(String name, Consumer<Robot> action, Runnable completion) {
+    Action(String name, Runnable action) {
         this.name = name;
         this.action = action;
-        addCallback((robot) -> completion.run());
     }
 
-    }
-
-    public void run(Robot robot) {
-        action.accept(robot);
+    public void run() {
+        action.run();
         resolved = true;
-        dispatchCallback(robot);
+        dispatchCallback(Event.RESOLVED);
     }
 
     // Method to see if it's completed
@@ -31,14 +25,21 @@ public class Action {
         return resolved;
     }
 
-    public void addCallback(Consumer<Robot> callback) {
-        callbacks.add(callback);
+    protected void setResolved(boolean resolved) {
+        this.resolved = resolved;
+        dispatchCallback(Event.RESOLVED);
     }
 
-    public void dispatchCallback(Robot robot) {
-        for (Consumer<Robot> callback : callbacks) {
-            callback.accept(robot);
-        }
+    public void registerCallback(Event event, Runnable callback) {
+        callbacks.registerCallback(event, callback);
+    }
+
+    public void dispatchCallback(Event event) {
+        callbacks.dispatchCallback(event);
+    }
+
+    public enum Event {
+        RUN, RESOLVED
     }
 
 }
