@@ -68,8 +68,8 @@ public class Pipeline extends OpenCvPipeline {
     public boolean doingJunctions = false;
     double x;
 
-    Scalar yellowLower = new Scalar(20, 150, 150);
-    Scalar yellowUpper = new Scalar(30, 255, 255);
+    Scalar yellowLower = new Scalar(20, 150, 120);
+    Scalar yellowUpper = new Scalar(40, 255, 255);
 
 
     public Pipeline(Telemetry telem) {
@@ -244,6 +244,9 @@ public class Pipeline extends OpenCvPipeline {
 
         imageROI = input.clone();
         // TODO: Adjust ROI w/ imageROI.adjustROI()
+        imageROI = imageROI.adjustROI(
+                -200, 0, 0, 0
+        );
 
         Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
 
@@ -271,11 +274,13 @@ public class Pipeline extends OpenCvPipeline {
                 moments = Imgproc.moments(yellowContour, true);
                 x = moments.get_m10() / moments.get_m00();
                 yellowContourArea = Imgproc.contourArea(yellowContour);
-                junctionArea = yellowContourArea;
                 junctionDistanceInternal = 170 - x;
             }
             yellowContour.release();
         }
+
+        junctionArea = yellowContourArea;
+
         yellowContours.clear();
         junctionDistance = junctionDistanceInternal;
     }
