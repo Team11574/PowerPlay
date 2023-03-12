@@ -8,8 +8,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.cog.control.GamepadPlus;
 import org.firstinspires.ftc.teamcode.cog.opmodes.RobotOpMode;
 import org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants;
@@ -25,11 +27,13 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
     boolean pastOverStopCurrent;
     boolean disabled;
 
+    DistanceSensor distanceSensor;
 
     @Override
     public void init() {
         testing_M = hardwareMap.get(DcMotorEx.class, "testing_M");
         testing_M.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         g = new GamepadPlus(gamepad1);
         tel = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         tel.addData("Starting Current Alert", testing_M.getCurrentAlert(CurrentUnit.MILLIAMPS));
@@ -71,6 +75,9 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
         testing_M.setCurrentAlert(SlideConstants.CURRENT_ALERT, CurrentUnit.MILLIAMPS);
         if (!disabled)
             testing_M.setPower(-gamepad1.left_stick_y);
+
+        tel.addData("Distance (cm)", distanceSensor.getDistance(DistanceUnit.CM));
+
         tel.addData("testing_M Current (mA)", testing_M.getCurrent(CurrentUnit.MILLIAMPS));
         tel.addData("testing_M Over Current", testing_M.isOverCurrent());
         tel.addData("testing_M Current Alert", testing_M.getCurrentAlert(CurrentUnit.MILLIAMPS));

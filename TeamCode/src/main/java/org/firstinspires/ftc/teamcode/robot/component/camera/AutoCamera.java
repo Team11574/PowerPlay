@@ -48,4 +48,16 @@ public class AutoCamera extends CameraSuper {
     public int getParkingSpot() {
         return pipeline.getParkingSpot();
     }
+
+    public void swapMode() {
+        pipeline.doingJunctions = !pipeline.doingJunctions;
+    }
+
+    public double getJunctionDistance() {
+        return pipeline.junctionDistance;
+    }
+
+    public double getJunctionArea() {
+        return pipeline.junctionArea;
+    }
 }

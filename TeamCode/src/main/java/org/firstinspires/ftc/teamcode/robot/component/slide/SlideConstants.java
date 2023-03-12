@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class SlideConstants {
     /* == Vertical Slide == */
     public static final double VS_TICKS_PER_REV = 384.5;
-    public static final double VS_GEAR_RATIO = ((double) 16)/19;
+    public static final double VS_GEAR_RATIO = ((double) 16) / 19;
     public static final double VS_PULLEY_CIRCUMFERENCE = 4.409; // in/rev
 
     // 73.4383020377 Ticks / In
@@ -17,7 +17,7 @@ public class SlideConstants {
     // input revolutions | output revolutions |        inch         |
 
     // TODO: Tune vertical slide
-    public static PIDFCoefficients VS_PIDF = new PIDFCoefficients(0,0,0,0);
+    public static PIDFCoefficients VS_PIDF = new PIDFCoefficients(0, 0, 0, 0);
 
     public static double VS_KG = 0.04;
 
@@ -47,7 +47,7 @@ public class SlideConstants {
     public static double HS_BRAKE_THRESHOLD = 75;
 
     // TODO: Tune horizontal slide
-    public static PIDFCoefficients HS_PIDF = new PIDFCoefficients(0,0,0,0);
+    public static PIDFCoefficients HS_PIDF = new PIDFCoefficients(0, 0, 0, 0);
 
     // TODO: Insert correct set positions for horizontal slide
     public static double HS_SP_LOW = 10;
@@ -74,14 +74,14 @@ public class SlideConstants {
     public static double HS_LEVER_SECOND = 0.19;
     public static double HS_LEVER_OUT = 0.13;
 
-    public static double HS_LEVER_SPEED = 0.03;
+    public static double HS_LEVER_SPEED = 0.05;
     // Extra Hinge Levelling Variables
     public static final double HS_LEVER_FLAT = 0.267;
     public static final double HS_LEVER_NEG_PI_6 = 0.1;
     public static final double HS_HINGE_FLAT = 0.635;
     public static final double HS_HINGE_NEG_PI_6 = 0.505;
-    public static double HS_LEVER_TICKS_PER_RAD = (HS_LEVER_FLAT - HS_LEVER_NEG_PI_6)/(Math.PI/6);
-    public static double HS_HINGE_TICKS_PER_RAD = (HS_HINGE_FLAT - HS_HINGE_NEG_PI_6)/(Math.PI/6);
+    public static double HS_LEVER_TICKS_PER_RAD = (HS_LEVER_FLAT - HS_LEVER_NEG_PI_6) / (Math.PI / 6);
+    public static double HS_HINGE_TICKS_PER_RAD = (HS_HINGE_FLAT - HS_HINGE_NEG_PI_6) / (Math.PI / 6);
     //public static double HS_LEVER_
 
     /* == Slides General == */

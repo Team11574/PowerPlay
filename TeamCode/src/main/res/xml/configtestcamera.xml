@@ -92,11 +92,6 @@
                 name="imu"
                 port="0"
                 bus="0" />
-
-            <REV_VL53L0X_RANGE_SENSOR
-                name="distanceSensor"
-                port="0"
-                bus="1" />
         </LynxModule>
     </LynxUsbDevice>
 

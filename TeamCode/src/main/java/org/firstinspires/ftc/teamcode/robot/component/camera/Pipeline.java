@@ -11,11 +11,11 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 
 public class Pipeline extends OpenCvPipeline {
@@ -42,8 +42,7 @@ public class Pipeline extends OpenCvPipeline {
 
     List<Scalar> colorRange;
 
-    int i;
-    int j;
+    int i, j, k;
     int maxIndex;
 
     double area;
@@ -55,6 +54,23 @@ public class Pipeline extends OpenCvPipeline {
     // Number of frames to include in parking decision
     final int SAMPLES = 10;
 
+    Mat yellowROI;
+    Mat yellowMask;
+    Mat valYellow;
+    List<MatOfPoint> yellowContours;
+    MatOfPoint yellowContour;
+    ArrayList<Mat> yellowChannels;
+    Moments moments;
+    double yellowContourArea = 0;
+    public double junctionDistance = Double.POSITIVE_INFINITY;
+    public double junctionArea = 0;
+    public double junctionDistanceInternal = Double.POSITIVE_INFINITY;
+    public boolean doingJunctions = false;
+    double x;
+
+    Scalar yellowLower = new Scalar(20, 150, 150);
+    Scalar yellowUpper = new Scalar(30, 255, 255);
+
 
     public Pipeline(Telemetry telem) {
         telemetry = telem;
@@ -62,6 +78,13 @@ public class Pipeline extends OpenCvPipeline {
         contours = new ArrayList<MatOfPoint>();
         mask = new Mat();
         maxContour = new MatOfPoint();
+
+        yellowMask = new Mat();
+        yellowContours = new ArrayList<>();
+        yellowContour = new MatOfPoint();
+        yellowChannels = new ArrayList<Mat>(3); // Channels for HSV image
+        valYellow = new Mat();
+
 
         // Define list of color thresholds
         colorRanges = new ArrayList<List<Scalar>>(3);
@@ -81,99 +104,91 @@ public class Pipeline extends OpenCvPipeline {
 
     }
 
-    /**
-     * Processes the input frame.
-     * Finds area of each color and outputs the largest area.
-     *
-     * @param input
-     * @return Telemetry output stream
-     */
     @Override
     public Mat processFrame(Mat input) {
-        try {
-            if (stopped) {
-                return input;
-            }
-
-            if (imageROI != null)
-                imageROI.release();
-
-            // Clone input to imageROI
-            imageROI = input.clone();
-
-            // Makes input to HSV from RGB image
-            Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
-
-
-            // Creates a region of interest in the middle of the frame
-            imageROI = imageROI.adjustROI(
-                    -searchZone.y,
-                    -(searchZone.height + searchZone.y) + 320,
-                    -searchZone.x,
-                    -(searchZone.width + searchZone.x) + 240
-            );
-
-            // === Find largest area ===
-            areas.clear();
-            for (i = 0; i < colorRanges.size(); i++) {
-                colorRange = colorRanges.get(i);
-
-                area = getArea(imageROI, colorRange);
-                areas.add(area);
-            }
-
-            maxArea = Collections.max(areas);
-            maxIndex = areas.indexOf(maxArea);
-
-            parkingList.add(maxIndex + 1);
-
-            //telemetry.addData("Array", areas);
-            //telemetry.addData("Orange Area", areas.get(0));
-            //telemetry.addData("Purple Area", areas.get(1));
-            //telemetry.addData("Green Area", areas.get(2));
-            telemetry.addData("Max Area", maxArea);
-            telemetry.addData("Zone", maxIndex + 1);
-            telemetry.update();
-
-            imageROI.release();
+        if (doingJunctions) {
+            updateJunctionDistance(input);
             return input;
-        } catch (ConcurrentModificationException e) {
-            e.printStackTrace();
-            return input;
+        } else {
+            return processParking(input);
         }
     }
 
-    public double getArea(Mat input, List<Scalar> colorRange) {
-        try {
-            procFrame = input.clone();
 
-            maxArea = 0;
-
-            Core.inRange(procFrame, colorRange.get(0), colorRange.get(1), mask);
-
-            Core.split(procFrame, channels);
-
-            Core.bitwise_and(channels.get(2), mask, val);
-
-            contours.clear();
-
-            Imgproc.findContours(val, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-
-            for (j = 0; j < contours.size(); j++) {
-                contour = contours.get(j);
-                area2 = Imgproc.contourArea(contour);
-                if (area2 > maxArea) {
-                    maxArea = area2;
-                }
-                contour.release();
-            }
-
-            procFrame.release();
-
-            return maxArea;
-        } catch (ConcurrentModificationException c) {
-            return 0;
+    public Mat processParking(Mat input) {
+        if (stopped) {
+            return input;
         }
+
+        if (imageROI != null)
+            imageROI.release();
+
+        imageROI = input.clone();
+
+        // Creates a region of interest in the middle of the frame
+        imageROI = imageROI.adjustROI(
+                -searchZone.y,
+                -(searchZone.height + searchZone.y) + 320,
+                -searchZone.x,
+                -(searchZone.width + searchZone.x) + 240
+        );
+
+        // Makes input to HSV from RGB image
+        Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
+
+        // === Find largest area ===
+        areas.clear();
+        for (i = 0; i < colorRanges.size(); i++) {
+            colorRange = colorRanges.get(i);
+
+            area = getArea(imageROI, colorRange);
+            areas.add(area);
+        }
+
+        maxArea = Collections.max(areas);
+        maxIndex = areas.indexOf(maxArea);
+
+        parkingList.add(maxIndex + 1);
+
+        //telemetry.addData("Array", areas);
+        //telemetry.addData("Orange Area", areas.get(0));
+        //telemetry.addData("Purple Area", areas.get(1));
+        //telemetry.addData("Green Area", areas.get(2));
+        telemetry.addData("Max Area", maxArea);
+        telemetry.addData("Zone", maxIndex + 1);
+        telemetry.update();
+
+        imageROI.release();
+        return input;
+    }
+
+    public double getArea(Mat input, List<Scalar> colorRange) {
+        procFrame = input.clone();
+
+        maxArea = 0;
+
+        Core.inRange(procFrame, colorRange.get(0), colorRange.get(1), mask);
+
+        Core.split(procFrame, channels);
+
+        Core.bitwise_and(channels.get(2), mask, val);
+
+        contours.clear();
+
+        Imgproc.findContours(val, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        for (j = 0; j < contours.size(); j++) {
+            contour = contours.get(j);
+            area2 = Imgproc.contourArea(contour);
+            if (area2 > maxArea) {
+                maxArea = area2;
+            }
+            contour.release();
+        }
+
+        procFrame.release();
+
+        return maxArea;
     }
 
     /**
@@ -183,14 +198,10 @@ public class Pipeline extends OpenCvPipeline {
      * @return parking spot
      */
     public int getParkingSpot() {
-        try {
-            if (parkingList.size() > SAMPLES) {
-                return mode(parkingList.subList(Math.max(parkingList.size() - (SAMPLES + 1), 0), parkingList.size()));
-            } else {
-                return mode(parkingList);
-            }
-        } catch (ConcurrentModificationException c) {
-            return 2;
+        if (parkingList.size() > SAMPLES) {
+            return mode(parkingList.subList(Math.max(parkingList.size() - (SAMPLES + 1), 0), parkingList.size()));
+        } else {
+            return mode(parkingList);
         }
     }
 
@@ -201,28 +212,24 @@ public class Pipeline extends OpenCvPipeline {
      * @return mode
      */
     static int mode(List<Integer> a) {
-        try {
-            int output = 2, maxCount = 0;
-            int i;
-            int j;
+        int output = 2, maxCount = 0;
+        int i;
+        int j;
 
-            for (i = 0; i < a.size(); ++i) {
-                int count = 0;
-                for (j = 0; j < a.size(); ++j) {
-                    if (a.get(j) == a.get(i))
-                        ++count;
-                }
-
-                if (count > maxCount) {
-                    maxCount = count;
-                    output = a.get(i);
-                }
+        for (i = 0; i < a.size(); ++i) {
+            int count = 0;
+            for (j = 0; j < a.size(); ++j) {
+                if (a.get(j) == a.get(i))
+                    ++count;
             }
 
-            return output;
-        } catch (ConcurrentModificationException c) {
-            return 2;
+            if (count > maxCount) {
+                maxCount = count;
+                output = a.get(i);
+            }
         }
+
+        return output;
     }
 
     /**
@@ -232,25 +239,44 @@ public class Pipeline extends OpenCvPipeline {
         stopped = true;
     }
 
-    /*public double get_junction_distance(Mat input) {
-        // Detect edges of a yellow rectangle
+    public void updateJunctionDistance(Mat input) {
+        // Use moments to find the center of yellow blobs
 
-        // Convert to HSV
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+        imageROI = input.clone();
+        // TODO: Adjust ROI w/ imageROI.adjustROI()
 
-        // Threshold for yellow
-        Core.inRange(input, new Scalar(20, 100, 100), new Scalar(30, 255, 255), input);
+        Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
 
-        // Find edges of yellow rectangle
-        Imgproc.Canny(input, input, 100, 200);
+        Core.inRange(imageROI, yellowLower, yellowUpper, yellowMask);
 
-        // Find center of yellow rectangle
-        Moments m = Imgproc.moments(input, true);
-        Point center = new Point(m.get_m10() / m.get_m00(), m.get_m01() / m.get_m00());
+        Core.split(imageROI, yellowChannels);
 
-        // Find distance from center of image to center of yellow rectangle
-        double distance = Math.sqrt(Math.pow(center.x - 120, 2) + Math.pow(center.y - 160, 2));
+        Core.bitwise_and(yellowChannels.get(2), yellowMask, valYellow);
 
-        return 0;
-    }*/
+        Imgproc.findContours(valYellow, yellowContours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        imageROI.release();
+        yellowMask.release();
+        junctionDistanceInternal = Double.POSITIVE_INFINITY;
+
+        telemetry.update();
+
+        Imgproc.drawContours(input, yellowContours, -1, yellowUpper, 2);
+
+        yellowContourArea = 0;
+
+        for (k = 0; k < yellowContours.size(); k++) {
+            yellowContour = yellowContours.get(k);
+            if (Imgproc.contourArea(yellowContour) > yellowContourArea) {
+                moments = Imgproc.moments(yellowContour, true);
+                x = moments.get_m10() / moments.get_m00();
+                yellowContourArea = Imgproc.contourArea(yellowContour);
+                junctionArea = yellowContourArea;
+                junctionDistanceInternal = 170 - x;
+            }
+            yellowContour.release();
+        }
+        yellowContours.clear();
+        junctionDistance = junctionDistanceInternal;
+    }
 }
