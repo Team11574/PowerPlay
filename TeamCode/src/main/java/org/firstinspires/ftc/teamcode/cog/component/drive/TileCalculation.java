@@ -408,6 +408,8 @@ public class TileCalculation {
 
     public void finalizeTrajectory() {
         addTrajectory(finalizingTrajectory);
+        lastTrajectory = finalizingTrajectory;
+        finalizingTrajectory = null;
     }
 
     public void reset() {

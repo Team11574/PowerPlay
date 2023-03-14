@@ -21,14 +21,11 @@ public class AutoCameraTesting extends LinearOpMode {
         Robot r = new Robot(hardwareMap, telemetry);
 
         camera.swapMode();
-        //camera.terminateCamera();
         while (!isStarted()) {
             multiTelemetry.addData("Junction distance", camera.getJunctionDistance());
             multiTelemetry.addData("Junction area", camera.getJunctionArea());
             multiTelemetry.update();
         }
-
-        //camera.terminateCamera();
 
         waitForStart();
 
@@ -41,7 +38,7 @@ public class AutoCameraTesting extends LinearOpMode {
             multiTelemetry.addData("Junction area", junctionArea);
             double adjustedArea = 800 / junctionArea;
             double junctionMaxArea = 3000;
-            multiTelemetry.addData("100/area", adjustedArea);
+            multiTelemetry.addData("800/area", adjustedArea);
             if (junctionArea > junctionMaxArea) {
                 velY = 0;
             } else {

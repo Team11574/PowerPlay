@@ -238,6 +238,9 @@ public class Pipeline extends OpenCvPipeline {
     public void stop() {
         stopped = true;
     }
+    public void start() {
+        stopped = false;
+    }
 
     public void updateJunctionDistance(Mat input) {
         // Use moments to find the center of yellow blobs

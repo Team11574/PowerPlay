@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.opmodes.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
@@ -36,13 +38,12 @@ public class TeleNewTesting extends RobotOpMode {
 
     DistanceSensor distanceSensor;
 
-    boolean isExtending;
+    boolean targetLocking;
 
     @Override
     public void init() {
         //super.init();
         this.robot = new Robot(hardwareMap, telemetry);
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         robot.verticalClaw.open();
         this.drivetrain = robot.drivetrain;
         drivetrain.setPoseEstimate(PoseStorage.lastPose);
@@ -60,94 +61,42 @@ public class TeleNewTesting extends RobotOpMode {
         drivetrain.updatePoseEstimate();
         update();
 
-        if (pad1.right_trigger_active()) {
-            int move_direction = pad1.left_stick_octant();
-            if (move_direction != -1)
-                queueMoveDirection = move_direction;
-            else if (queueMoveDirection != -1) {
-                queueMovement(queueMoveDirection);
-                queueMoveDirection = move_direction;
-            }
-            multiTelemetry.addData("Direction: ", move_direction);
+        // Adjust drivetrain
+        if (!targetLocking) {
+            adjustDrivetrain();
         } else {
-            queueMoveDirection = -1;
-            double velY = -pad1.gamepad.left_stick_y;
-            double velX = pad1.gamepad.left_stick_x;
-            double theta = pad1.gamepad.right_stick_x;
-
-            if (velX + velY != 0) {
-                //trajectoryRunning = false;
-                // TODO: Can set trajectory running to false if we implement cancellable trajectories
-                t.queueClear();
-            }
-
-            double normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
-            double frontRight_Power = (velY - velX - theta) / normalFactor;
-            double backRight_Power = (velY + velX - theta) / normalFactor;
-            double frontLeft_Power = (velY + velX + theta) / normalFactor;
-            double backLeft_Power = (velY - velX + theta) / normalFactor;
-
-            if (!trajectoryRunning)
-                drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+            targetLock();
         }
-
-        // 1. Have a trajectory and nothing has been started recently
-        // 2. Have a trajectory and the current trajectory is finished
-        // 3.
-
-        if (t.queueHasTrajectory()) {
-            if (!trajectoryRunning) {
-                TrajectorySequence sequence = t.build();
-                if (sequence != null) {
-                    drivetrain.followTrajectorySequenceAsync(sequence);
-                    trajectoryRunning = true;
-                }
-            } else {
-                TrajectorySequence sequence = t.build();
-                if (sequence != null) {
-                    drivetrain.modifyTrajectorySequenceAsync(sequence);
-                }
-            }
-        }
-
-        if (!drivetrain.isBusy()) {
-            trajectoryRunning = false;
-            t.reset();
-        }
-
-        /*
-        if (!drivetrain.isBusy() && !trajectoryRunning) {
-            if (t.queueHasTrajectory()) {
-                Trajectory trajectory = t.queueGet(0);
-                drivetrain.followTrajectoryAsync(trajectory);
-                trajectoryRunning = true;
-            }
-        }
-
-        if (!drivetrain.isBusy() && trajectoryRunning) {
-            if (t.queueLength() >= 2) {
-                t.queueRemove(0);
-                Trajectory trajectory = t.queueGet(0);
-                drivetrain.followTrajectoryAsync(trajectory);
-                trajectoryRunning = true;
-            } else if (t.queueLength() == 1) {
-                t.queueRemove(0);
-            } else {
-                trajectoryRunning = false;
-            }
-        }
-
-         */
 
         if (pad1.a_pressed) {
-            robot.horizontalSlide.setPower(0.25);
-            isExtending = true;
+            // TOGGLE TARGET LOCKING
+            robot.autoCamera.toggleCamera();
+            targetLocking = true;
         }
 
-        if (distanceSensor.getDistance(DistanceUnit.CM) < 2) {
-            robot.horizontalSlide.setPower(0);
-            isExtending = false;
-            robot.horizontalClaw.close();
+        if (pad1.x_pressed && !trajectoryRunning) {
+            // Assert we are centered on the current tile
+            Vector2d position = t.getVectorByID();
+            double heading = drivetrain.getPoseEstimate().getHeading();
+            drivetrain.setPoseEstimate(new Pose2d(position, heading));
+        }
+
+        // TOGGLE X to extend horizontal slide, grab a cone, and retract
+        // TODO: Go through with Dallin to see if this seems logical
+        if (pad2.x_pressed) {
+            if  (!robot.isExtending && !robot.nearCone()) {
+                // Start extend
+                robot.extend();
+            } else if (robot.isExtending && !robot.nearCone()) {
+                // Cancel extend
+                // Same thing as if it reaches the cone, except the claw will not close
+                // and the arm will not retract
+                robot.horizontalScheduler.clearGlobal();
+                robot.stopExtend();
+            } else if (robot.isExtending) {
+                // At cone distance, close claw and retract
+                robot.finishExtend();
+            }
         }
 
 
@@ -254,7 +203,7 @@ public class TeleNewTesting extends RobotOpMode {
 
         robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
         if (!overrideMain) {
-            if (!robot.isRetracting && !isExtending) {
+            if (!robot.isRetracting && !robot.isExtending) {
                 robot.horizontalSlide.setPower(pad2.get_partitioned_left_stick_x());
                 robot.moveLever(-pad2.get_partitioned_right_stick_y(), !yRetraction);
                 if (levellingEnabled && !yRetraction)
@@ -298,6 +247,127 @@ public class TeleNewTesting extends RobotOpMode {
                     break;
             }
         }
+    }
+
+    public void adjustDrivetrain() {
+        if (pad1.right_trigger_active()) {
+            // Tile based movement mode
+            int move_direction = pad1.left_stick_octant();
+            if (move_direction != -1)
+                queueMoveDirection = move_direction;
+            else if (queueMoveDirection != -1) {
+                queueMovement(queueMoveDirection);
+                queueMoveDirection = move_direction;
+            }
+            multiTelemetry.addData("Direction: ", move_direction);
+        } else {
+            queueMoveDirection = -1;
+            double velY = -pad1.gamepad.left_stick_y;
+            double velX = pad1.gamepad.left_stick_x;
+            double theta = pad1.gamepad.right_stick_x;
+
+            if (velX + velY != 0) {
+                //trajectoryRunning = false;
+                // TODO: Can set trajectory running to false if we implement cancellable trajectories
+                t.queueClear();
+            }
+
+            double normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
+            double frontRight_Power = (velY - velX - theta) / normalFactor;
+            double backRight_Power = (velY + velX - theta) / normalFactor;
+            double frontLeft_Power = (velY + velX + theta) / normalFactor;
+            double backLeft_Power = (velY - velX + theta) / normalFactor;
+
+            if (!trajectoryRunning)
+                drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+            else
+                // TODO: TEST
+                t.finalizeTrajectory();
+        }
+
+        // 1. Have a trajectory and nothing has been started recently
+        // 2. Have a trajectory and the current trajectory is finished
+        // 3.
+
+        if (t.queueHasTrajectory()) {
+            if (!trajectoryRunning) {
+                TrajectorySequence sequence = t.build();
+                if (sequence != null) {
+                    drivetrain.followTrajectorySequenceAsync(sequence);
+                    trajectoryRunning = true;
+                }
+            } else {
+                TrajectorySequence sequence = t.build();
+                if (sequence != null) {
+                    drivetrain.modifyTrajectorySequenceAsync(sequence);
+                }
+            }
+        }
+
+        if (!drivetrain.isBusy()) {
+            trajectoryRunning = false;
+            t.reset();
+        }
+
+
+
+        /*
+        if (!drivetrain.isBusy() && !trajectoryRunning) {
+            if (t.queueHasTrajectory()) {
+                Trajectory trajectory = t.queueGet(0);
+                drivetrain.followTrajectoryAsync(trajectory);
+                trajectoryRunning = true;
+            }
+        }
+
+        if (!drivetrain.isBusy() && trajectoryRunning) {
+            if (t.queueLength() >= 2) {
+                t.queueRemove(0);
+                Trajectory trajectory = t.queueGet(0);
+                drivetrain.followTrajectoryAsync(trajectory);
+                trajectoryRunning = true;
+            } else if (t.queueLength() == 1) {
+                t.queueRemove(0);
+            } else {
+                trajectoryRunning = false;
+            }
+        }
+
+         */
+    }
+
+    public void targetLock() {
+        double velX;
+        double velY;
+        double theta;
+        double junctionDistance = robot.autoCamera.getJunctionDistance();
+        double junctionArea = robot.autoCamera.getJunctionArea();
+        multiTelemetry.addData("Junction distance", junctionDistance);
+        multiTelemetry.addData("Junction area", junctionArea);
+        double adjustedArea = 800 / junctionArea;
+        double junctionMaxArea = 3000;
+        multiTelemetry.addData("Adjusted area", adjustedArea);
+        if (junctionArea > junctionMaxArea) {
+            // Happens when robot is about 11.5 cm from the pole
+            velY = 0;
+        } else {
+            velY = Math.max(0, adjustedArea);
+        }
+        velX = pad1.gamepad.left_stick_x;
+        if (Math.abs(junctionDistance) < 10) {
+            theta = 0;
+        } else {
+            theta = -0.005 * junctionDistance;
+        }
+
+
+        double normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
+        double frontRight_Power = (velY - velX - theta) / normalFactor;
+        double backRight_Power = (velY + velX - theta) / normalFactor;
+        double frontLeft_Power = (velY + velX + theta) / normalFactor;
+        double backLeft_Power = (velY - velX + theta) / normalFactor;
+
+        drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
     }
 
     public void update() {

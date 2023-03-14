@@ -16,10 +16,12 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_THIRD;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MAX_ENCODER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MIN_ENCODER;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_SENSOR_DISTANCE_CM;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_MAX;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_MIN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_SPEED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_START;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.S_AUTO_EXTEND_POWER;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_DOWN;
@@ -31,10 +33,12 @@ import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstant
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
 import org.firstinspires.ftc.teamcode.cog.component.Component;
 import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
@@ -66,11 +70,13 @@ public class Robot extends Component {
     public ContinuousServo turret;
     public ContinuousServo hinge;
     public Lever lever;
+    public DistanceSensor horizontalDistanceSensor;
 
     public Scheduler horizontalScheduler;
     public Scheduler verticalScheduler;
 
     public boolean isRetracting = false;
+    public boolean isExtending = false;
     public boolean isDepositing = false;
 
 
@@ -110,6 +116,8 @@ public class Robot extends Component {
         horizontalSlide.addSetPosition(0);
         horizontalSlide.setPower(0);
         horizontalSlide.goToSetPosition(0);
+
+        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_distanceSensor");
     }
 
     private void configureVerticalSlide() {
@@ -196,6 +204,7 @@ public class Robot extends Component {
         if (!isRetracting) {
             isRetracting = true;
             // Lever mid
+            horizontalClaw.close();
             lever.goToSetPosition(Lever.LeverPosition.MID, false);
             horizontalScheduler.linearSchedule(
                     when -> true,
@@ -315,6 +324,52 @@ public class Robot extends Component {
         } else {
             hinge.goToSetPosition(0);
         }
+    }
+
+    public void extend() {
+        isExtending = true;
+        dropHorizontalArm();
+        horizontalScheduler.globalSchedule(
+                when -> true,
+                then -> {
+                    horizontalSlide.setPower(S_AUTO_EXTEND_POWER);
+                },
+                500
+        );
+
+        // Once at distance, stop moving the slide but
+        // say we are still in the process of extending
+        // for the sake of the X toggle
+        horizontalScheduler.globalSchedule(
+                when -> nearCone(),
+                then -> horizontalSlide.setPower(0)
+        );
+    }
+
+    public void finishExtend() {
+        horizontalClaw.close();
+        stopExtend();
+        retractArm(false, false);
+    }
+
+    public void stopExtend() {
+        horizontalSlide.setPower(0);
+        isExtending = false;
+    }
+
+    public void dropHorizontalArm() {
+        // TODO: Figure out how to input what height the lever is at
+        horizontalClaw.open();
+        lever.goToSetPosition(Lever.LeverPosition.OUT, true);
+        levelHinge();
+    }
+
+    public boolean nearCone() {
+        return nearCone(HS_SENSOR_DISTANCE_CM);
+    }
+
+    public boolean nearCone(double distance) {
+        return horizontalDistanceSensor.getDistance(DistanceUnit.CM) < distance;
     }
 
     public void update() {
