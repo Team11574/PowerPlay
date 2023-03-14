@@ -1,19 +1,45 @@
-                          _=====_     SECONDARY CONTROLLER:     _=====_
-            LT = NONE    / _____ \                             / _____ \    RT = NONE
-          LB = NONE    +.-'_____'-.---------------------------.-'_____'-.+   RB = NONE
-                      /   |     |  '.                       .'  |     |   \
-                     / ___| /|\ |___ \                     / ___| (Y) |___ \
-    ↑ = slide MED   / |      |      | ;  __           __  ; |             | ;   Y = NONE
-    ← = slide LOW   | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = extend/retract
-   → = slide HIGH   | |___   |   ___| ;                   ; |___       ___| ;   A = back claw
- ↓ = slide GROUND   |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = front claw
-                    | \   |_____|  .','" "', |___|  ,'" "', '.  |_____|  .' |
-                    |  '-.______.-' /  @"@ \       /  @"@  \  '-._____.-'   |
-                    |               | (   ) |------| (   ) |                |
-                    |              /\  @~@  /      \  @"@  /\               |
-                    |             /  '.___.'        '.___.'  \              |
-                    |            /                            \             |
-                     \          /  ↕ = vert slide    ↕ = lever \           /
-                      \________/  ↔ = horiz slide     ↔ = NONE  \_________/
+                                _=====_      SECONDARY CONTROLLER:      _=====_
+                   LT = NONE   / _____ \                               / _____ \    RT = NONE
+                  LB = NONE   +.-'_____'-.---------------------------.-'_____'-.+   RB = NONE
+                             /   |     |  '.                       .'  |     |   \
+                            / ___| /|\ |___ \                     / ___| (Y) |___ \
+    ↑ = Vert Slide MED     / |      |      | ;  __           __  ; |             | ;   Y = NONE
+    ← = Vert Slide LOW     | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = Extend/Retract
+    → = Vert Slide HIGH    | |___   |   ___| ;                   ; |___       ___| ;   A = Back Claw
+    ↓ = Vert Slide GROUND  |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = Front Claw
+                           | \   |_____|  .','" "', |___|  ,'" "', '.  |_____|  .' |
+                           |  '-.______.-' /  @"@ \       /  @"@  \  '-._____.-'   |
+                           |               | (   ) |------| (   ) |                |
+                           |              /\  @~@  /      \  @"@  /\               |
+                           |             /  '.___.'        '.___.'  \              |
+                           |            / ⊙ = Override     ⊙ = Clear \             |
+                            \          /  ↕ = Vert Slide   ↕ = Lever  \           /
+                             \________/  ←→ = Hori Slide  ←→ = NONE    \_________/
+
+    Override = Disable all horizontal components and set horizontal power to 0.
+    Clear = Clear schedulers.
+    Needed controls: Anything to do with the front arm.
 
 
+
+
+
+                               _=====_        PRIMARY CONTROLLER:      _=====_
+                LT = NONE     / _____ \                               / _____ \    RT = Tile lock
+                LB = NONE    +.-'_____'-.---------------------------.-'_____'-.+   RB = NONE
+                            /   |     |  '.                       .'  |     |   \
+                           / ___| /|\ |___ \                     / ___| (Y) |___ \
+        ↑ = NONE          / |      |      | ;  __           __  ; |             | ;   Y = NONE
+        ← = NONE          | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = Assert Centered
+        → = NONE          | |___   |   ___| ;                   ; |___       ___| ;   A = TARGET LOCK
+        ↓ = NONE          |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = NONE
+                          | \   |_____|  .','" "', |___|  ,'" "', '.  |_____|  .' |
+                          |  '-.______.-' /  @"@ \       /  @"@  \  '-._____.-'   |
+                          |               | (   ) |------| (   ) |                |
+                          |              /\  @~@  /      \  @"@  /\               |
+                          |             /  '.___.'        '.___.'  \              |
+                          |            / ⊙ = Center        ⊙ = NONE \             |
+                           \          /  ↕ = Forward/Back  ↕ = NONE  \           /
+                            \________/  ←→ = Strafe       ←→ = Rotate \_________/
+
+    Needed controls:

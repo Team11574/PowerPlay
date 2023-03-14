@@ -84,6 +84,9 @@ public class TeleNewTesting extends RobotOpMode {
             drivetrain.setPoseEstimate(new Pose2d(position, heading));
         }
 
+        if (pad1.left_stick_button_pressed)
+            t.queueCenter();
+
         // TOGGLE X to extend horizontal slide, grab a cone, and retract
         // TODO: Go through with Dallin to see if this seems logical
         if (pad2.x_pressed) {
@@ -100,25 +103,6 @@ public class TeleNewTesting extends RobotOpMode {
             } else if (robot.isExtending) {
                 // At cone distance, close claw and retract
                 robot.finishExtend();
-            }
-        }
-
-
-        if (pad1.left_stick_button_pressed)
-            t.queueCenter();
-
-        // HOLD TRIGGER to flip
-        if (!overrideMain) {
-            if (!robot.isDepositing) {
-                if (pad2.right_trigger_active()) {
-                    robot.verticalFlip.flipDown();
-                } else {
-                    robot.verticalFlip.flipUp();
-                }
-            }
-        } else {
-            if (pad2.right_trigger_pressed) {
-                robot.verticalFlip.toggle();
             }
         }
 
@@ -139,8 +123,8 @@ public class TeleNewTesting extends RobotOpMode {
         }
 
 
-        // TOGGLE X to toggle back claw
-        if (pad2.x_pressed && !overrideMain) {
+        // TOGGLE A to toggle back claw
+        if (pad2.a_pressed && !overrideMain) {
             robot.horizontalClaw.toggle();
         }
 
@@ -149,6 +133,7 @@ public class TeleNewTesting extends RobotOpMode {
             robot.verticalClaw.toggle();
         }
 
+        /*
         // PRESS A to retract
         if (pad2.a_pressed && !overrideMain) {
             robot.retractArm();
@@ -172,6 +157,22 @@ public class TeleNewTesting extends RobotOpMode {
             }
         }
 
+        // HOLD TRIGGER to flip
+        if (!overrideMain) {
+            if (!robot.isDepositing) {
+                if (pad2.right_trigger_active()) {
+                    robot.verticalFlip.flipDown();
+                } else {
+                    robot.verticalFlip.flipUp();
+                }
+            }
+        } else {
+            if (pad2.right_trigger_pressed) {
+                robot.verticalFlip.toggle();
+            }
+        }
+         */
+
         if (pad2.dpad_down_pressed) {
             multiTelemetry.addLine("Down pressed");
             robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
@@ -192,10 +193,13 @@ public class TeleNewTesting extends RobotOpMode {
             robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
         }
 
+        /*
         if (pad2.right_bumper_pressed && !overrideMain) {
             robot.depositCone();
         }
+         */
 
+        /*
         // Hinge control, temporary
         if (pad2.left_bumper_pressed) {
             //robot.hinge.setOffsetFactor(robot.hinge.getOffsetFactor() * -1);
@@ -204,6 +208,8 @@ public class TeleNewTesting extends RobotOpMode {
                 robot.hinge.goToSetPosition(0);
         }
         //robot.hinge.offsetPosition(pad2.gamepad.left_trigger);
+
+         */
 
         robot.verticalSlide.setPower(-pad2.get_partitioned_left_stick_y());
         if (!overrideMain) {
