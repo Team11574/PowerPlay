@@ -1,4 +1,4 @@
-package incognito.cog.hardware.component.camera.cv;
+package incognito.teamcode.robot.component.camera.cv;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;

@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import incognito.cog.actions.Scheduler;
-import incognito.cog.component.camera.AutoCamera;
-import incognito.cog.component.drive.Drivetrain;
-import incognito.cog.component.servo.ContinuousServo;
+import incognito.cog.hardware.component.drive.Drivetrain;
+import incognito.cog.hardware.component.servo.ContinuousServo;
 import incognito.cog.robot.RobotCog;
 import incognito.teamcode.config.SlideConstants;
+import incognito.teamcode.robot.component.camera.AutoCamera;
 import incognito.teamcode.robot.component.claw.Claw;
 import incognito.teamcode.robot.component.claw.Flipper;
 import incognito.teamcode.robot.component.claw.Lever;

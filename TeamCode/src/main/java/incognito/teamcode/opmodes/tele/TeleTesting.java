@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import incognito.cog.component.drive.Drivetrain;
-import incognito.cog.control.GamepadPlus;
+import incognito.cog.hardware.component.drive.Drivetrain;
+import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;

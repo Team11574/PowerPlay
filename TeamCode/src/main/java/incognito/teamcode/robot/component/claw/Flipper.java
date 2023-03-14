@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import incognito.cog.component.servo.SetServo;
+import incognito.cog.hardware.component.servo.SetServo;
 
 public class Flipper extends SetServo {
     public Flipper(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,

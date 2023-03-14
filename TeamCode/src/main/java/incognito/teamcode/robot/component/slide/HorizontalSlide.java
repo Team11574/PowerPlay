@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import incognito.cog.hardware.component.motor.MotorGroup;
+
 public class HorizontalSlide extends MotorGroup {
 
     public double stopDirection = 0;

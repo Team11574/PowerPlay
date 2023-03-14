@@ -5,10 +5,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import incognito.cog.actions.Scheduler;
-import incognito.cog.component.drive.Drivetrain;
-import incognito.cog.component.drive.PoseStorage;
-import incognito.cog.component.drive.TileCalculation;
-import incognito.cog.control.GamepadPlus;
+import incognito.cog.hardware.component.drive.Drivetrain;
+import incognito.cog.hardware.component.drive.PoseStorage;
+import incognito.cog.hardware.component.drive.TileCalculation;
+import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.trajectory.TrajectorySequence;
 import incognito.teamcode.robot.Robot;
@@ -90,14 +90,13 @@ public class Tele extends RobotOpMode {
 
 
         if (t.queueHasTrajectory()) {
+            TrajectorySequence sequence = t.build();
             if (!trajectoryRunning) {
-                TrajectorySequence sequence = t.build();
                 if (sequence != null) {
                     drivetrain.followTrajectorySequenceAsync(sequence);
                     trajectoryRunning = true;
                 }
             } else {
-                TrajectorySequence sequence = t.build();
                 if (sequence != null) {
                     drivetrain.modifyTrajectorySequenceAsync(sequence);
                 }

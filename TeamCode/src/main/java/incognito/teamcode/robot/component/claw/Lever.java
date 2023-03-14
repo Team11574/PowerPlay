@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import incognito.cog.component.servo.ContinuousServo;
+import incognito.cog.hardware.component.servo.ContinuousServo;
 
 public class Lever extends ContinuousServo {
     public Lever(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
