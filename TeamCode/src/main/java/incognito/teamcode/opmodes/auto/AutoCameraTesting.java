@@ -5,8 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.camera.AutoCamera;
+import incognito.teamcode.robot.Robot;
 
 @Autonomous(name = "AUTO Camera Testing", group = "auto")
 public class AutoCameraTesting extends LinearOpMode {
@@ -61,7 +61,7 @@ public class AutoCameraTesting extends LinearOpMode {
             r.drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
             multiTelemetry.update();
         } while (//(theta != 0 || velY != 0) &&
-                    opModeIsActive());
+                opModeIsActive());
 
     }
 }

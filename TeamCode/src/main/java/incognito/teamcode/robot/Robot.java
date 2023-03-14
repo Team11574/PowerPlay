@@ -1,52 +1,59 @@
-package org.firstinspires.ftc.teamcode.robot;
+package incognito.teamcode.robot;
 
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_CLOSED;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_FLAT;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_SPEED;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_START;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FIFTH;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FLAT;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FOURTH;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_MID;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SECOND;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SPEED;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_THIRD;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MAX_ENCODER;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MIN_ENCODER;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_MAX;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_MIN;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_SPEED;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_START;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_CLOSED;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_DOWN;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_UP;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_AUTO;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_HIGH;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_LOW;
-import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_MEDIUM;
+import static incognito.teamcode.config.SlideConstants.HS_CLAW_CLOSED;
+import static incognito.teamcode.config.SlideConstants.HS_CLAW_OPEN;
+import static incognito.teamcode.config.SlideConstants.HS_HINGE_FLAT;
+import static incognito.teamcode.config.SlideConstants.HS_HINGE_SPEED;
+import static incognito.teamcode.config.SlideConstants.HS_HINGE_START;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_FIFTH;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_FLAT;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_FOURTH;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_IN;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_MID;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_OUT;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_SECOND;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_SPEED;
+import static incognito.teamcode.config.SlideConstants.HS_LEVER_THIRD;
+import static incognito.teamcode.config.SlideConstants.HS_MAX_ENCODER;
+import static incognito.teamcode.config.SlideConstants.HS_MIN_ENCODER;
+import static incognito.teamcode.config.SlideConstants.HS_SENSOR_DISTANCE_CM;
+import static incognito.teamcode.config.SlideConstants.HS_TURRET_MAX;
+import static incognito.teamcode.config.SlideConstants.HS_TURRET_MIN;
+import static incognito.teamcode.config.SlideConstants.HS_TURRET_SPEED;
+import static incognito.teamcode.config.SlideConstants.HS_TURRET_START;
+import static incognito.teamcode.config.SlideConstants.S_AUTO_EXTEND_POWER;
+import static incognito.teamcode.config.SlideConstants.VS_CLAW_CLOSED;
+import static incognito.teamcode.config.SlideConstants.VS_CLAW_OPEN;
+import static incognito.teamcode.config.SlideConstants.VS_FLIP_DOWN;
+import static incognito.teamcode.config.SlideConstants.VS_FLIP_UP;
+import static incognito.teamcode.config.SlideConstants.VS_SP_AUTO;
+import static incognito.teamcode.config.SlideConstants.VS_SP_HIGH;
+import static incognito.teamcode.config.SlideConstants.VS_SP_LOW;
+import static incognito.teamcode.config.SlideConstants.VS_SP_MEDIUM;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
-import org.firstinspires.ftc.teamcode.cog.component.Component;
-import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
-import org.firstinspires.ftc.teamcode.cog.component.servo.ContinuousServo;
-import org.firstinspires.ftc.teamcode.robot.component.camera.AutoCamera;
-import org.firstinspires.ftc.teamcode.robot.component.claw.Claw;
-import org.firstinspires.ftc.teamcode.robot.component.claw.Flipper;
-import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
-import org.firstinspires.ftc.teamcode.robot.component.slide.HorizontalSlide;
-import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class Robot extends Component {
+import incognito.cog.actions.Scheduler;
+import incognito.cog.hardware.component.Component;
+import incognito.cog.hardware.component.drive.Drivetrain;
+import incognito.cog.hardware.component.servo.ContinuousServo;
+import incognito.cog.robot.RobotCog;
+import incognito.teamcode.robot.component.camera.AutoCamera;
+import incognito.teamcode.robot.component.claw.Claw;
+import incognito.teamcode.robot.component.claw.Flipper;
+import incognito.teamcode.robot.component.claw.Lever;
+import incognito.teamcode.robot.component.slide.HorizontalSlide;
+import incognito.teamcode.robot.component.slide.VerticalSlide;
+
+
+public class Robot extends RobotCog {
     // ===== Instance Variables =====
 
     boolean cameraEnabled;
@@ -66,11 +73,13 @@ public class Robot extends Component {
     public ContinuousServo turret;
     public ContinuousServo hinge;
     public Lever lever;
+    public DistanceSensor horizontalDistanceSensor;
 
     public Scheduler horizontalScheduler;
     public Scheduler verticalScheduler;
 
     public boolean isRetracting = false;
+    public boolean isExtending = false;
     public boolean isDepositing = false;
 
 
@@ -110,6 +119,8 @@ public class Robot extends Component {
         horizontalSlide.addSetPosition(0);
         horizontalSlide.setPower(0);
         horizontalSlide.goToSetPosition(0);
+
+        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_distanceSensor");
     }
 
     private void configureVerticalSlide() {
@@ -196,6 +207,7 @@ public class Robot extends Component {
         if (!isRetracting) {
             isRetracting = true;
             // Lever mid
+            horizontalClaw.close();
             lever.goToSetPosition(Lever.LeverPosition.MID, false);
             horizontalScheduler.linearSchedule(
                     when -> true,
@@ -316,3 +328,58 @@ public class Robot extends Component {
             hinge.goToSetPosition(0);
         }
     }
+
+    public void extend() {
+        isExtending = true;
+        dropHorizontalArm();
+        horizontalScheduler.globalSchedule(
+                when -> true,
+                then -> {
+                    horizontalSlide.setPower(S_AUTO_EXTEND_POWER);
+                },
+                500
+        );
+
+        // Once at distance, stop moving the slide but
+        // say we are still in the process of extending
+        // for the sake of the X toggle
+        horizontalScheduler.globalSchedule(
+                when -> nearCone(),
+                then -> horizontalSlide.setPower(0)
+        );
+    }
+
+    public void finishExtend() {
+        horizontalClaw.close();
+        stopExtend();
+        retractArm(false, false);
+    }
+
+    public void stopExtend() {
+        horizontalSlide.setPower(0);
+        isExtending = false;
+    }
+
+    public void dropHorizontalArm() {
+        // TODO: Figure out how to input what height the lever is at
+        horizontalClaw.open();
+        lever.goToSetPosition(Lever.LeverPosition.OUT, true);
+        levelHinge();
+    }
+
+    public boolean nearCone() {
+        return nearCone(HS_SENSOR_DISTANCE_CM);
+    }
+
+    public boolean nearCone(double distance) {
+        return horizontalDistanceSensor.getDistance(DistanceUnit.CM) < distance;
+    }
+
+    public void update() {
+        verticalSlide.update();
+        if (!isRetracting)
+            horizontalSlide.update();
+        horizontalScheduler.update();
+        verticalScheduler.update();
+    }
+}
