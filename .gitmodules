@@ -1,0 +1,3 @@
+[submodule "TeamCode/src/main/java/incognito/cog"]
+	path = TeamCode/src/main/java/incognito/cog
+	url = https://github.com/Team11574/cog.git
