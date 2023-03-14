@@ -33,7 +33,7 @@ public class AutoCamera extends CameraSuper {
 
             @Override
             public void onOpened() {
-                cvCamera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                startCamera();
             }
 
             @Override
@@ -42,6 +42,7 @@ public class AutoCamera extends CameraSuper {
             }
         });
     }
+
 
     /**
      * Get parking spot returned by pipeline

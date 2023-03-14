@@ -91,7 +91,7 @@ public class AutoRight3Cone extends RobotLinearOpMode {
             spots = new TrajectorySequence[]{spot1, spot2, spot3};
 
             waitForStart();
-            robot.autoCamera.terminateCamera();
+            robot.autoCamera.stopCamera();
             parkingSpot = robot.getParkingSpot();
         } catch (ConcurrentModificationException e) {
             multiTelemetry.addData("Concurrent Mod Exception:", e.toString());

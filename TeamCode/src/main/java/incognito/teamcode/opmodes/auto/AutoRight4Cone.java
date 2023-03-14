@@ -104,7 +104,7 @@ public class AutoRight4Cone extends RobotLinearOpMode {
         spots = new TrajectorySequence[]{spot1, spot2, spot3};
 
         waitForStart();
-        robot.autoCamera.terminateCamera();
+        robot.autoCamera.stopCamera();
 
         int parkingSpot = robot.getParkingSpot();
 

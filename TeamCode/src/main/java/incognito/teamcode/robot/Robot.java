@@ -1,4 +1,33 @@
-package incognito.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot;
+
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_CLOSED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_FLAT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_SPEED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_HINGE_START;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FIFTH;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FLAT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_FOURTH;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_IN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_MID;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_OUT;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SECOND;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_SPEED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_LEVER_THIRD;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MAX_ENCODER;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_MIN_ENCODER;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_MAX;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_MIN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_SPEED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.HS_TURRET_START;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_CLOSED;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_DOWN;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_FLIP_UP;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_AUTO;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_HIGH;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_LOW;
+import static org.firstinspires.ftc.teamcode.robot.component.slide.SlideConstants.VS_SP_MEDIUM;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -6,20 +35,18 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.cog.actions.Scheduler;
+import org.firstinspires.ftc.teamcode.cog.component.Component;
+import org.firstinspires.ftc.teamcode.cog.component.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.cog.component.servo.ContinuousServo;
+import org.firstinspires.ftc.teamcode.robot.component.camera.AutoCamera;
+import org.firstinspires.ftc.teamcode.robot.component.claw.Claw;
+import org.firstinspires.ftc.teamcode.robot.component.claw.Flipper;
+import org.firstinspires.ftc.teamcode.robot.component.claw.Lever;
+import org.firstinspires.ftc.teamcode.robot.component.slide.HorizontalSlide;
+import org.firstinspires.ftc.teamcode.robot.component.slide.VerticalSlide;
 
-import incognito.cog.actions.Scheduler;
-import incognito.cog.hardware.component.drive.Drivetrain;
-import incognito.cog.hardware.component.servo.ContinuousServo;
-import incognito.cog.robot.RobotCog;
-import incognito.teamcode.config.SlideConstants;
-import incognito.teamcode.robot.component.camera.AutoCamera;
-import incognito.teamcode.robot.component.claw.Claw;
-import incognito.teamcode.robot.component.claw.Flipper;
-import incognito.teamcode.robot.component.claw.Lever;
-import incognito.teamcode.robot.component.slide.HorizontalSlide;
-import incognito.teamcode.robot.component.slide.VerticalSlide;
-
-public class Robot extends RobotCog {
+public class Robot extends Component {
     // ===== Instance Variables =====
 
     boolean cameraEnabled;
@@ -79,7 +106,7 @@ public class Robot extends RobotCog {
 
     private void configureHorizontalSlide() {
         DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
-        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, SlideConstants.HS_MIN_ENCODER, SlideConstants.HS_MAX_ENCODER);
+        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, HS_MIN_ENCODER, HS_MAX_ENCODER);
         horizontalSlide.addSetPosition(0);
         horizontalSlide.setPower(0);
         horizontalSlide.goToSetPosition(0);
@@ -91,46 +118,46 @@ public class Robot extends RobotCog {
         VS_slideRight_M.setDirection(DcMotorEx.Direction.REVERSE);
         DigitalChannel VS_limitSwitch_D = hardwareMap.get(DigitalChannel.class, "VS_limitSwitch_D");
         verticalSlide = new VerticalSlide(hardwareMap, telemetry, new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M}, VS_limitSwitch_D);
-        verticalSlide.addSetPositionLengths(new double[]{0, SlideConstants.VS_SP_LOW, SlideConstants.VS_SP_MEDIUM, SlideConstants.VS_SP_HIGH, SlideConstants.VS_SP_AUTO});
+        verticalSlide.addSetPositionLengths(new double[]{0, VS_SP_LOW, VS_SP_MEDIUM, VS_SP_HIGH, VS_SP_AUTO});
         verticalSlide.setPower(0);
     }
 
     private void configureClaws() {
         Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
-        horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, SlideConstants.HS_CLAW_OPEN, SlideConstants.HS_CLAW_CLOSED);
+        horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, HS_CLAW_OPEN, HS_CLAW_CLOSED);
         horizontalClaw.open();
 
         Servo VS_claw_S = hardwareMap.get(Servo.class, "VS_claw_S");
-        verticalClaw = new Claw(hardwareMap, telemetry, VS_claw_S, SlideConstants.VS_CLAW_OPEN, SlideConstants.VS_CLAW_CLOSED);
+        verticalClaw = new Claw(hardwareMap, telemetry, VS_claw_S, VS_CLAW_OPEN, VS_CLAW_CLOSED);
         verticalClaw.close();
 
         Servo VS_flip_S = hardwareMap.get(Servo.class, "VS_flip_S");
-        verticalFlip = new Flipper(hardwareMap, telemetry, VS_flip_S, SlideConstants.VS_FLIP_DOWN, SlideConstants.VS_FLIP_UP);
+        verticalFlip = new Flipper(hardwareMap, telemetry, VS_flip_S, VS_FLIP_DOWN, VS_FLIP_UP);
         verticalFlip.flipUp();
     }
 
     private void configureArm() {
         Servo HS_turret_S = hardwareMap.get(Servo.class, "HS_turret_S");
-        turret = new ContinuousServo(hardwareMap, telemetry, HS_turret_S, SlideConstants.HS_TURRET_START, SlideConstants.HS_TURRET_MIN, SlideConstants.HS_TURRET_MAX);
-        turret.setOffsetFactor(SlideConstants.HS_TURRET_SPEED);
+        turret = new ContinuousServo(hardwareMap, telemetry, HS_turret_S, HS_TURRET_START, HS_TURRET_MIN, HS_TURRET_MAX);
+        turret.setOffsetFactor(HS_TURRET_SPEED);
 
         Servo HS_hinge_S = hardwareMap.get(Servo.class, "HS_hinge_S");
-        hinge = new ContinuousServo(hardwareMap, telemetry, HS_hinge_S, SlideConstants.HS_HINGE_START);
-        hinge.setOffsetFactor(SlideConstants.HS_HINGE_SPEED);
+        hinge = new ContinuousServo(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
+        hinge.setOffsetFactor(HS_HINGE_SPEED);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
         telemetry.addLine("Creating lever");
         lever = new Lever(hardwareMap, telemetry, HS_lever_S,
-                new double[]{SlideConstants.HS_LEVER_IN,
-                        SlideConstants.HS_LEVER_MID,
-                        SlideConstants.HS_LEVER_FIFTH,
-                        SlideConstants.HS_LEVER_FOURTH,
-                        SlideConstants.HS_LEVER_THIRD,
-                        SlideConstants.HS_LEVER_SECOND,
-                        SlideConstants.HS_LEVER_OUT},
-                SlideConstants.HS_LEVER_OUT, SlideConstants.HS_LEVER_IN);
+                new double[]{HS_LEVER_IN,
+                        HS_LEVER_MID,
+                        HS_LEVER_FIFTH,
+                        HS_LEVER_FOURTH,
+                        HS_LEVER_THIRD,
+                        HS_LEVER_SECOND,
+                        HS_LEVER_OUT},
+                HS_LEVER_OUT, HS_LEVER_IN);
         lever.goToSetPosition(Lever.LeverPosition.IN);
-        lever.setOffsetFactor(SlideConstants.HS_LEVER_SPEED);
+        lever.setOffsetFactor(HS_LEVER_SPEED);
     }
 
     // Turned to public variables
@@ -282,19 +309,10 @@ public class Robot extends RobotCog {
 
         hinge.setPosition(newHingePosition);
          */
-        double hingePosition = lever.getPosition() - SlideConstants.HS_LEVER_FLAT + SlideConstants.HS_HINGE_FLAT + 0.05;
+        double hingePosition = lever.getPosition() - HS_LEVER_FLAT + HS_HINGE_FLAT + 0.05;
         if (hingePosition < 1) {
             hinge.setPosition(hingePosition);
         } else {
             hinge.goToSetPosition(0);
         }
     }
-
-    public void update() {
-        verticalSlide.update();
-        if (!isRetracting)
-            horizontalSlide.update();
-        horizontalScheduler.update();
-        verticalScheduler.update();
-    }
-}
