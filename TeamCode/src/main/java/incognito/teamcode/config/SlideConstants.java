@@ -74,7 +74,7 @@ public class SlideConstants {
     public static double HS_LEVER_SECOND = 0.19;
     public static double HS_LEVER_OUT = 0.13;
 
-    public static double HS_LEVER_SPEED = 0.03;
+    public static double HS_LEVER_SPEED = 0.05;
     // Extra Hinge Levelling Variables
     public static final double HS_LEVER_FLAT = 0.267;
     public static final double HS_LEVER_NEG_PI_6 = 0.1;

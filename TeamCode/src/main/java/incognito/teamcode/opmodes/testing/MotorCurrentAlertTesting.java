@@ -1,16 +1,22 @@
 package incognito.teamcode.opmodes.testing;
 
+import static incognito.teamcode.config.SlideConstants.CURRENT_ALERT_STOPPED;
+import static incognito.teamcode.config.SlideConstants.VELOCITY_STOP_THRESHOLD;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import incognito.cog.control.GamepadPlus;
+import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.teamcode.config.SlideConstants;
+
 
 @TeleOp(name = "Motor Current Alert Testing", group = "testing")
 public class MotorCurrentAlertTesting extends RobotOpMode {
@@ -23,11 +29,13 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
     boolean pastOverStopCurrent;
     boolean disabled;
 
+    DistanceSensor distanceSensor;
 
     @Override
     public void init() {
         testing_M = hardwareMap.get(DcMotorEx.class, "testing_M");
         testing_M.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         g = new GamepadPlus(gamepad1);
         tel = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         tel.addData("Starting Current Alert", testing_M.getCurrentAlert(CurrentUnit.MILLIAMPS));
@@ -37,8 +45,8 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
     @Override
     public void loop() {
         boolean overCurrent = testing_M.isOverCurrent();
-        boolean overStopCurrent = (testing_M.getCurrent(CurrentUnit.MILLIAMPS) > SlideConstants.CURRENT_ALERT_STOPPED &&
-                testing_M.getVelocity() < SlideConstants.VELOCITY_STOP_THRESHOLD);
+        boolean overStopCurrent = (testing_M.getCurrent(CurrentUnit.MILLIAMPS) > CURRENT_ALERT_STOPPED &&
+                testing_M.getVelocity() < VELOCITY_STOP_THRESHOLD);
         if (overCurrent || overStopCurrent) {
             testing_M.setMotorDisable();
             disabled = true;
@@ -69,6 +77,9 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
         testing_M.setCurrentAlert(SlideConstants.CURRENT_ALERT, CurrentUnit.MILLIAMPS);
         if (!disabled)
             testing_M.setPower(-gamepad1.left_stick_y);
+
+        tel.addData("Distance (cm)", distanceSensor.getDistance(DistanceUnit.CM));
+
         tel.addData("testing_M Current (mA)", testing_M.getCurrent(CurrentUnit.MILLIAMPS));
         tel.addData("testing_M Over Current", testing_M.isOverCurrent());
         tel.addData("testing_M Current Alert", testing_M.getCurrentAlert(CurrentUnit.MILLIAMPS));
