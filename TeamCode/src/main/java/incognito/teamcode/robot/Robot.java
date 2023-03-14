@@ -332,7 +332,7 @@ public class Robot extends RobotCog {
     public void extend() {
         isExtending = true;
         dropHorizontalArm();
-        horizontalScheduler.globalSchedule(
+        horizontalScheduler.linearSchedule(
                 when -> true,
                 then -> {
                     horizontalSlide.setPower(S_AUTO_EXTEND_POWER);
@@ -343,7 +343,7 @@ public class Robot extends RobotCog {
         // Once at distance, stop moving the slide but
         // say we are still in the process of extending
         // for the sake of the X toggle
-        horizontalScheduler.globalSchedule(
+        horizontalScheduler.linearSchedule(
                 when -> nearCone(),
                 then -> horizontalSlide.setPower(0)
         );

@@ -58,8 +58,6 @@ public class TeleNewTesting extends RobotOpMode {
     @Override
     public void loop() {
         //super.loop();
-        robot.update();
-        drivetrain.updatePoseEstimate();
         update();
 
         // Adjust drivetrain
@@ -71,8 +69,12 @@ public class TeleNewTesting extends RobotOpMode {
 
         if (pad1.a_pressed) {
             // TOGGLE TARGET LOCKING
-            robot.autoCamera.toggleCamera();
-            targetLocking = true;
+            targetLocking = !targetLocking;
+            if (targetLocking) {
+                robot.autoCamera.startCamera();
+            } else {
+                robot.autoCamera.stopCamera();
+            }
         }
 
         if (pad1.x_pressed && !trajectoryRunning) {
@@ -92,8 +94,9 @@ public class TeleNewTesting extends RobotOpMode {
                 // Cancel extend
                 // Same thing as if it reaches the cone, except the claw will not close
                 // and the arm will not retract
-                robot.horizontalScheduler.clearGlobal();
+                robot.horizontalScheduler.clearLinear();
                 robot.stopExtend();
+                robot.retractArm(false, false);
             } else if (robot.isExtending) {
                 // At cone distance, close claw and retract
                 robot.finishExtend();
@@ -349,6 +352,7 @@ public class TeleNewTesting extends RobotOpMode {
         double junctionMaxArea = 3000;
         multiTelemetry.addData("Adjusted area", adjustedArea);
         if (junctionArea > junctionMaxArea) {
+            // TODO: Consider adding in negative velocity if too close to the pole
             // Happens when robot is about 11.5 cm from the pole
             velY = 0;
         } else {
@@ -372,6 +376,8 @@ public class TeleNewTesting extends RobotOpMode {
     }
 
     public void update() {
+        robot.update();
+        drivetrain.updatePoseEstimate();
         pad1.update();
         pad2.update();
         scheduler.update();
