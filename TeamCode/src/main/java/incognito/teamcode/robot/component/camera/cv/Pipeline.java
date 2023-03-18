@@ -68,8 +68,8 @@ public class Pipeline extends OpenCvPipeline {
     public boolean doingJunctions = false;
     double x;
 
-    Scalar yellowLower = new Scalar(20, 150, 120);
-    Scalar yellowUpper = new Scalar(40, 255, 255);
+    Scalar yellowLower = new Scalar(0, 65, 40);
+    Scalar yellowUpper = new Scalar(50, 255, 255);
 
 
     public Pipeline(Telemetry telem) {
@@ -245,10 +245,12 @@ public class Pipeline extends OpenCvPipeline {
     public void updateJunctionDistance(Mat input) {
         // Use moments to find the center of yellow blobs
 
+        telemetry.addLine("Junction distance update is running!");
+
         imageROI = input.clone();
         // TODO: Adjust ROI w/ imageROI.adjustROI()
         imageROI = imageROI.adjustROI(
-                -200, 0, 0, 0
+                -150, 0, 0, 0
         );
 
         Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
@@ -264,8 +266,6 @@ public class Pipeline extends OpenCvPipeline {
         imageROI.release();
         yellowMask.release();
         junctionDistanceInternal = Double.POSITIVE_INFINITY;
-
-        telemetry.update();
 
         Imgproc.drawContours(input, yellowContours, -1, yellowUpper, 2);
 

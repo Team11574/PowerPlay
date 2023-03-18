@@ -31,6 +31,7 @@ import static incognito.teamcode.config.SlideConstants.VS_SP_HIGH;
 import static incognito.teamcode.config.SlideConstants.VS_SP_LOW;
 import static incognito.teamcode.config.SlideConstants.VS_SP_MEDIUM;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -335,6 +336,9 @@ public class Robot extends RobotCog {
         horizontalScheduler.linearSchedule(
                 when -> true,
                 then -> {
+                    for (DcMotorEx motor : horizontalSlide.motors) {
+                        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
                     horizontalSlide.setPower(S_AUTO_EXTEND_POWER);
                 },
                 500

@@ -5,7 +5,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -37,14 +36,15 @@ public class TeleNewTesting extends RobotOpMode {
     TileCalculation t;
     boolean trajectoryRunning = false;
 
-    DistanceSensor distanceSensor;
-
     boolean targetLocking;
+
+    double velX, velY, theta = 0;
 
     @Override
     public void init() {
         //super.init();
-        this.robot = new Robot(hardwareMap, telemetry);
+        this.robot = new Robot(hardwareMap, telemetry, true);
+        robot.autoCamera.swapMode(); // enable target locking mode
         robot.verticalClaw.open();
         this.drivetrain = robot.drivetrain;
         drivetrain.setPoseEstimate(PoseStorage.lastPose);
@@ -88,7 +88,6 @@ public class TeleNewTesting extends RobotOpMode {
             t.queueCenter();
 
         // TOGGLE X to extend horizontal slide, grab a cone, and retract
-        // TODO: Go through with Dallin to see if this seems logical
         if (pad2.x_pressed) {
             if  (!robot.isExtending && !robot.nearCone()) {
                 // Start extend
@@ -132,6 +131,10 @@ public class TeleNewTesting extends RobotOpMode {
         if (pad2.b_pressed) {
             robot.verticalClaw.toggle();
         }
+
+
+        robot.lever.advancePositionDiscrete(pad2.get_partitioned_right_stick_x());
+
 
         /*
         // PRESS A to retract
@@ -219,7 +222,7 @@ public class TeleNewTesting extends RobotOpMode {
                 if (levellingEnabled && !yRetraction)
                     robot.levelHinge();
             }
-            robot.moveTurret(pad2.get_partitioned_right_stick_x());
+            // robot.moveTurret(pad2.get_partitioned_right_stick_x());
         }
 
         fullTelemetry();
@@ -272,9 +275,15 @@ public class TeleNewTesting extends RobotOpMode {
             multiTelemetry.addData("Direction: ", move_direction);
         } else {
             queueMoveDirection = -1;
-            double velY = -pad1.gamepad.left_stick_y;
-            double velX = pad1.gamepad.left_stick_x;
-            double theta = pad1.gamepad.right_stick_x;
+            double inputVelY = -pad1.gamepad.left_stick_y;
+            double inputVelX = pad1.gamepad.left_stick_x;
+            double inputTheta = pad1.gamepad.right_stick_x;
+
+            double rampSpeed = 0.05;
+
+            velY = ramp(inputVelY, velY, rampSpeed);
+            velX = ramp(inputVelX, velX, rampSpeed);
+            theta = ramp(inputTheta, theta, rampSpeed);
 
             if (velX + velY != 0) {
                 //trajectoryRunning = false;
@@ -344,6 +353,19 @@ public class TeleNewTesting extends RobotOpMode {
         }
 
          */
+    }
+
+    private double ramp(double input, double currentValue, double speed) {
+        double newValue = input + Math.signum(input) * speed;
+
+        if (Math.abs(currentValue) > Math.abs(input)) {
+            velX = input;
+        }
+        if (velX < speed && input == 0) {
+            velX = 0;
+        }
+
+        return newValue;
     }
 
     public void targetLock() {
@@ -416,12 +438,12 @@ public class TeleNewTesting extends RobotOpMode {
         // multiTelemetry.addData("Power", robot.horizontalSlide.motors[0].getPower());
         // multiTelemetry.addData("Mode", robot.horizontalSlide.motors[0].getMode());
         multiTelemetry.addLine();
-        multiTelemetry.addData("Turret pos", robot.turret.getPosition());
+        // multiTelemetry.addData("Turret pos", robot.turret.getPosition());
         multiTelemetry.addData("Lever pos", robot.lever.getPosition());
         multiTelemetry.addData("Hinge pos", robot.hinge.getPosition());
         multiTelemetry.addLine();
         multiTelemetry.addData("Pose", drivetrain.getPoseEstimate());
-        multiTelemetry.addData("Distance (cm)", distanceSensor.getDistance(DistanceUnit.CM));
+        multiTelemetry.addData("Distance (cm)", robot.horizontalDistanceSensor.getDistance(DistanceUnit.CM));
 
         multiTelemetry.update();
     }
