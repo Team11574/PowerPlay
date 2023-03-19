@@ -33,6 +33,7 @@ public class AutoCamera extends CameraSuper {
 
             @Override
             public void onOpened() {
+                cvCamera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
                 startCamera();
             }
 
@@ -57,12 +58,18 @@ public class AutoCamera extends CameraSuper {
         pipeline.doingJunctions = !pipeline.doingJunctions;
     }
 
-    public double getJunctionDistance() {
-        telemetry.addLine("AutoCamera --> getJunctionDistance");
-        return pipeline.junctionDistance;
+    public void setMode(boolean b) {
+        pipeline.doingJunctions = b;
     }
 
-    public double getJunctionArea() {
-        return pipeline.junctionArea;
+    // In pixels
+    public double getJunctionDistance() {
+        telemetry.addLine("AutoCamera --> getJunctionDistance");
+        return pipeline.junctionHorizontalDistance;
+    }
+
+    // In pixels
+    public double getJunctionWidth() {
+        return pipeline.junctionWidth;
     }
 }

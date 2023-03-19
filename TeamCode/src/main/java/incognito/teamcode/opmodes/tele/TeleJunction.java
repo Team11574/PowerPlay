@@ -1,12 +1,17 @@
 package incognito.teamcode.opmodes.tele;
 
+import static incognito.teamcode.config.CameraConstants.JUNCTION_DISTANCE_THRESHOLD;
+import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
+import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
+import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
+import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
-import incognito.cog.trajectory.TrajectorySequence;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
@@ -16,11 +21,20 @@ public class TeleJunction extends RobotOpMode {
     double junctionArea;
     MultipleTelemetry multiTelemetry;
     AutoCamera camera;
+    GamepadPlus pad1;
+
     Robot robot;
     double velX;
     double velY;
     double theta;
-    GamepadPlus pad1;
+    double junctionWidth;
+    double junctionHorizontalDistance;
+    double junctionYPower;
+    double normalFactor;
+    double frontRight_Power;
+    double backRight_Power;
+    double frontLeft_Power;
+    double backLeft_Power;
 
     boolean targetLocking = true;
 
@@ -37,7 +51,7 @@ public class TeleJunction extends RobotOpMode {
     @Override
     public void init_loop() {
         multiTelemetry.addData("Junction distance", robot.autoCamera.getJunctionDistance());
-        multiTelemetry.addData("Junction area", robot.autoCamera.getJunctionArea());
+        multiTelemetry.addData("Junction area", robot.autoCamera.getJunctionWidth());
         multiTelemetry.update();
     }
 
@@ -74,27 +88,40 @@ public class TeleJunction extends RobotOpMode {
         pad1.update();
     }
 
-    private void targetLock() {
-        junctionDistance = robot.autoCamera.getJunctionDistance();
-        junctionArea = robot.autoCamera.getJunctionArea();
-        multiTelemetry.addData("Junction distance", junctionDistance);
-        multiTelemetry.addData("Junction area", junctionArea);
-        double adjustedArea = 800 / junctionArea;
-        double junctionMaxArea = 3000;
-        multiTelemetry.addData("Adjusted area", adjustedArea);
-        if (junctionArea > junctionMaxArea) {
+    public void targetLock() {
+
+        junctionWidth = robot.autoCamera.getJunctionWidth();
+        junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
+        // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when
+        //  far away from the junction but slowly when close.
+        junctionYPower = 1 / junctionWidth * JUNCTION_Y_POWER_FACTOR;
+
+        // TODO: Test, and consider removing. My thinking is that having the ability
+        //  to move the robot in and out along the the autolock for precise movements
+        //  could be good.
+        velY = pad1.get_partitioned_left_stick_y();
+
+        // TODO: Test how close this is and adjust JUNCTION_WIDTH_THRESHOLD accordingly
+        // TODO: See if we need different JUNCTION_MAX_WIDTH values for different
+        //  junction heights, and if so create them.
+        if (junctionWidth > JUNCTION_MAX_WIDTH
+                || junctionWidth < JUNCTION_MIN_WIDTH) {
             // TODO: Consider adding in negative velocity if too close to the pole
-            // Happens when robot is about 11.5 cm from the pole
-            velY = 0;
+            velY += 0;
         } else {
-            velY = Math.max(0, adjustedArea);
+            velY += Math.max(0, junctionYPower);
         }
-        velX = pad1.gamepad.left_stick_x;
-        if (Math.abs(junctionDistance) < 10) {
+        velX = pad1.get_partitioned_left_stick_x();
+        if (Math.abs(junctionHorizontalDistance) < JUNCTION_DISTANCE_THRESHOLD) {
             theta = 0;
         } else {
-            theta = -0.005 * junctionDistance;
+            theta = junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
         }
+
+        multiTelemetry.addData("Junction distance", junctionHorizontalDistance);
+        multiTelemetry.addData("Junction area", junctionWidth);
+        multiTelemetry.addData("Junction Y power", velY);
+        multiTelemetry.addData("Junction theta power", theta);
     }
 
     public void adjustDrivetrain() {

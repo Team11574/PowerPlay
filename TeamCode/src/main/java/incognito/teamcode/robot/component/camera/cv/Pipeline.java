@@ -3,17 +3,21 @@ package incognito.teamcode.robot.component.camera.cv;
 import static incognito.teamcode.config.CameraConstants.greenThreshold;
 import static incognito.teamcode.config.CameraConstants.orangeThreshold;
 import static incognito.teamcode.config.CameraConstants.purpleThreshold;
+import static incognito.teamcode.config.CameraConstants.yellowLower;
+import static incognito.teamcode.config.CameraConstants.yellowUpper;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,16 +64,16 @@ public class Pipeline extends OpenCvPipeline {
     List<MatOfPoint> yellowContours;
     MatOfPoint yellowContour;
     ArrayList<Mat> yellowChannels;
+    double yellowWidth;
     Moments moments;
-    double yellowContourArea = 0;
-    public double junctionDistance = Double.POSITIVE_INFINITY;
-    public double junctionArea = 0;
-    public double junctionDistanceInternal = Double.POSITIVE_INFINITY;
+    double yellowMaxWidth = 0;
+    public double junctionHorizontalDistance = Double.POSITIVE_INFINITY;
+    public double junctionWidth = 0;
+    public double junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
     public boolean doingJunctions = false;
     double x;
-
-    public static Scalar yellowLower = new Scalar(16, 123, 140);
-    public static Scalar yellowUpper = new Scalar(41, 255, 255);
+    double y;
+    DecimalFormat df = new DecimalFormat("0.00");
 
 
     public Pipeline(Telemetry telem) {
@@ -252,6 +256,7 @@ public class Pipeline extends OpenCvPipeline {
         /*imageROI = imageROI.adjustROI(
                 -150, 0, 0, 0
         );*/
+// Use moments to find the center of yellow blobs
 
         Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
 
@@ -265,26 +270,34 @@ public class Pipeline extends OpenCvPipeline {
 
         imageROI.release();
         yellowMask.release();
-        junctionDistanceInternal = Double.POSITIVE_INFINITY;
+        junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
+
+        telemetry.update();
 
         Imgproc.drawContours(input, yellowContours, -1, yellowUpper, 2);
 
-        yellowContourArea = 0;
+        yellowMaxWidth = 0;
 
         for (k = 0; k < yellowContours.size(); k++) {
             yellowContour = yellowContours.get(k);
-            if (Imgproc.contourArea(yellowContour) > yellowContourArea) {
+            // Create adjusted contour area to only take into account the width of the bounding rectangle
+            yellowWidth = Imgproc.contourArea(yellowContour) / Imgproc.boundingRect(yellowContour).height;
+            if (yellowWidth > yellowMaxWidth) {
                 moments = Imgproc.moments(yellowContour, true);
                 x = moments.get_m10() / moments.get_m00();
-                yellowContourArea = Imgproc.contourArea(yellowContour);
-                junctionDistanceInternal = 170 - x;
+                y = moments.get_m01() / moments.get_m00();
+                Imgproc.putText(input, df.format(yellowWidth), new Point(x-20, y), 5, 1, new Scalar(255, 255, 30));
+                yellowMaxWidth = yellowWidth;
+                telemetry.addData("Yellow max width", yellowMaxWidth);
+                // why is this 170?
+                junctionHorizontalDistanceInternal = 170 - x;
             }
             yellowContour.release();
         }
 
-        junctionArea = yellowContourArea;
+        junctionWidth = yellowMaxWidth;
 
         yellowContours.clear();
-        junctionDistance = junctionDistanceInternal;
+        junctionHorizontalDistance = junctionHorizontalDistanceInternal;
     }
 }

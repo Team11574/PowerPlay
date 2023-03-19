@@ -22,4 +22,13 @@ public class CameraConstants {
     public static Scalar purpleLow = new Scalar(130, 40, 0);
     public static Scalar purpleHigh = new Scalar(150, 255, 255);
     public static final List<Scalar> purpleThreshold = Arrays.asList(purpleLow, purpleHigh);
+
+    public static Scalar yellowLower = new Scalar(16, 123, 140);
+    public static Scalar yellowUpper = new Scalar(41, 255, 255);
+
+    public static double JUNCTION_MAX_WIDTH = 30;
+    public static double JUNCTION_MIN_WIDTH = 5;
+    public static double JUNCTION_Y_POWER_FACTOR = 8;
+    public static double JUNCTION_DISTANCE_THRESHOLD = 10;
+    public static double JUNCTION_THETA_POWER_FACTOR = -0.005;
 }

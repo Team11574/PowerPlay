@@ -23,7 +23,7 @@ public class AutoCameraTesting extends LinearOpMode {
         camera.swapMode();
         while (!isStarted()) {
             multiTelemetry.addData("Junction distance", camera.getJunctionDistance());
-            multiTelemetry.addData("Junction area", camera.getJunctionArea());
+            multiTelemetry.addData("Junction area", camera.getJunctionWidth());
             multiTelemetry.update();
         }
 
@@ -33,7 +33,7 @@ public class AutoCameraTesting extends LinearOpMode {
         double theta;
         do {
             junctionDistance = camera.getJunctionDistance();
-            junctionArea = camera.getJunctionArea();
+            junctionArea = camera.getJunctionWidth();
             multiTelemetry.addData("Junction distance", junctionDistance);
             multiTelemetry.addData("Junction area", junctionArea);
             double adjustedArea = 800 / junctionArea;
