@@ -58,6 +58,7 @@ public class AutoCamera extends CameraSuper {
     }
 
     public double getJunctionDistance() {
+        telemetry.addLine("AutoCamera --> getJunctionDistance");
         return pipeline.junctionDistance;
     }
 

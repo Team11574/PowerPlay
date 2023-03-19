@@ -68,8 +68,8 @@ public class Pipeline extends OpenCvPipeline {
     public boolean doingJunctions = false;
     double x;
 
-    Scalar yellowLower = new Scalar(0, 65, 40);
-    Scalar yellowUpper = new Scalar(50, 255, 255);
+    public static Scalar yellowLower = new Scalar(16, 123, 140);
+    public static Scalar yellowUpper = new Scalar(41, 255, 255);
 
 
     public Pipeline(Telemetry telem) {
@@ -88,9 +88,9 @@ public class Pipeline extends OpenCvPipeline {
 
         // Define list of color thresholds
         colorRanges = new ArrayList<List<Scalar>>(3);
+        colorRanges.add(greenThreshold);
         colorRanges.add(orangeThreshold);
         colorRanges.add(purpleThreshold);
-        colorRanges.add(greenThreshold);
 
         // Extra hierarchy thing for contours
         hierarchy = new Mat();
@@ -249,9 +249,9 @@ public class Pipeline extends OpenCvPipeline {
 
         imageROI = input.clone();
         // TODO: Adjust ROI w/ imageROI.adjustROI()
-        imageROI = imageROI.adjustROI(
+        /*imageROI = imageROI.adjustROI(
                 -150, 0, 0, 0
-        );
+        );*/
 
         Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
 

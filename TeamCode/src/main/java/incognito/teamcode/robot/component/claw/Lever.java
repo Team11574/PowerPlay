@@ -9,7 +9,7 @@ import incognito.cog.hardware.component.servo.ContinuousServo;
 
 public class Lever extends ContinuousServo {
     double discreteProgress = 0;
-    double discreteAdvancementThreshold = 0.5;
+    double discreteAdvancementThreshold = 5;
     public Lever(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
                  double[] positions, double max, double min) {
         super(hardwareMap, telemetry, crServo, positions, max, min);
@@ -30,9 +30,13 @@ public class Lever extends ContinuousServo {
     // Offset position but only move to set positions
     // TODO: Test
     public void advancePositionDiscrete(double amount, boolean updateLastPosition) {
-        discreteProgress += amount;
-        if (Math.abs(discreteProgress) > discreteAdvancementThreshold) {
-            shiftPositions((int) Math.signum(discreteProgress));
+        if (amount == 0) {
+            discreteProgress = discreteAdvancementThreshold;
+            return;
+        }
+        discreteProgress += Math.abs(amount);
+        if (Math.abs(discreteProgress) >= discreteAdvancementThreshold) {
+            shiftPositions((int) Math.signum(amount));
             discreteProgress = 0;
         }
     }
