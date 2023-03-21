@@ -506,6 +506,8 @@ public class TeleNewTesting extends RobotOpMode {
         multiTelemetry.addData("Pose", drivetrain.getPoseEstimate());
         multiTelemetry.addData("Distance (cm)", robot.horizontalDistanceSensor.getDistance(DistanceUnit.CM));
 
+        multiTelemetry.addData("Facing junction height", t.facingJunctionHeight());
+
         multiTelemetry.update();
     }
 }
