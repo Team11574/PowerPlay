@@ -1,6 +1,6 @@
 package incognito.teamcode.opmodes.tele;
 
-import static incognito.teamcode.config.CameraConstants.JUNCTION_DISTANCE_THRESHOLD;
+import static incognito.teamcode.config.CameraConstants.JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
@@ -432,7 +432,7 @@ public class TeleNewTesting extends RobotOpMode {
         //  could be good.
         velY = pad1.get_partitioned_left_stick_y();
 
-        // TODO: Test how close this is and adjust JUNCTION_WIDTH_THRESHOLD accordingly
+        // TODO: Test how close this is and adjust JUNCTION_MAX_WIDTH accordingly
         // TODO: See if we need different JUNCTION_MAX_WIDTH values for different
         //  junction heights, and if so create them.
         if (junctionWidth > JUNCTION_MAX_WIDTH
@@ -443,7 +443,7 @@ public class TeleNewTesting extends RobotOpMode {
             velY += Math.max(0, junctionYPower);
         }
         velX = pad1.get_partitioned_left_stick_x();
-        if (Math.abs(junctionHorizontalDistance) < JUNCTION_DISTANCE_THRESHOLD) {
+        if (Math.abs(junctionHorizontalDistance) < JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD) {
             theta = 0;
         } else {
             theta = junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;

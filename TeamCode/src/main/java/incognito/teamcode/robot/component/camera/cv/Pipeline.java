@@ -256,7 +256,7 @@ public class Pipeline extends OpenCvPipeline {
         /*imageROI = imageROI.adjustROI(
                 -150, 0, 0, 0
         );*/
-// Use moments to find the center of yellow blobs
+        // Use moments to find the center of yellow blobs
 
         Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
 

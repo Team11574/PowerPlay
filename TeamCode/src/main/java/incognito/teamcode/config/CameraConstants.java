@@ -29,6 +29,6 @@ public class CameraConstants {
     public static double JUNCTION_MAX_WIDTH = 30;
     public static double JUNCTION_MIN_WIDTH = 5;
     public static double JUNCTION_Y_POWER_FACTOR = 8;
-    public static double JUNCTION_DISTANCE_THRESHOLD = 10;
+    public static double JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD = 10;
     public static double JUNCTION_THETA_POWER_FACTOR = -0.005;
 }
