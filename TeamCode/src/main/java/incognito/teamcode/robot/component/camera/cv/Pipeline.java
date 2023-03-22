@@ -1,8 +1,15 @@
 package incognito.teamcode.robot.component.camera.cv;
 
+import static incognito.teamcode.config.CameraConstants.aprilWeight;
+import static incognito.teamcode.config.CameraConstants.colorWeight;
+import static incognito.teamcode.config.CameraConstants.cx;
+import static incognito.teamcode.config.CameraConstants.cy;
+import static incognito.teamcode.config.CameraConstants.fx;
+import static incognito.teamcode.config.CameraConstants.fy;
 import static incognito.teamcode.config.CameraConstants.greenThreshold;
 import static incognito.teamcode.config.CameraConstants.orangeThreshold;
 import static incognito.teamcode.config.CameraConstants.purpleThreshold;
+import static incognito.teamcode.config.CameraConstants.tagSize;
 import static incognito.teamcode.config.CameraConstants.yellowLower;
 import static incognito.teamcode.config.CameraConstants.yellowUpper;
 
@@ -15,6 +22,8 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.text.DecimalFormat;
@@ -53,7 +62,8 @@ public class Pipeline extends OpenCvPipeline {
     double area2;
     double maxArea;
 
-    ArrayList<Integer> parkingList = new ArrayList<Integer>();
+    ArrayList<Integer> colorParkingList = new ArrayList<Integer>();
+    ArrayList<Integer> aprilParkingList = new ArrayList<Integer>();
 
     // Number of frames to include in parking decision
     final int SAMPLES = 10;
@@ -74,6 +84,15 @@ public class Pipeline extends OpenCvPipeline {
     double x;
     double y;
     DecimalFormat df = new DecimalFormat("0.00");
+
+    long aprilDetector;
+    Mat gray;
+    private ArrayList<AprilTagDetection> detections = new ArrayList<>();
+
+    List<Integer> colorParkingSublist;
+    List<Integer> aprilParkingSubList;
+
+    int aprilParking;
 
 
     public Pipeline(Telemetry telem) {
@@ -102,10 +121,13 @@ public class Pipeline extends OpenCvPipeline {
         val = new Mat();
 
         // Zone to search for cones
-        searchZone = new Rect(180, 40, 140, 180); // Creates a region in the middle of the frame to look
+        searchZone = new Rect(120, 0, 80, 240); // Creates a region in the middle of the frame to look
 
         areas = new ArrayList<Double>();
 
+        gray = new Mat();
+
+        aprilDetector = AprilTagDetectorJNI.createApriltagDetector(AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 3);
     }
 
     @Override
@@ -123,6 +145,11 @@ public class Pipeline extends OpenCvPipeline {
         if (stopped) {
             return input;
         }
+
+        aprilParking = processAprilTags(input);
+
+        if (aprilParking != 0)
+            aprilParkingList.add(aprilParking);
 
         if (imageROI != null)
             imageROI.release();
@@ -152,7 +179,7 @@ public class Pipeline extends OpenCvPipeline {
         maxArea = Collections.max(areas);
         maxIndex = areas.indexOf(maxArea);
 
-        parkingList.add(maxIndex + 1);
+        colorParkingList.add(maxIndex + 1);
 
         //telemetry.addData("Array", areas);
         //telemetry.addData("Orange Area", areas.get(0));
@@ -202,10 +229,24 @@ public class Pipeline extends OpenCvPipeline {
      * @return parking spot
      */
     public int getParkingSpot() {
-        if (parkingList.size() > SAMPLES) {
-            return mode(parkingList.subList(Math.max(parkingList.size() - (SAMPLES + 1), 0), parkingList.size()));
+        colorParkingSublist = colorParkingList;
+        aprilParkingSubList = aprilParkingList;
+
+        if (colorParkingList.size() > SAMPLES) {
+            colorParkingSublist = colorParkingList.subList(Math.max(colorParkingList.size() - (SAMPLES + 1), 0), colorParkingList.size());
+        }
+        if (aprilParkingList.size() > SAMPLES) {
+            aprilParkingSubList = aprilParkingList.subList(Math.max(colorParkingList.size() - (SAMPLES + 1), 0), colorParkingList.size());
+        }
+        int colorParkingValue = mode(colorParkingSublist);
+        int aprilParkingValue = mode(aprilParkingSubList);
+        int colorParkingCount = Collections.frequency(colorParkingSublist, colorParkingValue);
+        int aprilParkingCount = Collections.frequency(aprilParkingSubList, aprilParkingValue);
+
+        if (colorParkingCount * colorWeight > aprilParkingCount * aprilWeight) {
+            return colorParkingValue;
         } else {
-            return mode(parkingList);
+            return aprilParkingValue;
         }
     }
 
@@ -299,5 +340,24 @@ public class Pipeline extends OpenCvPipeline {
 
         yellowContours.clear();
         junctionHorizontalDistance = junctionHorizontalDistanceInternal;
+    }
+
+    public int processAprilTags(Mat input) {
+        Imgproc.cvtColor(input, gray, Imgproc.COLOR_RGB2GRAY);
+        gray.adjustROI(
+                -searchZone.y,
+                -(searchZone.height + searchZone.y) + 320,
+                -searchZone.x,
+                -(searchZone.width + searchZone.x) + 240);
+
+        // Detect AprilTags
+        detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(aprilDetector, gray, tagSize, fx, fy, cx, cy);
+
+        for (AprilTagDetection detection : detections) {
+            telemetry.addData("April tag detected", detection.id);
+            return detection.id + 1;
+        }
+
+        return 0;
     }
 }

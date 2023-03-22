@@ -31,4 +31,13 @@ public class CameraConstants {
     public static double JUNCTION_Y_POWER_FACTOR = 8;
     public static double JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD = 10;
     public static double JUNCTION_THETA_POWER_FACTOR = -0.005;
+
+    public static double tagSize = 0.04;
+    public static double fx = 931.4759229459526;
+    public static double fy = 822.317;
+    public static double cx = 934.3344071111114;
+    public static double cy = 233.4049079752566;
+
+    public static double aprilWeight = 1;
+    public static double colorWeight = 0.9;
 }
