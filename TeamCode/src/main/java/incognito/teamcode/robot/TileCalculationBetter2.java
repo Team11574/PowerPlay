@@ -22,7 +22,7 @@ public class TileCalculationBetter2 {
         UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT,
         LEFT_UP, RIGHT_UP, LEFT_DOWN, RIGHT_DOWN;
 
-        final List<String> STRINGS = Arrays.stream(TileDirection.values()).map(TileDirection::name).collect(Collectors.toList());
+        final List<String> STRINGS = Arrays.asList(Arrays.toString(TileDirection.values()).replaceAll("^.|.$", "").split(", "));
         final List<List<String>> STRINGS_SPLIT = STRINGS.stream().map(s -> Arrays.asList(s.split("_"))).collect(Collectors.toList());
 
         public TileDirection inverse() {
