@@ -54,7 +54,6 @@ public class TeleJunction extends RobotOpMode {
         multiTelemetry.addData("Junction distance", robot.autoCamera.getJunctionDistance());
         multiTelemetry.addData("Junction area", robot.autoCamera.getJunctionWidth());
         multiTelemetry.addData("Segment index", robot.drivetrain.getCurrentSegmentIndex());
-        multiTelemetry.addData("Segment count", robot.drivetrain.getCurrentSegmentSize());
         multiTelemetry.addData("Last segment index", robot.drivetrain.getLastSegmentIndex());
         multiTelemetry.update();
     }
