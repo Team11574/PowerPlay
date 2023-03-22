@@ -22,8 +22,25 @@ public class TileCalculationBetter2 {
         UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT,
         LEFT_UP, RIGHT_UP, LEFT_DOWN, RIGHT_DOWN;
 
-        final List<String> STRINGS = Arrays.asList(Arrays.toString(TileDirection.values()).replaceAll("^.|.$", "").split(", "));
-        final List<List<String>> STRINGS_SPLIT = STRINGS.stream().map(s -> Arrays.asList(s.split("_"))).collect(Collectors.toList());
+        final List<String> STRINGS = Arrays.asList(
+                "UP", "DOWN", "LEFT", "RIGHT",
+                "UP_LEFT", "UP_RIGHT", "DOWN_LEFT", "DOWN_RIGHT",
+                "LEFT_UP", "RIGHT_UP", "LEFT_DOWN", "RIGHT_DOWN"
+        );
+        final List<List<String>> STRINGS_SPLIT = Arrays.asList(
+                Arrays.asList("UP"),
+                Arrays.asList("DOWN"),
+                Arrays.asList("LEFT"),
+                Arrays.asList("RIGHT"),
+                Arrays.asList("UP", "LEFT"),
+                Arrays.asList("UP", "RIGHT"),
+                Arrays.asList("DOWN", "LEFT"),
+                Arrays.asList("DOWN", "RIGHT"),
+                Arrays.asList("LEFT", "UP"),
+                Arrays.asList("RIGHT", "UP"),
+                Arrays.asList("LEFT", "DOWN"),
+                Arrays.asList("RIGHT", "DOWN")
+        );
 
         public TileDirection inverse() {
             switch (this) {
