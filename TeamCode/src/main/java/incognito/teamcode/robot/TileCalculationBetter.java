@@ -223,7 +223,9 @@ public class TileCalculationBetter {
      * @param direction The direction to move the robot.
      */
     public void move(TileDirection direction) {
-        move(direction, 2);
+        directions.add(direction);
+
+        //move(direction, 2);
     }
 
     /**
@@ -240,7 +242,7 @@ public class TileCalculationBetter {
         } else {
             // If the robot is not moving in the same direction as the last direction,
             // then we want to add a movement.
-            Trajectory lastTrajectory = getLastTrajectory();
+            Trajectory lastTrajectory = getLastTrajectory(); // can be null
             Pose2d startPose;
             if (lastTrajectory == null) {
                 startPose = getSequenceStartPose();
@@ -253,10 +255,10 @@ public class TileCalculationBetter {
             double endY = startY + direction.getY();
             // Account for out of bounds
             if (endX <= MIN_X || endX >= MAX_X) {
-                endX = startX;
+                return;
             }
             if (endY <= MIN_Y || endY >= MAX_Y) {
-                endY = startY;
+                return;
             }
 
             push(drivetrain.trajectoryBuilder(startPose, direction.getHeading())
@@ -276,8 +278,7 @@ public class TileCalculationBetter {
         }
         Trajectory startTrajectory = trajectories.get(0);
         TrajectorySequenceBuilder sequenceBuilder = drivetrain.trajectorySequenceBuilder(sequenceStartPose)
-                .setTangent(startTrajectory.start().getHeading())
-                .addTrajectory(startTrajectory);
+                .setTangent(startTrajectory.start().getHeading());
         for (Trajectory followingTrajectory : trajectories) {
             sequenceBuilder = sequenceBuilder.addTrajectory(followingTrajectory);
         }

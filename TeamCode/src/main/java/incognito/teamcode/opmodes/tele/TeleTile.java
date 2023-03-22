@@ -11,6 +11,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import incognito.cog.hardware.component.drive.Drivetrain;
+import incognito.cog.hardware.component.drive.PoseStorage;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.util.TelemetryBigError;
@@ -32,6 +33,7 @@ public class TeleTile extends RobotOpMode {
         //camera = new AutoCamera(hardwareMap, multiTelemetry);
         robot = new Robot(hardwareMap, telemetry, false);
         drivetrain = robot.drivetrain;
+        drivetrain.setPoseEstimate(PoseStorage.lastPose);
         pad1 = new GamepadPlus(gamepad1);
         tileCalculation = new TileCalculationBetter(drivetrain);
         TelemetryBigError.initialize(multiTelemetry);
