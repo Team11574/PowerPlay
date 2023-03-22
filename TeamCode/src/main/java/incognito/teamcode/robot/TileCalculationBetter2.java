@@ -253,7 +253,7 @@ public class TileCalculationBetter2 {
             push(direction);
             push(direction);
         } else {
-            push(direction.and(getLastDirection()));
+            push(getLastDirection().and(direction));
             push(direction);
         }
     }
