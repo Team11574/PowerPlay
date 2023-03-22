@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
+import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
@@ -44,7 +45,7 @@ public class TeleJunction extends RobotOpMode {
         //camera = new AutoCamera(hardwareMap, multiTelemetry);
         robot = new Robot(hardwareMap, telemetry, true);
         pad1 = new GamepadPlus(gamepad1);
-
+        TelemetryBigError.initialize(multiTelemetry);
         robot.autoCamera.swapMode();
     }
 
@@ -94,7 +95,14 @@ public class TeleJunction extends RobotOpMode {
         junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
         // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when
         //  far away from the junction but slowly when close.
-        junctionYPower = 1 / junctionWidth * JUNCTION_Y_POWER_FACTOR;
+        if (junctionWidth == Double.POSITIVE_INFINITY) {
+            TelemetryBigError.raise(2);
+            multiTelemetry.addLine("Junction locking failed");
+            targetLocking = false;
+            return;
+        } else {
+            junctionYPower = 1 / junctionWidth * JUNCTION_Y_POWER_FACTOR;
+        }
 
         // TODO: Test, and consider removing. My thinking is that having the ability
         //  to move the robot in and out along the the autolock for precise movements
