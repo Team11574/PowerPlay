@@ -17,6 +17,7 @@ import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.TileCalculationBetter;
+import incognito.teamcode.robot.TileCalculationBetter2;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
 @TeleOp(name = "Tile Test", group = "tele")
@@ -25,7 +26,7 @@ public class TeleTile extends RobotOpMode {
     GamepadPlus pad1;
     Robot robot;
     Drivetrain drivetrain;
-    TileCalculationBetter tileCalculation;
+    TileCalculationBetter2 tileCalculation;
 
     @Override
     public void init() {
@@ -35,7 +36,7 @@ public class TeleTile extends RobotOpMode {
         drivetrain = robot.drivetrain;
         drivetrain.setPoseEstimate(PoseStorage.lastPose);
         pad1 = new GamepadPlus(gamepad1);
-        tileCalculation = new TileCalculationBetter(drivetrain);
+        tileCalculation = new TileCalculationBetter2(drivetrain);
         TelemetryBigError.initialize(multiTelemetry);
     }
 
@@ -44,9 +45,9 @@ public class TeleTile extends RobotOpMode {
 
         if (pad1.a_pressed) {
             // Queue some moves
-            tileCalculation.move(TileCalculationBetter.TileDirection.UP);
-            tileCalculation.move(TileCalculationBetter.TileDirection.UP);
-            tileCalculation.move(TileCalculationBetter.TileDirection.LEFT);
+            tileCalculation.move(TileCalculationBetter2.TileDirection.UP);
+            tileCalculation.move(TileCalculationBetter2.TileDirection.UP);
+            tileCalculation.move(TileCalculationBetter2.TileDirection.LEFT);
         }
 
         if (pad1.x_pressed) {
@@ -85,7 +86,6 @@ public class TeleTile extends RobotOpMode {
         multiTelemetry.addData("Last built index", tileCalculation.getLastBuiltIndex());
         multiTelemetry.addData("Build state", tileCalculation.getBuildState(drivetrain.getCurrentSegmentIndex()));
         multiTelemetry.addData("Last direction", tileCalculation.getLastDirection());
-        multiTelemetry.addData("Last trajectory", tileCalculation.getLastTrajectory());
         multiTelemetry.addData("Sequence start pose", tileCalculation.getSequenceStartPose());
 
         multiTelemetry.update();
