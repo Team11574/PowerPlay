@@ -4,6 +4,7 @@ import static com.example.meepmeeptesting.Generic.midpoint;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
@@ -15,8 +16,8 @@ public class MeepMeepTesting {
         double deltaX = 0.5;
 
         //Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
-        // Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
-        Pose2d startPos = new Pose2d(12, 12, Math.toRadians(270));
+         Pose2d startPos = new Pose2d(36, -60, Math.toRadians(270));
+        //Pose2d startPos = new Pose2d(12, 12, Math.toRadians(270));
 
 
         // Forward 57, left 2, rotate 160 degrees
@@ -27,7 +28,7 @@ public class MeepMeepTesting {
                 .setDimensions(16.5, 17)
                 .followTrajectorySequence(drivetrain -> {
                     drivetrain.setPoseEstimate(startPos);
-
+                    /*
                     TileCalculation t = new TileCalculation(drivetrain);
                     returnThingy r = t.queueMove(TileCalculation.Move.DOWN);
                     TileCalculation.Tile target1 = t.targetTile;
@@ -38,23 +39,28 @@ public class MeepMeepTesting {
                     System.out.println(r.startHeading);
                     System.out.println(r.endHeading);
                     System.out.println(r.startPose);
+                     */
+
+                    double directionalHeading = Math.toRadians(90);
 
 
-
-                    return drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
+                    return drivetrain.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), directionalHeading)) //r.startPose)
+                            //.setTangent(directionalHeading)
+                            .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+12), directionalHeading)
+                            .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+36), directionalHeading)
+                            .splineToConstantHeading(new Vector2d(startPos.getX()+12, startPos.getY()+48), directionalHeading-Math.PI/2)
+                            .build();
                             //.setTangent(Math.toRadians(270))
                             //.splineToConstantHeading(new Vector2d(12, -12), Math.toRadians(270))
-
+                            /*
                             .setTangent(r.startHeading)
                             .splineToConstantHeading(
                                     midpoint(t.getVectorByID(r.nextTile), t.getVectorByID(target1)),
                                     r.endHeading)
-                            /*
                             .splineToConstantHeading(
                                     t.getVectorByID(r.nextTile),
                                     r.endHeading)
 
-                             */
                             .setTangent(r2.startHeading)
                             .splineToConstantHeading(
                                     midpoint(t.getVectorByID(r2.nextTile), t.getVectorByID(target2)),
@@ -64,6 +70,7 @@ public class MeepMeepTesting {
                                     r2.endHeading)
 
                             .build();
+                            */
                                     // .setTangent(Math.toRadians(90))
                                     // .splineToConstantHeading(new Vector2d(36, 60), Math.toRadians(90))
                                     // .setTangent(Math.toRadians(180))
