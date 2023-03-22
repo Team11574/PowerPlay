@@ -73,7 +73,10 @@ public class TileCalculationBetter {
      * @param activeSegmentIndex The current segment index of the active TrajectorySequence.
      * @return The current build state of the TrajectorySequence.
      */
-    public BuildState getBuildState(int activeSegmentIndex) {
+    public BuildState getBuildState(Integer activeSegmentIndex) {
+        if (activeSegmentIndex == null) {
+            activeSegmentIndex = -1;
+        }
         if (activeSegmentIndex == -1
                 && getBuildIndex() >= 0
                 && getLastBuiltIndex() == -1) {
@@ -86,7 +89,7 @@ public class TileCalculationBetter {
             return BuildState.ACTIVE;
         } else if (activeSegmentIndex >= 0
                 && getBuildIndex() != getLastBuiltIndex()
-                && activeSegmentIndex <= getLastBuiltIndex()) {
+                && activeSegmentIndex < getBuildIndex()) {
             // Build is active but we have added a new trajectory to the list,
             // and the drive is still running a trajectory that was built before.
             // TODO: It's possible that if the activeSegmentIndex = getLastBuiltIndex() then
@@ -94,11 +97,14 @@ public class TileCalculationBetter {
             //  to be tested or changed.
             return BuildState.ADJUSTED;
         } else if (activeSegmentIndex >= 0
-                && getBuildIndex() < getLastBuiltIndex()) {
-            //
+                && getBuildIndex() != getLastBuiltIndex()
+                && activeSegmentIndex >= getBuildIndex()) {
+            // Build is actively following a trajectory that we want to change,
+            // which is bad.
             return BuildState.CANCELLED;
         } else if (activeSegmentIndex == -1
-                && getBuildIndex() == getLastBuiltIndex()) {
+                && getBuildIndex() == getLastBuiltIndex()
+                && getBuildIndex() != -1) {
             // Build has just finished since the drive is not running a trajectory
             // but previously we had built all of the trajectories available.
             reset();
@@ -112,6 +118,7 @@ public class TileCalculationBetter {
         }
         // If none of the above cases are true, then we haven't accounted for something.
         TelemetryBigError.raise(1);
+        // reset();
         return BuildState.ERROR;
     }
 
@@ -120,18 +127,6 @@ public class TileCalculationBetter {
         tile.move(LEFT);
             .move(UP.and(LEFT));
 
-    t {
-        Array trajectories
-        Array directions
-        int lastBuiltIndex
-
-        enum BuildState {
-            BUILD, REBUILD, NONE
-        }
-
-
-
-    }
 
     switch (t.getBuildState(drivetrain.getCurrentSegmentIndex())) {
         case STARTED:
@@ -144,10 +139,10 @@ public class TileCalculationBetter {
             // dont go to manual mode
             break;
         case INACTIVE:
-            // go to manual mode
+            // stay in manual mode?
             break;
         case FINISHED:
-            // go to manual mode
+            // go to manual mode?
             break;
     }
 
