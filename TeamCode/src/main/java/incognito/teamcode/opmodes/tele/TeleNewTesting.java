@@ -21,6 +21,7 @@ import incognito.cog.hardware.component.drive.TileCalculation;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.trajectory.TrajectorySequence;
+import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
@@ -67,6 +68,7 @@ public class TeleNewTesting extends RobotOpMode {
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         scheduler = new Scheduler();
         t = new TileCalculation(robot.drivetrain);
+        TelemetryBigError.initialize(multiTelemetry);
     }
 
     @Override
@@ -465,6 +467,7 @@ public class TeleNewTesting extends RobotOpMode {
     }
 
     public void update() {
+        TelemetryBigError.update();
         robot.update();
         drivetrain.updatePoseEstimate();
         pad1.update();
