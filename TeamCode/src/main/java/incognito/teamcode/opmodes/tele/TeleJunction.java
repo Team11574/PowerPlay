@@ -1,5 +1,6 @@
 package incognito.teamcode.opmodes.tele;
 
+import static incognito.teamcode.config.CameraConstants.JUNCTION_ERROR_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
@@ -95,7 +96,7 @@ public class TeleJunction extends RobotOpMode {
         junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
         // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when
         //  far away from the junction but slowly when close.
-        if (junctionWidth == Double.POSITIVE_INFINITY) {
+        if (junctionWidth > JUNCTION_ERROR_WIDTH) {
             TelemetryBigError.raise(2);
             multiTelemetry.addLine("Junction locking failed");
             targetLocking = false;
@@ -107,7 +108,7 @@ public class TeleJunction extends RobotOpMode {
         // TODO: Test, and consider removing. My thinking is that having the ability
         //  to move the robot in and out along the the autolock for precise movements
         //  could be good.
-        velY = pad1.get_partitioned_left_stick_y();
+        velY = -pad1.get_partitioned_left_stick_y();
 
         // TODO: Test how close this is and adjust JUNCTION_WIDTH_THRESHOLD accordingly
         // TODO: See if we need different JUNCTION_MAX_WIDTH values for different
