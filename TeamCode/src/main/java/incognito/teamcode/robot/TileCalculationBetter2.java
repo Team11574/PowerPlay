@@ -247,7 +247,7 @@ public class TileCalculationBetter2 {
             // If the robot is moving in the opposite direction of the last direction,
             // then we want to remove the last movement.
             pop();
-        } else if (direction == getLastDirection()) {
+        } else if (direction == getLastDirection() || getLastDirection() == null) {
             // If the robot is moving in the same direction as the last direction,
             // then we want to add a movement.
             push(direction);
