@@ -26,9 +26,8 @@ public class CameraConstants {
     public static Scalar yellowLower = new Scalar(16, 52, 113);
     public static Scalar yellowUpper = new Scalar(41, 255, 255);
 
-    public static double JUNCTION_MAX_WIDTH = 50;
+    public static double JUNCTION_MAX_WIDTH = 35;
     public static double JUNCTION_MIN_WIDTH = 10;
-    public static double JUNCTION_ERROR_WIDTH = 1000;
     public static double JUNCTION_Y_POWER_FACTOR = 8;
     public static double JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD = 10;
     public static double JUNCTION_THETA_POWER_FACTOR = -0.005;

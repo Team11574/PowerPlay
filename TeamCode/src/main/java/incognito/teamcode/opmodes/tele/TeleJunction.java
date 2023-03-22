@@ -1,6 +1,5 @@
 package incognito.teamcode.opmodes.tele;
 
-import static incognito.teamcode.config.CameraConstants.JUNCTION_ERROR_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
@@ -55,6 +54,8 @@ public class TeleJunction extends RobotOpMode {
         multiTelemetry.addData("Junction distance", robot.autoCamera.getJunctionDistance());
         multiTelemetry.addData("Junction area", robot.autoCamera.getJunctionWidth());
         multiTelemetry.addData("Segment index", robot.drivetrain.getCurrentSegmentIndex());
+        multiTelemetry.addData("Segment count", robot.drivetrain.getCurrentSegmentSize());
+        multiTelemetry.addData("Last segment index", robot.drivetrain.getLastSegmentIndex());
         multiTelemetry.update();
     }
 
@@ -97,7 +98,7 @@ public class TeleJunction extends RobotOpMode {
         junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
         // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when
         //  far away from the junction but slowly when close.
-        if (junctionWidth > JUNCTION_ERROR_WIDTH) {
+        if (junctionWidth == 0) {
             TelemetryBigError.raise(2);
             multiTelemetry.addLine("Junction locking failed");
             targetLocking = false;
@@ -129,7 +130,7 @@ public class TeleJunction extends RobotOpMode {
         }
 
         multiTelemetry.addData("Junction distance", junctionHorizontalDistance);
-        multiTelemetry.addData("Junction area", junctionWidth);
+        multiTelemetry.addData("Junction width", junctionWidth);
         multiTelemetry.addData("Junction Y power", velY);
         multiTelemetry.addData("Junction theta power", theta);
     }

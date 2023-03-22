@@ -47,6 +47,11 @@ public class TeleTile extends RobotOpMode {
             tileCalculation.move(TileCalculationBetter.TileDirection.LEFT);
         }
 
+        if (pad1.x_pressed) {
+            // Queue some moves
+            TelemetryBigError.raise(1);
+        }
+
         switch (tileCalculation.getBuildState(drivetrain.getCurrentSegmentIndex())) {
             case STARTED:
                 drivetrain.followTrajectorySequenceAsync(tileCalculation.build());
