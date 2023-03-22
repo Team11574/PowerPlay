@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import incognito.cog.trajectory.TrajectorySequenceBuilder;
 import incognito.cog.util.TelemetryBigError;
 import incognito.cog.hardware.component.drive.Drivetrain;
 import incognito.cog.trajectory.TrajectorySequence;
@@ -19,7 +20,47 @@ import incognito.cog.trajectory.TrajectorySequence;
 public class TileCalculationBetter {
 
     public enum TileDirection {
-        UP, DOWN, LEFT, RIGHT
+        UP, DOWN, LEFT, RIGHT;
+
+        public TileDirection inverse() {
+            switch (this) {
+                case UP: return DOWN;
+                case DOWN: return UP;
+                case LEFT: return RIGHT;
+                case RIGHT: return LEFT;
+                default: return null;
+            }
+        }
+
+        public double getHeading() {
+            switch (this) {
+                case RIGHT: return Math.toRadians(0);
+                case UP: return Math.toRadians(90);
+                case LEFT: return Math.toRadians(180);
+                case DOWN: return Math.toRadians(270);
+                default: return 0;
+            }
+        }
+
+        public double getX() {
+            switch (this) {
+                case RIGHT: return TILE_SIZE/2;
+                case UP: return 0;
+                case LEFT: return -TILE_SIZE/2;
+                case DOWN: return 0;
+                default: return 0;
+            }
+        }
+
+        public double getY() {
+            switch (this) {
+                case RIGHT: return 0;
+                case UP: return TILE_SIZE/2;
+                case LEFT: return 0;
+                case DOWN: return -TILE_SIZE/2;
+                default: return 0;
+            }
+        }
     }
 
     public enum BuildState {
@@ -30,6 +71,12 @@ public class TileCalculationBetter {
     ArrayList<Trajectory> trajectories = new ArrayList<>();
     ArrayList<TileDirection> directions = new ArrayList<>();
     int lastBuiltIndex = -1;
+    Pose2d sequenceStartPose;
+    static final double TILE_SIZE = 24;
+    static final double MIN_X = -72; // in
+    static final double MIN_Y = -72; // in
+    static final double MAX_X = 72; // in
+    static final double MAX_Y = 72; // in
 
     /**
      * Create TileCalculation object to regulate movement between tiles.
@@ -41,22 +88,11 @@ public class TileCalculationBetter {
     }
 
     /**
-     * Move the robot to the next tile.
-     *
-     * @param direction The direction to move the robot.
-     */
-    public void move(TileDirection direction) {
-        switch (direction) {
-
-        }
-    }
-
-    /**
      * Build index is the index of the final value in the trajectory list.
      * @return int
      */
     public int getBuildIndex() {
-        return trajectories.size()-1;
+        return trajectories.size() - 1;
     }
 
     /**
@@ -122,541 +158,129 @@ public class TileCalculationBetter {
         return BuildState.ERROR;
     }
 
-    /*
-    if (a)
-        tile.move(LEFT);
-            .move(UP.and(LEFT));
-
-
-    switch (t.getBuildState(drivetrain.getCurrentSegmentIndex())) {
-        case STARTED:
-            drivetrain.followTrajectorySequence(t.build());
-            break;
-        case ADJUSTED:
-            drivetrain.modifyTrajectorySequence(t.build());
-            break;
-        case ACTIVE:
-            // dont go to manual mode
-            break;
-        case INACTIVE:
-            // stay in manual mode?
-            break;
-        case FINISHED:
-            // go to manual mode?
-            break;
+    /**
+     * Reset the TileCalculation object.
+     */
+    public void reset() {
+        trajectories.clear();
+        directions.clear();
+        lastBuiltIndex = -1;
+        sequenceStartPose = null;
     }
 
-    TrajectorySequenceBuilder sequenceBuilder = null;
-    Trajectory lastTrajectory = null;
-    Trajectory finalizingTrajectory = null;
-    double MIN_X = -72; // in
-    double MIN_Y = -72; // in
-    double MAX_X = 72; // in
-    double MAX_Y = 72; // in
-    double CENTER_THRESHOLD = 1; // in
+    /**
+     * Get the last direction that the robot moved in.
+     * @return The last direction that the robot moved in, or null if the robot hasn't moved.
      */
-
-
-    enum FieldElement {
-        A1, A12, A2, A23, A3, A34, A4, A45, A5, A56, A6,
-        AB1, AB12, AB2, AB23, AB3, AB34, AB4, AB45, AB5, AB56, AB6,
-        B1, B12, B2, B23, B3, B34, B4, B45, B5, B56, B6,
-        BC1, BC12, BC2, BC23, BC3, BC34, BC4, BC45, BC5, BC56, BC6,
-        C1, C12, C2, C23, C3, C34, C4, C45, C5, C56, C6,
-        CD1, CD12, CD2, CD23, CD3, CD34, CD4, CD45, CD5, CD56, CD6,
-        D1, D12, D2, D23, D3, D34, D4, D45, D5, D56, D6,
-        DE1, DE12, DE2, DE23, DE3, DE34, DE4, DE45, DE5, DE56, DE6,
-        E1, E12, E2, E23, E3, E34, E4, E45, E5, E56, E6,
-        EF1, EF12, EF2, EF23, EF3, EF34, EF4, EF45, EF5, EF56, EF6,
-        F1, F12, F2, F23, F3, F34, F4, F45, F5, F56, F6;
-
-        static final int ROWS = 11;
-        static final int COLS = 11;
-
-        public static FieldElement getElement(int row, int col) {
-            return FieldElement.values()[(row - 1) * COLS + (col - 1)];
-        }
-
-        public int getRow() {
-            return this.ordinal() / COLS + 1;
-        }
-
-        public int getCol() {
-            return this.ordinal() % COLS + 1;
-        }
-
-        public FieldElement nextRow() {
-            int nextRow = clamp(this.getRow() + 1, 0, ROWS);
-            return FieldElement.getElement(nextRow, this.getCol());
-        }
-
-        public FieldElement prevRow() {
-            int prevRow = clamp(this.getRow() - 1, 0, ROWS);
-            return FieldElement.getElement(prevRow, this.getCol());
-        }
-
-        public FieldElement nextCol() {
-            int nextCol = clamp(this.getCol() + 1, 0, COLS);
-            return FieldElement.getElement(this.getRow(), nextCol);
-        }
-
-        public FieldElement prevCol() {
-            int prevCol = clamp(this.getCol() - 1, 0, COLS);
-            return FieldElement.getElement(this.getRow(), prevCol);
-        }
-
-        /**
-         * Find junction height by junction ID
-         *
-         * @param ID must be of style /[A-F]{2}[1-6]{2}/
-         * @return Junction height (GROUND, LOW, MEDIUM, or HIGH) of the junction, or null
-         * if the ID is not a junction.
-         */
-        public static Junction getJunctionHeightByID(FieldElement ID) {
-            // GROUND
-            if (Arrays.asList(
-                    AB12, AB34, AB56,
-                    CD12, CD34, CD56,
-                    EF12, EF34, EF56
-            ).contains(ID)) {
-                return Junction.GROUND;
-            }
-            // LOW
-            if (Arrays.asList(
-                    AB23, AB45,
-                    BC12, BC56,
-                    DE12, DE56,
-                    EF23, EF45
-            ).contains(ID)) {
-                return Junction.LOW;
-            }
-
-            // MEDIUM
-            if (Arrays.asList(
-                    BC23, BC45,
-                    DE23, DE45
-            ).contains(ID)) {
-                return Junction.MEDIUM;
-            }
-            // HIGH
-            if (Arrays.asList(
-                    BC34,
-                    CD23, CD45,
-                    DE34
-            ).contains(ID)) {
-                return Junction.HIGH;
-            }
+    public TileDirection getLastDirection() {
+        if (directions.size() == 0) {
             return null;
         }
+        return directions.get(directions.size() - 1);
     }
 
-    public enum Move {
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT,
-    }
-
-    public enum Junction {
-        TOP_RIGHT,
-        TOP_LEFT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT,
-        GROUND,
-        LOW,
-        MEDIUM,
-        HIGH;
-
-        public Junction getHeightByDirection(Tile tile) {
-            return getHeightByDirection(this, tile);
-        }
-
-        public static Junction getHeightByDirection(Junction junction, Tile tile) {
-            if (junction.ordinal() > 3) {
-                // junction is already a height, not a direction
-                return junction;
-            }
-            FieldElement fieldTile = FieldElement.valueOf(tile.name());
-            FieldElement fieldJunction = null;
-            if (junction == TOP_LEFT) {
-                fieldJunction = fieldTile.prevRow().prevCol();
-            } else if (junction == TOP_RIGHT) {
-                fieldJunction = fieldTile.prevRow().nextCol();
-            } else if (junction == BOTTOM_LEFT) {
-                fieldJunction = fieldTile.nextRow().prevCol();
-            } else if (junction == BOTTOM_RIGHT) {
-                fieldJunction = fieldTile.nextRow().nextCol();
-            }
-            return FieldElement.getJunctionHeightByID(fieldJunction);
-        }
-
-        public static Junction getDirectionByHeight(Junction junction, Tile tile) {
-            if (junction.ordinal() <= 3) {
-                // Junction is already a direction, not a height
-                return junction;
-            }
+    /**
+     * Get the last trajectory that was added to the list.
+     * @return The last trajectory that was added to the list, or null if the list is empty.
+     */
+    public Trajectory getLastTrajectory() {
+        if (trajectories.size() == 0) {
             return null;
         }
-    }
-
-    enum Tile {
-        A1, A2, A3, A4, A5, A6,
-        B1, B2, B3, B4, B5, B6,
-        C1, C2, C3, C4, C5, C6,
-        D1, D2, D3, D4, D5, D6,
-        E1, E2, E3, E4, E5, E6,
-        F1, F2, F3, F4, F5, F6;
-
-        static final int ROWS = 6;
-        static final int COLS = 6;
-
-        /**
-         * Get a tile by row, column
-         *
-         * @param row Tile row (1-6)
-         * @param col Tile column (1-6)
-         * @return Tile associated with row, column
-         */
-        public static Tile getTile(int row, int col) {
-            return Tile.values()[(row - 1) * COLS + (col - 1)];
-        }
-
-        public int[] getRowCol() {
-            return new int[]{this.getRow(), this.getCol()};
-        }
-
-        public int getRow() {
-            return this.ordinal() / COLS + 1;
-        }
-
-        public int getCol() {
-            return this.ordinal() % COLS + 1;
-        }
-
-        public Tile nextRow() {
-            int nextRow = clamp(this.getRow() + 1, 0, ROWS);
-            return Tile.getTile(nextRow, this.getCol());
-        }
-
-        public Tile prevRow() {
-            int prevRow = clamp(this.getRow() - 1, 0, ROWS);
-            return Tile.getTile(prevRow, this.getCol());
-        }
-
-        public Tile nextCol() {
-            int nextCol = clamp(this.getCol() + 1, 0, COLS);
-            return Tile.getTile(this.getRow(), nextCol);
-        }
-
-        public Tile prevCol() {
-            int prevCol = clamp(this.getCol() - 1, 0, COLS);
-            return Tile.getTile(this.getRow(), prevCol);
-        }
+        return trajectories.get(trajectories.size() - 1);
     }
 
     /**
-     * Find what field tile a Vector2d is in by an ID with format /[A-F][1-6]/
-     * col increases as x increases.
-     * row increases as y decreases.
-     *
-     * @param pos The Vector2d (x, y) position.
-     * @return Tile The Tile ID that the Vector2d is in.
+     * Add a new trajectory to the list.
      */
-    public Tile getIDByVector(Vector2d pos) {
-        // Clamp x and y within min/max bounds
-        double x = clamp(pos.getX(), MIN_X, MAX_X);
-        double y = -clamp(pos.getY(), MIN_Y, MAX_Y);
-        // Get row/col based on x and y
-        int row = ((int) y + 72 - 12) / 24 + 1;
-        int col = ((int) x + 72 - 12) / 24 + 1;
-        return Tile.getTile(row, col);
+    public void push(Trajectory trajectory, TileDirection direction) {
+        trajectories.add(trajectory);
+        directions.add(direction);
     }
 
     /**
-     * Find what field tile the robot is currently in by an ID with format /[A-F][1-6]/
-     *
-     * @return Tile The Tile ID that the robot is currently in.
+     * Remove the last trajectory and direction from the list.
      */
-    public Tile getIDByVector() {
-        return getIDByVector(lastPose);
-    }
-
-    /**
-     * Find what field tile the given Pose2d x and y is in by an ID with format /[A-F][1-6]/
-     *
-     * @param pose The Pose2d to convert to a Vector2d.
-     * @return Tile The Tile ID that the Pose2d is in.
-     */
-    public Tile getIDByVector(Pose2d pose) {
-        return getIDByVector(new Vector2d(pose.getX(), pose.getY()));
-    }
-
-    /**
-     * Find the Roadrunner vector position of the center of a tile by ID.
-     *
-     * @param ID The tile ID to use.
-     * @return Vector2d The (x, y) position of the center of the tile.
-     */
-    public Vector2d getVectorByID(Tile ID) {
-        int row = ID.getRow();
-        int col = ID.getCol();
-        int y = -((row - 1) * 24 + 12 - 72);
-        int x = (col - 1) * 24 + 12 - 72;
-        return new Vector2d(x, y);
-    }
-
-    /**
-     * Find the Roadrunner vector position of the center the current robot's tile.
-     *
-     * @return Vector2d The (x, y) position of the center of the tile.
-     */
-    public Vector2d getVectorByID() {
-        return getVectorByID(getIDByVector());
-    }
-
-    /**
-     * Determine if the robot is at (or near) the center of its current tile
-     * with threshold CENTER_THRESHOLD.
-     *
-     * @return boolean Returns true if the robot is centered.
-     */
-    public boolean isCentered() {
-        return isCentered(CENTER_THRESHOLD, getIDByVector());
-    }
-
-    /**
-     * Determine if the robot is at (or near) the center of its current tile.
-     *
-     * @param threshold Number of inches as threshold to be considered centered.
-     * @return boolean Returns true if the robot is centered.
-     */
-    public boolean isCentered(double threshold) {
-        return isCentered(threshold, getIDByVector());
-    }
-
-    /**
-     * Determine if the robot is at (or near) the center of a tile.
-     *
-     * @param threshold Number of inches as threshold to be considered centered.
-     * @param ID        The Tile ID to check for centering.
-     * @return boolean Returns true if the robot is centered.
-     */
-    public boolean isCentered(double threshold, Tile ID) {
-        Vector2d currentPos = new Vector2d(lastPose.getX(), lastPose.getY());
-        Vector2d targetPos = getVectorByID(ID);
-        return withinThreshold(currentPos.getX(), targetPos.getX(), threshold) &&
-                withinThreshold(currentPos.getY(), targetPos.getY(), threshold);
-    }
-
-    /**
-     * Add a trajectory to the queue.
-     *
-     * @param traj Trajectory to add.
-     */
-    public void addTrajectory(Trajectory traj) {
-        if (traj == null) return;
-        if (sequenceBuilder == null)
-            sequenceBuilder = drivetrain.trajectorySequenceBuilder(lastPose);
-        sequenceBuilder.addTrajectory(traj);
-        lastTrajectory = traj;
-    }
-
-    /**
-     * Queue a trajectory movement in a direction, ending in the center of the next tile.
-     * Continuous.
-     *
-     * @param direction Move direction to move in (UP, DOWN, LEFT, or RIGHT)
-     */
-    public void queueMove(Move direction) {
-        Tile nextTile;
-        Trajectory newTrajectorySegment1;
-        Trajectory newTrajectorySegment2;
-        double startHeading;
-        double endHeading;
-        Pose2d startPose;
-        switch (direction) {
-            case UP:
-                nextTile = targetTile.prevRow();
-                startHeading = Math.toRadians(90);
-                endHeading = Math.toRadians(90);
-                break;
-            case DOWN:
-                nextTile = targetTile.nextRow();
-                startHeading = Math.toRadians(270);
-                endHeading = Math.toRadians(270);
-                break;
-            case LEFT:
-                nextTile = targetTile.prevCol();
-                startHeading = Math.toRadians(180);
-                endHeading = Math.toRadians(180);
-                break;
-            case RIGHT:
-                nextTile = targetTile.nextCol();
-                startHeading = Math.toRadians(0);
-                endHeading = Math.toRadians(0);
-                break;
-            default:
-                return;
-        }
-        if (nextTile == targetTile) {
+    public void pop() {
+        if (trajectories.size() == 0) {
             return;
         }
-        // Remove the last half-square trajectory
-        if (lastTrajectory == null) {
-            startPose = drivetrain.getPoseEstimate();
-        } else {
-            startHeading = lastTrajectory.end().getHeading();
-            startPose = lastTrajectory.end();
+        trajectories.remove(trajectories.size() - 1);
+        directions.remove(directions.size() - 1);
+    }
+
+    public Pose2d getSequenceStartPose() {
+        if (sequenceStartPose == null) {
+            // If we are just starting a new trajectory, we need to create a new pose
+            sequenceStartPose = drivetrain.getPoseEstimate();
         }
-
-
-        // Add new full-square trajectory
-        newTrajectorySegment1 = drivetrain.trajectoryBuilder(startPose, startHeading)
-                .splineToConstantHeading(
-                        midpoint(getVectorByID(nextTile), getVectorByID(targetTile)),
-                        endHeading)
-                .build();
-        newTrajectorySegment2 = drivetrain.trajectoryBuilder(newTrajectorySegment1.end(), endHeading)
-                .splineToConstantHeading(
-                        getVectorByID(nextTile),
-                        endHeading)
-                .build();
-        addTrajectory(newTrajectorySegment1);
-        finalizingTrajectory = newTrajectorySegment2;
-        targetTile = nextTile;
+        return sequenceStartPose;
     }
 
-    public void finalizeTrajectory() {
-        if (finalizingTrajectory == null) return;
-        addTrajectory(finalizingTrajectory);
-        lastTrajectory = finalizingTrajectory;
-        finalizingTrajectory = null;
+    /**
+     * Move the robot to the next tile (a move of 24 inches).
+     *
+     * @param direction The direction to move the robot.
+     */
+    public void move(TileDirection direction) {
+        move(direction, 2);
     }
 
-    public void reset() {
-        sequenceBuilder = null;
-        lastTrajectory = null;
-        finalizingTrajectory = null;
+    /**
+     * Move the robot 12 inches in the given direction.
+     *
+     * @param direction The direction to move the robot.
+     * @param times The number of times to move 12 inches in the given direction.
+     */
+    public void move(TileDirection direction, int times) {
+        if (direction.inverse() == getLastDirection()) {
+            // If the robot is moving in the opposite direction of the last direction,
+            // then we want to remove the last movement.
+            pop();
+        } else {
+            // If the robot is not moving in the same direction as the last direction,
+            // then we want to add a movement.
+            Trajectory lastTrajectory = getLastTrajectory();
+            Pose2d startPose;
+            if (lastTrajectory == null) {
+                startPose = getSequenceStartPose();
+            } else {
+                startPose = lastTrajectory.end();
+            }
+            double startX = startPose.getX();
+            double startY = startPose.getY();
+            double endX = startX + direction.getX();
+            double endY = startY + direction.getY();
+            // Account for out of bounds
+            if (endX <= MIN_X || endX >= MAX_X) {
+                endX = startX;
+            }
+            if (endY <= MIN_Y || endY >= MAX_Y) {
+                endY = startY;
+            }
+
+            push(drivetrain.trajectoryBuilder(startPose, direction.getHeading())
+                            .splineToConstantHeading(
+                                    new Vector2d(endX, endY), direction.getHeading()
+                            ).build(),
+                    direction);
+        }
+        if (times > 1) {
+            move(direction, times - 1);
+        }
     }
 
     public TrajectorySequence build() {
-        if (sequenceBuilder == null) return null;
+        if (trajectories.size() == 0) {
+            return null;
+        }
+        Trajectory startTrajectory = trajectories.get(0);
+        TrajectorySequenceBuilder sequenceBuilder = drivetrain.trajectorySequenceBuilder(sequenceStartPose)
+                .setTangent(startTrajectory.start().getHeading())
+                .addTrajectory(startTrajectory);
+        for (Trajectory followingTrajectory : trajectories) {
+            sequenceBuilder = sequenceBuilder.addTrajectory(followingTrajectory);
+        }
         return sequenceBuilder.build();
-    }
-
-    public void queueMoveToJunction(Junction junction) {
-        if (junction.ordinal() > 3) {
-            // Ordinal is GROUND, LOW, MEDIUM, or HIGH
-            // Find junction direction of this height?
-            return;
-        }
-        Junction height = junction.getHeightByDirection(targetTile);
-        double[][] heightDistance = { // in
-                {5, 5},
-                {5, 5},
-                {5, 5},
-                {5, 5},
-        };
-
-        double[] endHeadings = { // Radians
-                // Top Left
-                Math.toRadians(135),
-                // Top Right
-                Math.toRadians(45),
-                // Bottom Left
-                Math.toRadians(225),
-                // Bottom Right
-                Math.toRadians(315)
-        };
-        double[][] factors = { // X, Y
-                // Top Left
-                {-1, 1},
-                // Top Right
-                {1, 1},
-                // Bottom Left
-                {-1, -1},
-                // Bottom Right
-                {1, -1}
-        };
-
-        Pose2d startPose;
-        if (lastTrajectory != null) {
-            startPose = lastTrajectory.end();
-        } else {
-            startPose = drivetrain.getPoseEstimate();
-        }
-        double endX = startPose.getX()
-                + factors[junction.ordinal()][0]
-                * heightDistance[height.ordinal() - 4][0];
-        double endY = startPose.getY()
-                + factors[junction.ordinal()][1]
-                * heightDistance[height.ordinal() - 4][1];
-        Pose2d endPose = new Pose2d(endX, endY, endHeadings[junction.ordinal()]);
-        Trajectory moveToJunction = drivetrain.trajectoryBuilder(startPose)
-                .lineToLinearHeading(endPose)
-                .build();
-        finalizeTrajectory();
-        addTrajectory(moveToJunction);
-    }
-
-    public Junction facingJunctionHeight() {
-        return facingJunctionHeight(targetTile);
-    }
-
-    public Junction facingJunctionHeight(Double heading) {
-        return facingJunctionHeight(targetTile, heading);
-    }
-
-    public Junction facingJunctionHeight(Tile tile) {
-        return facingJunctionHeight(tile, lastPose.getHeading());
-    }
-
-    public Junction facingJunctionHeight(Tile tile, Double heading) {
-        int facingJunction = (int) Math.round((heading - 45) / 90) % 4;
-        return Junction.values()[facingJunction].getHeightByDirection(tile);
-
-    }
-
-    /**
-     * Queue a trajectory to center the robot on the tile. Discontinuous.
-     */
-    public void queueCenter() {
-        queueCenter(CENTER_THRESHOLD);
-    }
-
-    /**
-     * Queue a trajectory to center the robot on the tile. Discontinuous.
-     *
-     * @param threshold The threshold (in inches) to be considered centered.
-     */
-    public void queueCenter(double threshold) {
-        if (lastTrajectory != null) {
-            return;
-        }
-        // No need to center the robot if already centered
-        if (isCentered(threshold))
-            return;
-
-        Trajectory centerTrajectory = drivetrain.trajectoryBuilder(drivetrain.getPoseEstimate())
-                .lineToConstantHeading(getVectorByID())
-                .build();
-        addTrajectory(centerTrajectory);
-    }
-
-    /**
-     * Clear the trajectory queue.
-     */
-    public void queueClear() {
-        // TODO: Consider implementing cancellation of trajectories and cancel current movement here
-        sequenceBuilder = null;
-    }
-
-    public boolean queueHasTrajectory() {
-        return lastTrajectory != null;
-    }
-
-    public void update() {
-        lastPose = drivetrain.getPoseEstimate();
-        targetTile = getIDByVector();
     }
 }
