@@ -18,7 +18,7 @@ import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.TileCalculationBetter;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
-@TeleOp(name = "Junction Test", group = "tele")
+@TeleOp(name = "Tile Test", group = "tele")
 public class TeleTile extends RobotOpMode {
     MultipleTelemetry multiTelemetry;
     GamepadPlus pad1;
