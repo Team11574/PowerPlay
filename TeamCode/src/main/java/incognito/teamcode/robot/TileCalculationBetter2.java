@@ -2,36 +2,41 @@ package incognito.teamcode.robot;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import incognito.cog.hardware.component.drive.Drivetrain;
 import incognito.cog.trajectory.TrajectorySequence;
 import incognito.cog.trajectory.TrajectorySequenceBuilder;
+import incognito.cog.util.Generic;
 import incognito.cog.util.TelemetryBigError;
 
 
 public class TileCalculationBetter2 {
 
-    public enum TileDirection {
+    public enum MoveDirection {
+        // Cardinal moves
         UP, DOWN, LEFT, RIGHT,
+        // L shaped moves
         UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT,
-        LEFT_UP, RIGHT_UP, LEFT_DOWN, RIGHT_DOWN;
+        LEFT_UP, RIGHT_UP, LEFT_DOWN, RIGHT_DOWN,
+        // Junctions
+        J_UP_LEFT, J_UP_RIGHT, J_DOWN_LEFT, J_DOWN_RIGHT;
 
         final List<String> STRINGS = Arrays.asList(
                 "UP", "DOWN", "LEFT", "RIGHT",
                 "UP_LEFT", "UP_RIGHT", "DOWN_LEFT", "DOWN_RIGHT",
-                "LEFT_UP", "RIGHT_UP", "LEFT_DOWN", "RIGHT_DOWN"
+                "LEFT_UP", "RIGHT_UP", "LEFT_DOWN", "RIGHT_DOWN",
+                "J_UP_LEFT", "J_UP_RIGHT", "J_DOWN_LEFT", "J_DOWN_RIGHT"
         );
         final List<List<String>> STRINGS_SPLIT = Arrays.asList(
                 Arrays.asList("UP"),
                 Arrays.asList("DOWN"),
                 Arrays.asList("LEFT"),
                 Arrays.asList("RIGHT"),
+
                 Arrays.asList("UP", "LEFT"),
                 Arrays.asList("UP", "RIGHT"),
                 Arrays.asList("DOWN", "LEFT"),
@@ -39,10 +44,15 @@ public class TileCalculationBetter2 {
                 Arrays.asList("LEFT", "UP"),
                 Arrays.asList("RIGHT", "UP"),
                 Arrays.asList("LEFT", "DOWN"),
-                Arrays.asList("RIGHT", "DOWN")
+                Arrays.asList("RIGHT", "DOWN"),
+
+                Arrays.asList("J", "UP", "LEFT"),
+                Arrays.asList("J", "UP", "RIGHT"),
+                Arrays.asList("J", "DOWN", "LEFT"),
+                Arrays.asList("J", "DOWN", "RIGHT")
         );
 
-        public TileDirection inverse() {
+        public MoveDirection inverse() {
             switch (this) {
                 case UP: return DOWN;
                 case DOWN: return UP;
@@ -58,17 +68,30 @@ public class TileCalculationBetter2 {
 
         public double getHeading() {
             switch (this) {
+                case UP_RIGHT:
+                case DOWN_RIGHT:
                 case RIGHT: return Math.toRadians(0);
+                case RIGHT_UP:
+                case LEFT_UP:
                 case UP: return Math.toRadians(90);
+                case UP_LEFT:
+                case DOWN_LEFT:
                 case LEFT: return Math.toRadians(180);
+                case LEFT_DOWN:
+                case RIGHT_DOWN:
                 case DOWN: return Math.toRadians(270);
-                // figure out if other headings are needed
+                // something is wrong if we get here
                 default: return -1;
+
             }
         }
 
-        public boolean isTowards(TileDirection direction) {
+        public boolean isTowards(MoveDirection direction) {
             return STRINGS_SPLIT.get(this.ordinal()).contains(direction.name());
+        }
+
+        public boolean isJunctionMove() {
+            return this.name().startsWith("J");
         }
 
 
@@ -88,13 +111,46 @@ public class TileCalculationBetter2 {
             return new Vector2d(getX(), getY());
         }
 
-        public TileDirection and(TileDirection direction) {
+        public MoveDirection and(MoveDirection direction) {
             String combination = this.name() + "_" + direction.name();
             if (STRINGS.contains(combination)) {
-                return TileDirection.valueOf(combination);
+                return MoveDirection.valueOf(combination);
             }
             // This is bad
             return direction;
+        }
+    }
+
+    public enum Junction {
+        GROUND,
+        LOW,
+        MEDIUM,
+        HIGH,
+        NONE;
+
+        public static final Junction[][] junctionOrder = {
+                {GROUND, LOW, GROUND, LOW, GROUND},
+                {LOW, MEDIUM, HIGH, MEDIUM, LOW},
+                {GROUND, HIGH, GROUND, HIGH, GROUND},
+                {LOW, MEDIUM, HIGH, MEDIUM, LOW},
+                {GROUND, LOW, GROUND, LOW, GROUND},
+        };
+
+        public static Junction getJunctionAtPosition(Pose2d pose) {
+            return getJunctionAtPosition(pose.getX(), pose.getY());
+        }
+
+        public static Junction getJunctionAtPosition(Vector2d vector) {
+            return getJunctionAtPosition(vector.getX(), vector.getY());
+        }
+        public static Junction getJunctionAtPosition(double x, double y) {
+            int xIndex = Generic.roundToFactor(x + 72, 24);
+            int yIndex = Generic.roundToFactor(y + 72, 24);
+            // If index is out of bounds, return NONE
+            if (xIndex < 0 || xIndex > junctionOrder[0].length || yIndex < 0 || yIndex > junctionOrder.length) {
+                return NONE;
+            }
+            return junctionOrder[yIndex][xIndex];
         }
     }
 
@@ -103,7 +159,7 @@ public class TileCalculationBetter2 {
     }
 
     Drivetrain drivetrain;
-    ArrayList<TileDirection> directions = new ArrayList<>();
+    ArrayList<MoveDirection> directions = new ArrayList<>();
     int lastBuiltIndex = -1;
     Pose2d sequenceStartPose;
     static final double TILE_SIZE = 24;
@@ -205,7 +261,7 @@ public class TileCalculationBetter2 {
      * Get the last direction that the robot moved in.
      * @return The last direction that the robot moved in, or null if the robot hasn't moved.
      */
-    public TileDirection getLastDirection() {
+    public MoveDirection getLastDirection() {
         if (directions.size() == 0) {
             return null;
         }
@@ -215,14 +271,14 @@ public class TileCalculationBetter2 {
     /**
      * Add a new trajectory to the list.
      */
-    public void push(TileDirection direction) {
+    public void push(MoveDirection direction) {
         directions.add(direction);
     }
 
     /**
      * Remove the last trajectory and direction from the list.
      */
-    public TileDirection pop() {
+    public MoveDirection pop() {
         if (directions.size() == 0) {
             return null;
         }
@@ -242,7 +298,7 @@ public class TileCalculationBetter2 {
      *
      * @param direction The direction to move the robot.
      */
-    public void move(TileDirection direction) {
+    public void move(MoveDirection direction) {
         if (direction.inverse() == getLastDirection()) {
             // If the robot is moving in the opposite direction of the last direction,
             // then we want to remove the last movement.
@@ -267,12 +323,16 @@ public class TileCalculationBetter2 {
         TrajectorySequenceBuilder sequenceBuilder = drivetrain.trajectorySequenceBuilder(sequenceStartPose);
         Vector2d lastPos = new Vector2d(sequenceStartPose.getX(), sequenceStartPose.getY());
         for (int i = 0; i < directions.size(); i++) {
-            TileDirection direction = directions.get(i);
+            MoveDirection direction = directions.get(i);
             if (i == 0) sequenceBuilder = sequenceBuilder.setTangent(direction.getHeading());
-            sequenceBuilder = sequenceBuilder.splineToConstantHeading(
-                    lastPos.plus(direction.getVector()),
-                    direction.getHeading()
-            );
+            if (direction.isJunctionMove()) {
+
+            } else {
+                    sequenceBuilder = sequenceBuilder.splineToConstantHeading(
+                            lastPos.plus(direction.getVector()),
+                            direction.getHeading()
+                    );
+            }
             lastPos = lastPos.plus(direction.getVector());
         }
         lastBuiltIndex = getBuildIndex();

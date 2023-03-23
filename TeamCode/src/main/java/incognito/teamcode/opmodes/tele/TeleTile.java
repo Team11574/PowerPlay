@@ -43,22 +43,22 @@ public class TeleTile extends RobotOpMode {
 
         if (pad1.a_pressed) {
             // Queue some moves
-            tileCalculation.move(TileCalculationBetter2.TileDirection.UP);
-            tileCalculation.move(TileCalculationBetter2.TileDirection.UP);
-            tileCalculation.move(TileCalculationBetter2.TileDirection.LEFT);
+            tileCalculation.move(TileCalculationBetter2.MoveDirection.UP);
+            tileCalculation.move(TileCalculationBetter2.MoveDirection.UP);
+            tileCalculation.move(TileCalculationBetter2.MoveDirection.LEFT);
         }
 
         if (pad1.dpad_up_pressed) {
-            tileCalculation.move(TileCalculationBetter2.TileDirection.UP);
+            tileCalculation.move(TileCalculationBetter2.MoveDirection.UP);
         }
         if (pad1.dpad_down_pressed) {
-            tileCalculation.move(TileCalculationBetter2.TileDirection.DOWN);
+            tileCalculation.move(TileCalculationBetter2.MoveDirection.DOWN);
         }
         if (pad1.dpad_left_pressed) {
-            tileCalculation.move(TileCalculationBetter2.TileDirection.LEFT);
+            tileCalculation.move(TileCalculationBetter2.MoveDirection.LEFT);
         }
         if (pad1.dpad_right_pressed) {
-            tileCalculation.move(TileCalculationBetter2.TileDirection.RIGHT);
+            tileCalculation.move(TileCalculationBetter2.MoveDirection.RIGHT);
         }
 
 
