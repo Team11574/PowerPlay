@@ -44,11 +44,12 @@ public class MeepMeepTesting {
                     double directionalHeading = Math.toRadians(90);
 
 
-                    return drivetrain.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), startPos.getHeading())) //r.startPose)
+                    return drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
                             .setTangent(directionalHeading)
                             .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+12), directionalHeading)
                             .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+36), directionalHeading)
-                            .splineToConstantHeading(new Vector2d(startPos.getX()-12, startPos.getY()+48), Math.PI)
+                            //.splineToConstantHeading(new Vector2d(startPos.getX()-12, startPos.getY()+48), Math.PI)
+                            .splineToSplineHeading(new Pose2d(startPos.getX()-12, startPos.getY()+48, startPos.getHeading()-Math.PI/2), Math.PI)
                             .build();
                             //.setTangent(Math.toRadians(270))
                             //.splineToConstantHeading(new Vector2d(12, -12), Math.toRadians(270))

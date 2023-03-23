@@ -1,14 +1,13 @@
 package incognito.teamcode.opmodes.tele;
 
-import static incognito.teamcode.config.CameraConstants.JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
+import static incognito.teamcode.robot.TileCalculationBetter2.BuildState.ACTIVE;
+import static incognito.teamcode.robot.TileCalculationBetter2.BuildState.INACTIVE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import java.util.ArrayList;
 
 import incognito.cog.hardware.component.drive.Drivetrain;
 import incognito.cog.hardware.component.drive.PoseStorage;
@@ -16,9 +15,7 @@ import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
-import incognito.teamcode.robot.TileCalculationBetter;
 import incognito.teamcode.robot.TileCalculationBetter2;
-import incognito.teamcode.robot.component.camera.AutoCamera;
 
 @TeleOp(name = "Tile Test", group = "tele")
 public class TeleTile extends RobotOpMode {
@@ -27,6 +24,7 @@ public class TeleTile extends RobotOpMode {
     Robot robot;
     Drivetrain drivetrain;
     TileCalculationBetter2 tileCalculation;
+    ArrayList<TileCalculationBetter2.BuildState> buildStates = new ArrayList<>();
 
     @Override
     public void init() {
@@ -50,6 +48,20 @@ public class TeleTile extends RobotOpMode {
             tileCalculation.move(TileCalculationBetter2.TileDirection.LEFT);
         }
 
+        if (pad1.dpad_up_pressed) {
+            tileCalculation.move(TileCalculationBetter2.TileDirection.UP);
+        }
+        if (pad1.dpad_down_pressed) {
+            tileCalculation.move(TileCalculationBetter2.TileDirection.DOWN);
+        }
+        if (pad1.dpad_left_pressed) {
+            tileCalculation.move(TileCalculationBetter2.TileDirection.LEFT);
+        }
+        if (pad1.dpad_right_pressed) {
+            tileCalculation.move(TileCalculationBetter2.TileDirection.RIGHT);
+        }
+
+
         if (pad1.x_pressed) {
             // Queue some moves
             TelemetryBigError.raise(1);
@@ -64,9 +76,17 @@ public class TeleTile extends RobotOpMode {
                 break;
             case ACTIVE:
                 // dont go to manual mode
+                if (buildStates.size() > 0 && buildStates.get(buildStates.size()-1) == ACTIVE) {
+                    buildStates.remove(buildStates.size()-1);
+                }
                 break;
             case INACTIVE:
                 // stay in manual mode?
+                if (buildStates.size() > 0 && buildStates.get(buildStates.size()-1) == INACTIVE) {
+                    buildStates.remove(buildStates.size()-1);
+                }
+                break;
+            case CANCELLED:
                 break;
             case FINISHED:
                 // go to manual mode?
@@ -75,6 +95,7 @@ public class TeleTile extends RobotOpMode {
                 multiTelemetry.addData("Error", "Error building trajectory");
                 break;
         }
+        buildStates.add(tileCalculation.getBuildState(drivetrain.getCurrentSegmentIndex()));
 
         if (pad1.b_pressed) {
             tileCalculation.reset();
@@ -87,13 +108,17 @@ public class TeleTile extends RobotOpMode {
         multiTelemetry.addData("Build state", tileCalculation.getBuildState(drivetrain.getCurrentSegmentIndex()));
         multiTelemetry.addData("Last direction", tileCalculation.getLastDirection());
         multiTelemetry.addData("Sequence start pose", tileCalculation.getSequenceStartPose());
+        multiTelemetry.addData("Build states", buildStates);
+
+        drivetrain.updatePoseEstimate();
+        if (drivetrain.isBusy()) {
+            multiTelemetry.addData("Sequence size", drivetrain.getCurrentTrajectorySize());
+            drivetrain.update();
+        }
 
         multiTelemetry.update();
         robot.update();
         pad1.update();
-        drivetrain.updatePoseEstimate();
-        if (drivetrain.isBusy()) {
-            drivetrain.update();
-        }
+
     }
 }

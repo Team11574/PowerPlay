@@ -271,9 +271,11 @@ public class TileCalculationBetter2 {
             if (i == 0) sequenceBuilder = sequenceBuilder.setTangent(direction.getHeading());
             sequenceBuilder = sequenceBuilder.splineToConstantHeading(
                     lastPos.plus(direction.getVector()),
-                    direction.getHeading());
+                    direction.getHeading()
+            );
             lastPos = lastPos.plus(direction.getVector());
         }
+        lastBuiltIndex = getBuildIndex();
         return sequenceBuilder.build();
     }
 }
