@@ -148,6 +148,8 @@ public class Pipeline extends OpenCvPipeline {
 
         aprilParking = processAprilTags(input);
 
+        telemetry.addData("April Parking", aprilParking);
+
         if (aprilParking != 0)
             aprilParkingList.add(aprilParking);
 
@@ -344,11 +346,11 @@ public class Pipeline extends OpenCvPipeline {
 
     public int processAprilTags(Mat input) {
         Imgproc.cvtColor(input, gray, Imgproc.COLOR_RGB2GRAY);
-        gray.adjustROI(
+        /*gray.adjustROI(
                 -searchZone.y,
                 -(searchZone.height + searchZone.y) + 320,
                 -searchZone.x,
-                -(searchZone.width + searchZone.x) + 240);
+                -(searchZone.width + searchZone.x) + 240);*/
 
         // Detect AprilTags
         detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(aprilDetector, gray, tagSize, fx, fy, cx, cy);
