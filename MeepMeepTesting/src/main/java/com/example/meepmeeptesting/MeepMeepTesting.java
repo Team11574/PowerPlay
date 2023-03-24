@@ -10,13 +10,25 @@ import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
+
+    public static int roundToFactor(double value, int factor) {
+        return (int) (factor * Math.round(value / factor));
+    }
+
+    public static double invertX(double x) {
+        return -x;
+    }
+    public static double invertHeading(double heading) {
+        return (heading + Math.PI) % (2 * Math.PI);
+    }
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
-
+        
         double deltaX = 0.5;
 
         //Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
-         Pose2d startPos = new Pose2d(36, -60, Math.toRadians(134));
+        Pose2d startPos = new Pose2d(invertX(36), -62.5, Math.toRadians(90));
+        //Pose2d startPos = new Pose2d(36, -60, Math.toRadians(330));
         //Pose2d startPos = new Pose2d(12, 12, Math.toRadians(270));
 
 
@@ -24,7 +36,7 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(26.914317478618088, 26.914317478618088, Math.toRadians(114.10780678008499), Math.toRadians(118.62129230769227), 12.75)
+                .setConstraints(26.914317478618088*2, 26.914317478618088*2, Math.toRadians(114.10780678008499), Math.toRadians(118.62129230769227), 12.75)
                 .setDimensions(16.5, 17)
                 .followTrajectorySequence(drivetrain -> {
                     drivetrain.setPoseEstimate(startPos);
@@ -40,19 +52,85 @@ public class MeepMeepTesting {
                     System.out.println(r.endHeading);
                     System.out.println(r.startPose);
                      */
+                    double cycleTime = 2.5; // seconds
 
                     double directionalHeading = Math.toRadians(90);
+                    double x = startPos.getX();
+                    double y = startPos.getY();
 
-
-                    return drivetrain.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), startPos.getHeading())) //r.startPose)
-                            .setTangent(directionalHeading)
-                            .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+12), directionalHeading)
-                            .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+36), directionalHeading)
-                            .splineToConstantHeading(new Vector2d(startPos.getX()-12, startPos.getY()+48), Math.PI)
-                            .build();
-                            //.setTangent(Math.toRadians(270))
-                            //.splineToConstantHeading(new Vector2d(12, -12), Math.toRadians(270))
+                    return drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
+                            .splineToSplineHeading(
+                                    new Pose2d(invertX(33.5), -3.5, invertHeading(Math.toRadians(170.8))),
+                                    directionalHeading
+                            )
+                            // Cones 1-6
+                            .waitSeconds(cycleTime * 6)
+                            .setTangent(Math.toRadians(270))
+                            // Center out
+                            .splineToSplineHeading(
+                                    new Pose2d(24, -12, Math.toRadians(90)),
+                                    Math.toRadians(180)
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(-24, -12, Math.toRadians(90)),
+                                    Math.toRadians(180)
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(-33.5, -3.5, Math.toRadians(180-170.8)),
+                                    Math.toRadians(90)
+                            )
+                            .waitSeconds(cycleTime * 2)
+                            .setTangent(Math.toRadians(270))
+                            .splineToSplineHeading(
+                                    new Pose2d(-12, -12, Math.toRadians(90)),
+                                    Math.toRadians(0)
+                            )
+                            /* 8 CONE RIGHT SIDE TESTING
+                            .splineToSplineHeading(
+                                    new Pose2d(33.5, -3.5, Math.toRadians(170.8)),
+                                    directionalHeading
+                            )
+                            // Cones 1-6
+                            .waitSeconds(cycleTime * 6)
+                            .setTangent(Math.toRadians(270))
+                            // Center out
+                            .splineToSplineHeading(
+                                    new Pose2d(24, -12, Math.toRadians(90)),
+                                    Math.toRadians(180)
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(-24, -12, Math.toRadians(90)),
+                                    Math.toRadians(180)
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(-33.5, -3.5, Math.toRadians(180-170.8)),
+                                    Math.toRadians(90)
+                            )
+                            .waitSeconds(cycleTime * 2)
+                            .setTangent(Math.toRadians(270))
+                            .splineToSplineHeading(
+                                    new Pose2d(-12, -12, Math.toRadians(90)),
+                                    Math.toRadians(0)
+                            )*/
                             /*
+                            .forward(58)
+                            .back(3)
+                            .lineToLinearHeading(new Pose2d(startPos.component1() - 2.5, startPos.component2() + 59, Math.toRadians(170.8)))
+                            .waitSeconds(0.5)
+                            .lineToLinearHeading(new Pose2d(36, -12, Math.toRadians(90)))
+                            .strafeLeft(24)
+                            /* NEW TILE MOVEMENT TESTING
+                            .setTangent(directionalHeading)
+                            .splineToConstantHeading(
+                                    new Vector2d(36, -60), directionalHeading
+                            )
+                            .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+12), directionalHeading)
+                            .splineToConstantHeading(new Vector2d(startPos.getX(), startPos.getY()+ 24), directionalHeading)
+                            //.splineToConstantHeading(new Vector2d(startPos.getX()-12, startPos.getY()+48), Math.PI)
+                            .splineToSplineHeading(new Pose2d(startPos.getX()-5, startPos.getY()+ 24 - 5, Math.toRadians(225)), Math.toRadians(225))
+move                             */
+
+                            /* OLD TILE CALCULATION TESTING
                             .setTangent(r.startHeading)
                             .splineToConstantHeading(
                                     midpoint(t.getVectorByID(r.nextTile), t.getVectorByID(target1)),
@@ -69,8 +147,7 @@ public class MeepMeepTesting {
                                     t.getVectorByID(r2.nextTile),
                                     r2.endHeading)
 
-                            .build();
-                            */
+move                            */
                                     // .setTangent(Math.toRadians(90))
                                     // .splineToConstantHeading(new Vector2d(36, 60), Math.toRadians(90))
                                     // .setTangent(Math.toRadians(180))
@@ -111,6 +188,7 @@ public class MeepMeepTesting {
                                 //.strafeRight(12)
                                 .strafeRight(33)
                          */
+                            .build();
                         }
                 );
 
