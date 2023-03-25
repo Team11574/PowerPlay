@@ -1,36 +1,10 @@
 package incognito.teamcode.robot;
 
-import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_CLOSED;
-import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_OPEN;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_FLAT;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_SPEED;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FIFTH;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FLAT;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FOURTH;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_IN;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_MID;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_OUT;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_SECOND;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_SPEED;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_THIRD;
 import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
 import static incognito.teamcode.config.WorldSlideConstants.HS_MIN_ENCODER;
-import static incognito.teamcode.config.WorldSlideConstants.HS_SENSOR_DISTANCE_CM;
-import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_MAX;
-import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_MIN;
-import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_SPEED;
-import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_START;
-import static incognito.teamcode.config.WorldSlideConstants.S_AUTO_EXTEND_POWER;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_CLOSED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_OPEN;
-import static incognito.teamcode.config.WorldSlideConstants.VS_FLIP_DOWN;
-import static incognito.teamcode.config.WorldSlideConstants.VS_FLIP_UP;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_END;
-import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_GROUND;
-import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_HIGH;
-import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_LOW;
-import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_MEDIUM;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_START;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_END;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_GROUND;
@@ -38,10 +12,6 @@ import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_HIGH;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_LOW;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_MEDIUM;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_START;
-import static incognito.teamcode.config.WorldSlideConstants.VS_SP_AUTO;
-import static incognito.teamcode.config.WorldSlideConstants.VS_SP_HIGH;
-import static incognito.teamcode.config.WorldSlideConstants.VS_SP_LOW;
-import static incognito.teamcode.config.WorldSlideConstants.VS_SP_MEDIUM;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -132,7 +102,7 @@ public class WorldRobot extends RobotCog {
         VS_slideRight_M.setDirection(DcMotorEx.Direction.REVERSE);
         DigitalChannel VS_limitSwitch_D = hardwareMap.get(DigitalChannel.class, "VS_limitSwitch_D");
         verticalSlide = new VerticalSlide(hardwareMap, telemetry, new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M}, VS_limitSwitch_D);
-        verticalSlide.addSetPositionLengths(new double[]{0, VS_SP_LOW, VS_SP_MEDIUM, VS_SP_HIGH, VS_SP_AUTO});
+        //verticalSlide.addSetPositionLengths(new double[]{0, VS_SP_LOW, VS_SP_MEDIUM, VS_SP_HIGH, VS_SP_AUTO});
         verticalSlide.setPower(0);
     }
 
