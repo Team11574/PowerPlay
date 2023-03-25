@@ -1,5 +1,8 @@
 package incognito.teamcode.robot;
 
+import static incognito.teamcode.robot.TileMovement.BuildState.ACTIVE;
+import static incognito.teamcode.robot.TileMovement.BuildState.INACTIVE;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
@@ -30,7 +33,7 @@ public class TileMovement {
                 "UP", "DOWN", "LEFT", "RIGHT",
                 "UP_LEFT", "UP_RIGHT", "DOWN_LEFT", "DOWN_RIGHT",
                 "LEFT_UP", "RIGHT_UP", "LEFT_DOWN", "RIGHT_DOWN",
-                "J_UP_LEFT", "J_UP_RIGHT", "J_DOWN_LEFT", "J_DOWN_RIGHT"
+                "J_UP_LEFT", "J_UP_RIGHT", "J_DOWN_LEFT", "J_DOWN_RIGHT", "CENTER"
         );
         final List<List<String>> STRINGS_SPLIT = Arrays.asList(
                 Arrays.asList("UP"),
@@ -50,7 +53,8 @@ public class TileMovement {
                 Arrays.asList("J", "UP", "LEFT"),
                 Arrays.asList("J", "UP", "RIGHT"),
                 Arrays.asList("J", "DOWN", "LEFT"),
-                Arrays.asList("J", "DOWN", "RIGHT")
+                Arrays.asList("J", "DOWN", "RIGHT"),
+                Arrays.asList("CENTER")
         );
 
         public MoveDirection inverse() {
@@ -244,8 +248,42 @@ public class TileMovement {
         return lastBuiltIndex;
     }
 
+
+    /*
+    switch (tileMovement.getBuildState(drivetrain.getCurrentSegmentIndex())) {
+        case STARTED:
+            drivetrain.followTrajectorySequenceAsync(tileMovement.build());
+            break;
+        case ADJUSTED:
+            drivetrain.modifyTrajectorySequenceAsync(tileMovement.build());
+            break;
+        case ACTIVE:
+            // dont go to manual mode
+            if (buildStates.size() > 0 && buildStates.get(buildStates.size()-1) == ACTIVE) {
+                buildStates.remove(buildStates.size()-1);
+            }
+            break;
+        case INACTIVE:
+            // stay in manual mode?
+            if (buildStates.size() > 0 && buildStates.get(buildStates.size()-1) == INACTIVE) {
+                buildStates.remove(buildStates.size()-1);
+            }
+            break;
+        case CANCELLED:
+            break;
+        case FINISHED:
+            // go to manual mode?
+            break;
+        case ERROR:
+            multiTelemetry.addData("Error", "Error building trajectory");
+            TelemetryBigError.raise(3);
+            break;
+    }
+    */
+
     /**
      * Get the current build state of the TrajectorySequence.
+     *
      *
      * @param activeSegmentIndex The current segment index of the active TrajectorySequence.
      * @return The current build state of the TrajectorySequence.
@@ -351,7 +389,7 @@ public class TileMovement {
      */
     public TileMovement move(MoveDirection direction) {
         // Clear any accidental junction moves if a new directional move is queued
-        if (getLastDirection().isJunctionMove()) pop();
+        if (getLastDirection() != null && getLastDirection().isJunctionMove()) pop();
         if (direction.isJunctionMove()) {
             moveToJunction(direction);
             return this;
@@ -359,6 +397,10 @@ public class TileMovement {
         if (direction.isCenter()) {
             moveCenter();
             return this;
+        }
+        if (directions.size() == 0) {
+            // Center if first move
+            moveCenter();
         }
         if (direction.inverse() == getLastDirection()) {
             // If the robot is moving in the opposite direction of the last direction,
@@ -382,17 +424,21 @@ public class TileMovement {
 
     public TileMovement moveToJunction(MoveDirection direction) {
         // Clear previous junction move (only one allowed per trajectory)
-        if (getLastDirection().isJunctionMove()) pop();
+        if (getLastDirection() != null && getLastDirection().isJunctionMove()) pop();
         if (!direction.isJunctionMove()) {
             return move(direction);
+        }
+        if (directions.size() == 0) {
+            // Center if first move
+            moveCenter();
         }
         push(direction);
         return this;
     }
 
     public TileMovement moveCenter() {
-        // Only move to center if it is the first move in the sequence
-        if (getBuildIndex() != -1) return this;
+        // Only allow move to center if it is the first move in the sequence
+        if (directions.size() != 0) return this;
         push(MoveDirection.CENTER);
         return this;
     }
@@ -406,12 +452,12 @@ public class TileMovement {
                 || addition.getX() < MIN_X
                 || addition.getY() > MAX_Y
                 || addition.getY() < MIN_Y) {
-            return sequenceBuilder.splineToConstantHeading(
-                    lastPos.plus(direction.getVector()),
-                    direction.getHeading()
-            );
+            return sequenceBuilder;
         }
-        return sequenceBuilder;
+        return sequenceBuilder.splineToConstantHeading(
+                lastPos.plus(direction.getVector()),
+                direction.getHeading()
+        );
     }
 
     private TrajectorySequenceBuilder addMoveToJunction(
@@ -463,17 +509,18 @@ public class TileMovement {
                             getSequenceStartPose().getHeading()
                     );
                 // Otherwise, it is an implicit centering that can be smooth
-                } else if (direction.isCenter()) {
-                    sequenceBuilder = addMoveCenter(
-                            sequenceBuilder,
-                            lastPos,
-                            directions.get(i+1).getHeading()
-                    );
+                } else if (!direction.isCenter()) {
+                    // Add a center move to start
+                    directions.add(0, MoveDirection.CENTER);
+                    // Reset the counter
+                    i--;
+                    continue;
+                // First direction is center and there are other directions after
                 } else {
                     sequenceBuilder = addMoveCenter(
                             sequenceBuilder,
                             lastPos,
-                            directions.get(i).getHeading()
+                            directions.get(i+1).getHeading()
                     );
                 }
             }

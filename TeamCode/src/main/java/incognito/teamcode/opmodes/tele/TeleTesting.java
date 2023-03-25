@@ -2,6 +2,7 @@ package incognito.teamcode.opmodes.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -12,6 +13,7 @@ import incognito.cog.opmodes.RobotOpMode;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
+@Disabled
 @TeleOp(name = "TeleTesting", group = "tele")
 public class TeleTesting extends RobotOpMode {
     // Instance Variables

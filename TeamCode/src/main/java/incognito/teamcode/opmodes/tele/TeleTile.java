@@ -85,46 +85,16 @@ public class TeleTile extends RobotOpMode {
                 queueMoveDirection = move_direction;
             }
             multiTelemetry.addData("Direction: ", move_direction);
+            if (pad1.left_stick_button_pressed) {
+                tileMovement.moveCenter();
+            }
         } else {
             queueMoveDirection = -1;
         }
-
-        if (pad1.left_stick_button_pressed) {
-            tileMovement.moveCenter();
+        if (pad1.right_trigger_depressed) {
+            // If we have just finished queueing some actions, execute them
+            drivetrain.followTrajectorySequenceAsync(tileMovement.build());
         }
-
-
-
-        switch (tileMovement.getBuildState(drivetrain.getCurrentSegmentIndex())) {
-            case STARTED:
-                drivetrain.followTrajectorySequenceAsync(tileMovement.build());
-                break;
-            case ADJUSTED:
-                drivetrain.modifyTrajectorySequenceAsync(tileMovement.build());
-                break;
-            case ACTIVE:
-                // dont go to manual mode
-                if (buildStates.size() > 0 && buildStates.get(buildStates.size()-1) == ACTIVE) {
-                    buildStates.remove(buildStates.size()-1);
-                }
-                break;
-            case INACTIVE:
-                // stay in manual mode?
-                if (buildStates.size() > 0 && buildStates.get(buildStates.size()-1) == INACTIVE) {
-                    buildStates.remove(buildStates.size()-1);
-                }
-                break;
-            case CANCELLED:
-                break;
-            case FINISHED:
-                // go to manual mode?
-                break;
-            case ERROR:
-                multiTelemetry.addData("Error", "Error building trajectory");
-                TelemetryBigError.raise(3);
-                break;
-        }
-        buildStates.add(tileMovement.getBuildState(drivetrain.getCurrentSegmentIndex()));
 
         if (pad1.b_pressed) {
             tileMovement.reset();
@@ -138,10 +108,11 @@ public class TeleTile extends RobotOpMode {
         multiTelemetry.addData("Last direction", tileMovement.getLastDirection());
         multiTelemetry.addData("Sequence start pose", tileMovement.getSequenceStartPose());
         multiTelemetry.addData("Build states", buildStates);
+        multiTelemetry.addData("Sequence size", drivetrain.getCurrentTrajectorySize());
+
 
         drivetrain.updatePoseEstimate();
         if (drivetrain.isBusy()) {
-            multiTelemetry.addData("Sequence size", drivetrain.getCurrentTrajectorySize());
             drivetrain.update();
         }
 

@@ -1,9 +1,11 @@
 package incognito.teamcode.opmodes.testing;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+@Disabled
 @TeleOp(name = "slideTest", group = "testing")
 public class SlideTest extends OpMode {
 

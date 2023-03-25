@@ -360,6 +360,9 @@ public class Pipeline extends OpenCvPipeline {
             return detection.id + 1;
         }
 
+        gray.release();
+        detections.clear();
+
         return 0;
     }
 }

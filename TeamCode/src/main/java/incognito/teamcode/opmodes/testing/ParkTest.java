@@ -2,11 +2,13 @@ package incognito.teamcode.opmodes.testing;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import incognito.cog.hardware.component.drive.SampleMecanumDrive;
 import incognito.cog.trajectory.TrajectorySequence;
 
+@Disabled
 @Autonomous(name = "Parking Test", group = "Testing")
 public class ParkTest extends LinearOpMode {
     @Override

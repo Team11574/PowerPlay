@@ -86,6 +86,9 @@
             <Servo
                 name="VS_claw_S"
                 port="1" />
+            <Servo
+                name="frontArm"
+                port="5" />
 
             <!-- IMU  -->
             <ControlHubImuBHI260AP

@@ -33,7 +33,8 @@ public class AutoCamera extends CameraSuper {
 
             @Override
             public void onOpened() {
-                cvCamera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                //cvCamera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                cvCamera.startStreaming(432, 240, OpenCvCameraRotation.UPRIGHT);
                 startCamera();
             }
 

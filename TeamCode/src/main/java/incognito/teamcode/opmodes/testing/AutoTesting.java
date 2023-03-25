@@ -3,6 +3,7 @@ package incognito.teamcode.opmodes.testing;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import incognito.cog.actions.Scheduler;
 import incognito.cog.opmodes.RobotLinearOpMode;
@@ -10,6 +11,7 @@ import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.claw.Lever;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
+@Disabled
 @Autonomous(name = "AUTO Testing", group = "testing")
 public class AutoTesting extends RobotLinearOpMode {
     // Instance variables
