@@ -94,6 +94,7 @@ public class TeleTile extends RobotOpMode {
         if (pad1.right_trigger_depressed) {
             // If we have just finished queueing some actions, execute them
             drivetrain.followTrajectorySequenceAsync(tileMovement.build());
+            tileMovement.reset();
         }
 
         if (pad1.b_pressed) {
@@ -104,7 +105,6 @@ public class TeleTile extends RobotOpMode {
         multiTelemetry.addData("Current segment index", drivetrain.getCurrentSegmentIndex());
         multiTelemetry.addData("Build index", tileMovement.getBuildIndex());
         multiTelemetry.addData("Last built index", tileMovement.getLastBuiltIndex());
-        multiTelemetry.addData("Current build state", tileMovement.getBuildState(drivetrain.getCurrentSegmentIndex()));
         multiTelemetry.addData("Last direction", tileMovement.getLastDirection());
         multiTelemetry.addData("Sequence start pose", tileMovement.getSequenceStartPose());
         multiTelemetry.addData("Build states", buildStates);

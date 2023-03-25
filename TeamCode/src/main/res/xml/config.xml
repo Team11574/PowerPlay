@@ -44,23 +44,18 @@
                 port="3" />
 
             <!-- Horizontal Slide Servos -->
+            <!-- GT -->
             <Servo
                 name="HS_claw_S"
                 port="0" />
-            <Servo
-                name="HS_turret_S"
-                port="1" />
+            <!-- GSS -->
             <Servo
                 name="HS_hinge_S"
-                port="2" />
+                port="1" />
+            <!-- Axon -->
             <Servo
                 name="HS_lever_S"
-                port="3" />
-
-            <!-- Vertical Slide Limit Switch -->
-            <DigitalDevice
-                name="VS_limitSwitch_D"
-                port="0" />
+                port="2" />
         </LynxModule>
         <LynxModule
             name="Control Hub"
@@ -80,15 +75,23 @@
                 port="3" />
 
             <!-- Vertical Slide Servos -->
+            <!-- GSS -->
             <Servo
-                name="VS_flip_S"
+                name="VS_hinge_S"
                 port="0" />
+            <!-- GT -->
             <Servo
                 name="VS_claw_S"
                 port="1" />
+            <!-- Axon -->
             <Servo
-                name="frontArm"
-                port="5" />
+                name="VS_lever_S"
+                port="2" />
+
+            <!-- Vertical Slide Limit Switch -->
+            <DigitalDevice
+                name="VS_limitSwitch_D"
+                port="0" />
 
             <!-- IMU  -->
             <ControlHubImuBHI260AP

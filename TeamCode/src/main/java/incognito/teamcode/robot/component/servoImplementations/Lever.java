@@ -1,4 +1,4 @@
-package incognito.teamcode.robot.component.claw;
+package incognito.teamcode.robot.component.servoImplementations;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;

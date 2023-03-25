@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import incognito.cog.actions.Scheduler;
 import incognito.cog.opmodes.RobotLinearOpMode;
 import incognito.teamcode.robot.Robot;
-import incognito.teamcode.robot.component.claw.Lever;
+import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
 @Disabled

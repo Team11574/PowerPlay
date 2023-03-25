@@ -1,35 +1,47 @@
 package incognito.teamcode.robot;
 
-import static incognito.teamcode.config.SlideConstants.HS_CLAW_CLOSED;
-import static incognito.teamcode.config.SlideConstants.HS_CLAW_OPEN;
-import static incognito.teamcode.config.SlideConstants.HS_HINGE_FLAT;
-import static incognito.teamcode.config.SlideConstants.HS_HINGE_SPEED;
-import static incognito.teamcode.config.SlideConstants.HS_HINGE_START;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_FIFTH;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_FLAT;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_FOURTH;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_IN;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_MID;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_OUT;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_SECOND;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_SPEED;
-import static incognito.teamcode.config.SlideConstants.HS_LEVER_THIRD;
-import static incognito.teamcode.config.SlideConstants.HS_MAX_ENCODER;
-import static incognito.teamcode.config.SlideConstants.HS_MIN_ENCODER;
-import static incognito.teamcode.config.SlideConstants.HS_SENSOR_DISTANCE_CM;
-import static incognito.teamcode.config.SlideConstants.HS_TURRET_MAX;
-import static incognito.teamcode.config.SlideConstants.HS_TURRET_MIN;
-import static incognito.teamcode.config.SlideConstants.HS_TURRET_SPEED;
-import static incognito.teamcode.config.SlideConstants.HS_TURRET_START;
-import static incognito.teamcode.config.SlideConstants.S_AUTO_EXTEND_POWER;
-import static incognito.teamcode.config.SlideConstants.VS_CLAW_CLOSED;
-import static incognito.teamcode.config.SlideConstants.VS_CLAW_OPEN;
-import static incognito.teamcode.config.SlideConstants.VS_FLIP_DOWN;
-import static incognito.teamcode.config.SlideConstants.VS_FLIP_UP;
-import static incognito.teamcode.config.SlideConstants.VS_SP_AUTO;
-import static incognito.teamcode.config.SlideConstants.VS_SP_HIGH;
-import static incognito.teamcode.config.SlideConstants.VS_SP_LOW;
-import static incognito.teamcode.config.SlideConstants.VS_SP_MEDIUM;
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_CLOSED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_OPEN;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_FLAT;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_SPEED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FIFTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FLAT;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FOURTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_IN;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_MID;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_OUT;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_SECOND;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_SPEED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_THIRD;
+import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
+import static incognito.teamcode.config.WorldSlideConstants.HS_MIN_ENCODER;
+import static incognito.teamcode.config.WorldSlideConstants.HS_SENSOR_DISTANCE_CM;
+import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_MAX;
+import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_MIN;
+import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_SPEED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_TURRET_START;
+import static incognito.teamcode.config.WorldSlideConstants.S_AUTO_EXTEND_POWER;
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_CLOSED;
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_OPEN;
+import static incognito.teamcode.config.WorldSlideConstants.VS_FLIP_DOWN;
+import static incognito.teamcode.config.WorldSlideConstants.VS_FLIP_UP;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_END;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_GROUND;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_HIGH;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_LOW;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_MEDIUM;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_START;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_END;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_GROUND;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_HIGH;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_LOW;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_MEDIUM;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_START;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SP_AUTO;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SP_HIGH;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SP_LOW;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SP_MEDIUM;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -48,12 +60,13 @@ import incognito.cog.robot.RobotCog;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 import incognito.teamcode.robot.component.servoImplementations.Claw;
 import incognito.teamcode.robot.component.servoImplementations.Flipper;
+import incognito.teamcode.robot.component.servoImplementations.Hinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.HorizontalSlide;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
 
-public class Robot extends RobotCog {
+public class WorldRobot extends RobotCog {
     // ===== Instance Variables =====
 
     boolean cameraEnabled;
@@ -68,11 +81,11 @@ public class Robot extends RobotCog {
     public VerticalSlide verticalSlide;
     public HorizontalSlide horizontalSlide;
     public Claw verticalClaw;
+    public Lever verticalLever;
+    public Hinge verticalHinge;
     public Claw horizontalClaw;
-    public Flipper verticalFlip;
-    public ContinuousServo turret;
-    public ContinuousServo hinge;
-    public Lever lever;
+    public Lever horizontalLever;
+    public Hinge horizontalHinge;
     public DistanceSensor horizontalDistanceSensor;
 
     public Scheduler horizontalScheduler;
@@ -83,11 +96,11 @@ public class Robot extends RobotCog {
     public boolean isDepositing = false;
 
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
+    public WorldRobot(HardwareMap hardwareMap, Telemetry telemetry) {
         this(hardwareMap, telemetry, false);
     }
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry, boolean cameraEnabled) {
+    public WorldRobot(HardwareMap hardwareMap, Telemetry telemetry, boolean cameraEnabled) {
         super(hardwareMap, telemetry);
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
@@ -100,9 +113,9 @@ public class Robot extends RobotCog {
         verticalScheduler = new Scheduler();
         configureDrivetrain();
         configureHorizontalSlide();
+        configureHorizontalArm();
         configureVerticalSlide();
-        configureClaws();
-        configureArm();
+        configureVerticalArm();
     }
 
     private void configureDrivetrain() {
@@ -111,16 +124,6 @@ public class Robot extends RobotCog {
         DcMotorEx DT_frontLeft_M = hardwareMap.get(DcMotorEx.class, "DT_frontLeft_M");
         DcMotorEx DT_backLeft_M = hardwareMap.get(DcMotorEx.class, "DT_backLeft_M");
         drivetrain = new Drivetrain(hardwareMap, telemetry, DT_frontRight_M, DT_backRight_M, DT_frontLeft_M, DT_backLeft_M);
-    }
-
-    private void configureHorizontalSlide() {
-        DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
-        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, HS_MIN_ENCODER, HS_MAX_ENCODER);
-        horizontalSlide.addSetPosition(0);
-        horizontalSlide.setPower(0);
-        horizontalSlide.goToSetPosition(0);
-
-        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_distanceSensor");
     }
 
     private void configureVerticalSlide() {
@@ -133,21 +136,24 @@ public class Robot extends RobotCog {
         verticalSlide.setPower(0);
     }
 
-    private void configureClaws() {
-        Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
-        horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, HS_CLAW_OPEN, HS_CLAW_CLOSED);
-        horizontalClaw.open();
-
+    private void configureVerticalArm() {
         Servo VS_claw_S = hardwareMap.get(Servo.class, "VS_claw_S");
         verticalClaw = new Claw(hardwareMap, telemetry, VS_claw_S, VS_CLAW_OPEN, VS_CLAW_CLOSED);
-        verticalClaw.close();
 
-        Servo VS_flip_S = hardwareMap.get(Servo.class, "VS_flip_S");
-        verticalFlip = new Flipper(hardwareMap, telemetry, VS_flip_S, VS_FLIP_DOWN, VS_FLIP_UP);
-        verticalFlip.flipUp();
+        Servo VS_hinge_S = hardwareMap.get(Servo.class, "VS_hinge_S");
+        verticalHinge = new Hinge(hardwareMap, telemetry, VS_hinge_S, VS_HINGE_START, VS_HINGE_START, VS_HINGE_END);
+
+        Servo VS_lever_S = hardwareMap.get(Servo.class, "VS_lever_S");
+        verticalLever = new Lever(hardwareMap, telemetry, VS_lever_S, new double[] {
+                VS_LEVER_START, VS_LEVER_GROUND, VS_LEVER_LOW, VS_LEVER_MEDIUM, VS_LEVER_HIGH, VS_LEVER_END
+        }, VS_LEVER_START, VS_LEVER_END
+        );
     }
 
-    private void configureArm() {
+    private void configureHorizontalArm() {
+        /*Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
+        horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, HS_CLAW_OPEN, HS_CLAW_CLOSED);
+
         Servo HS_turret_S = hardwareMap.get(Servo.class, "HS_turret_S");
         turret = new ContinuousServo(hardwareMap, telemetry, HS_turret_S, HS_TURRET_START, HS_TURRET_MIN, HS_TURRET_MAX);
         turret.setOffsetFactor(HS_TURRET_SPEED);
@@ -168,7 +174,17 @@ public class Robot extends RobotCog {
                         HS_LEVER_OUT},
                 HS_LEVER_OUT, HS_LEVER_IN);
         lever.goToSetPosition(Lever.LeverPosition.IN);
-        lever.setOffsetFactor(HS_LEVER_SPEED);
+        lever.setOffsetFactor(HS_LEVER_SPEED);*/
+    }
+
+    private void configureHorizontalSlide() {
+        DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
+        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, HS_MIN_ENCODER, HS_MAX_ENCODER);
+        horizontalSlide.addSetPosition(0);
+        horizontalSlide.setPower(0);
+        horizontalSlide.goToSetPosition(0);
+
+        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_distanceSensor");
     }
 
     // Turned to public variables
@@ -181,7 +197,7 @@ public class Robot extends RobotCog {
             return autoCamera.getParkingSpot();
         // Default spot is 2
         return 2;
-    }
+    }/*
 
     public void moveLever(double amount) {
         moveLever(amount, true);
@@ -309,7 +325,7 @@ public class Robot extends RobotCog {
     }
 
     public void levelHinge() {
-        /* OLD
+        *//* OLD
         // The angle of the lever in radians
         double leverAngle = (lever.getPosition() - HS_LEVER_FLAT) / HS_LEVER_TICKS_PER_RAD;
 
@@ -320,7 +336,7 @@ public class Robot extends RobotCog {
         double newHingePosition = hingeParallel * HS_HINGE_TICKS_PER_RAD + HS_HINGE_FLAT;
 
         hinge.setPosition(newHingePosition);
-         */
+         *//*
         double hingePosition = lever.getPosition() - HS_LEVER_FLAT + HS_HINGE_FLAT + 0.05;
         if (hingePosition < 1) {
             hinge.setPosition(hingePosition);
@@ -376,7 +392,7 @@ public class Robot extends RobotCog {
 
     public boolean nearCone(double distance) {
         return horizontalDistanceSensor.getDistance(DistanceUnit.CM) < distance;
-    }
+    }*/
 
     public void update() {
         verticalSlide.update();
