@@ -23,6 +23,7 @@ public class ServoTesting extends OpMode {
     long waitTime = 500;
     long waitTimeLong = 1000;
     GamepadPlus pad1;
+    double moveSpeed = 0.01;
 
     @Override
     public void init() {
@@ -68,7 +69,7 @@ public class ServoTesting extends OpMode {
     public void testServo(SetServo servo, String name) {
         while (!pad1.b_pressed) {
             log("Testing [" + name + "]");
-            servo.setPosition(servo.getPosition() + pad1.last_right_stick_y);
+            servo.setPosition(servo.getPosition() + pad1.last_right_stick_y * moveSpeed);
             clearLog("Current servo position: " + servo.getPosition());
         }
     }
