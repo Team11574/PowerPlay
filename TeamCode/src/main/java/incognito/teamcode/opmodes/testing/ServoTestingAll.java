@@ -34,17 +34,17 @@ public class ServoTestingAll extends LinearOpMode {
 
         log("<<< VERTICAL ARM SERVOS >>>");
 
-        testServo(robot.verticalClaw, "verticalClaw");
-        testServo(robot.verticalHinge, "verticalHinge");
-        testServo(robot.verticalLever, "verticalLever");
+        testServo(robot.verticalArm.claw, "verticalClaw");
+        testServo(robot.verticalArm.hinge, "verticalHinge");
+        testServo(robot.verticalArm.lever, "verticalLever");
 
         sleep(waitTimeLong);
 
         log("<<< HORIZONTAL ARM SERVOS >>>");
 
-        testServo(robot.horizontalClaw, "horizontalClaw");
-        testServo(robot.horizontalHinge, "horizontalHinge");
-        testServo(robot.horizontalLever, "horizontalLever");
+        testServo(robot.horizontalArm.claw, "horizontalClaw");
+        testServo(robot.horizontalArm.claw, "horizontalHinge");
+        testServo(robot.horizontalArm.lever, "horizontalLever");
 
 
     }

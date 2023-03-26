@@ -101,8 +101,8 @@ public class AutoRight3Cone extends RobotLinearOpMode {
 
         initialPositionAndCone();
 
-        moveToPoleAndBack(Lever.LeverPosition.FIFTH, true);
-        moveToPoleAndBack(Lever.LeverPosition.FOURTH, false);
+        moveToPoleAndBack(Lever.HorizontalLeverPosition.FIFTH, true);
+        moveToPoleAndBack(Lever.HorizontalLeverPosition.FOURTH, false);
 
         drivetrain.followTrajectorySequenceAsync(readjustPos);
         while (drivetrain.isBusy()) {
@@ -121,7 +121,7 @@ public class AutoRight3Cone extends RobotLinearOpMode {
         // GO TO INITIAL POS
         drivetrain.followTrajectorySequenceAsync(initialPos);
         // START GOING UP
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         // Wait til at position and fully up
         while (drivetrain.isBusy() || !robot.verticalSlide.atSetPosition()) {
             if (drivetrain.isBusy()) {
@@ -134,15 +134,15 @@ public class AutoRight3Cone extends RobotLinearOpMode {
         robot.depositCone();
         // Queue horizontal slide out
         robot.horizontalSlide.setTargetPosition(1450);
-        robot.lever.goToSetPosition(Lever.LeverPosition.MID);
+        robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
         robot.levelHinge();
         // Wait for deposit finish
         robot.waitForDeposit();
         // Queue vertical slide down
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
     }
 
-    private void moveToPoleAndBack(Lever.LeverPosition height, boolean oneMore) {
+    private void moveToPoleAndBack(Lever.HorizontalLeverPosition height, boolean oneMore) {
         // Queue first move to stack
         drivetrain.followTrajectorySequenceAsync(moveLeft);
         // Wait until in position, horizontal slide is out (vertical slide not necessarily down)
@@ -199,14 +199,14 @@ public class AutoRight3Cone extends RobotLinearOpMode {
         // Swap cone
         robot.verticalClaw.close();
         // Queue vertical slide up
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         // Queue horizontal slide out if want one more cone
         if (oneMore) {
             scheduler.globalSchedule(
                     when -> true,
                     then -> {
                         robot.returnOut();
-                        robot.lever.goToSetPosition(Lever.LeverPosition.MID);
+                        robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
                         robot.levelHinge();
                     },
                     500
@@ -222,7 +222,7 @@ public class AutoRight3Cone extends RobotLinearOpMode {
         robot.depositCone();
         robot.waitForDeposit();
         // Queue vertical slide to ground
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
 
         /*
         // Queue drivetrain to move towards stack

@@ -1,9 +1,8 @@
 package incognito.teamcode.robot.component.slide;
 
 import static incognito.cog.util.Generic.withinThreshold;
-import static incognito.teamcode.config.SlideConstants.S_SET_POSITION_THRESHOLD;
-import static incognito.teamcode.config.SlideConstants.VS_ENCODER_CENTER;
-import static incognito.teamcode.config.SlideConstants.VS_TICKS_PER_IN;
+import static incognito.teamcode.config.WorldSlideConstants.VS_ENCODER_CENTER;
+import static incognito.teamcode.config.WorldSlideConstants.VS_TICKS_PER_IN;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,11 +15,20 @@ import incognito.cog.exceptions.UndefinedSetPositionException;
 import incognito.cog.hardware.component.motor.MotorGroup;
 
 public class VerticalSlide extends MotorGroup {
+
+    public enum Position {
+        INTAKE,
+        LOW,
+        MEDIUM,
+        HIGH
+    }
+
+
     // Instance Variables
     DigitalChannel limitSwitch;
 
-    public double stopDirection = 0;
-    public boolean disabled = false;
+    public boolean atTop = false;
+    public boolean atBottom = true;
 
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, limitSwitch);
@@ -44,6 +52,18 @@ public class VerticalSlide extends MotorGroup {
         initializeHardware();
     }
 
+    public boolean goingUp() {
+        if (isRunToPosition() && getTargetPosition() > getPosition()) return true;
+        if (isRunUsingEncoder() && getPower() > 0) return true;
+        return false;
+    }
+
+    public boolean goingDown() {
+        if (isRunToPosition() && getTargetPosition() < getPosition()) return true;
+        if (isRunUsingEncoder() && getPower() < 0) return true;
+        return false;
+    }
+
     protected void initializeHardware() {
         limitSwitch.setMode(DigitalChannel.Mode.INPUT);
         for (DcMotorEx motor : motors) {
@@ -53,44 +73,31 @@ public class VerticalSlide extends MotorGroup {
         }
     }
 
-    public void goToSetPosition(SetPosition setPosition) {
+    public void goToSetPosition(Position setPosition) {
         goToSetPosition(setPosition.ordinal());
     }
 
     // do we really need this
-    public void setSetPosition(SetPosition setPosition, int positionValue) throws UndefinedSetPositionException {
-        setSetPosition(setPosition.ordinal(), positionValue);
+    public void setSetPosition(Position position, int positionValue) throws UndefinedSetPositionException {
+        setSetPosition(position.ordinal(), positionValue);
     }
 
     // do we really need this
-    public void setSetPositionLength(SetPosition setPosition, double positionValue) throws UndefinedSetPositionException {
-        setSetPositionLength(setPosition.ordinal(), positionValue);
+    public void setSetPositionLength(Position position, double positionValue) throws UndefinedSetPositionException {
+        setSetPositionLength(position.ordinal(), positionValue);
     }
 
     public boolean getLimitState() {
         return !limitSwitch.getState();
     }
 
+    @Override
     public void setPower(double power) {
-        if (disabled)
-            return;
-        if (Math.abs(power) < 0.1 && motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
-            // In RUN_TO_POSITION MODE
-            if (Math.signum(getTargetPosition() - getPosition()) == stopDirection && stopDirection != 0) {
-                // If hit limit switch, actually set power to 0
-                power = 0;
-            } else {
-                return;
-            }
-        }
+        if (atTop && goingUp())
+            power = 0;
+        else if (atBottom && goingDown())
+            power = 0;
         lastPower = power;
-        if (stopDirection == 1 && power > 0) {
-            power = 0;
-        } else if (stopDirection == -1 && power < 0) {
-            power = 0;
-        } else {
-            stopDirection = 0;
-        }
         double realPower = Math.min(power * maxPower, maxPower);
         for (DcMotorEx motor : motors) {
             motor.setPower(realPower);
@@ -98,31 +105,18 @@ public class VerticalSlide extends MotorGroup {
         }
     }
 
-    public boolean goToTop() {
-        update();
-        setPower(maxPower);
-        return stopDirection == 1;
-    }
-
-    public boolean goToBottom() {
-        update();
-        setPower(-maxPower);
-        return stopDirection == -1;
-    }
-
-    @Override
-    public boolean atSetPosition() {
-        return atSetPosition(S_SET_POSITION_THRESHOLD);
-    }
-
     @Override
     public boolean atSetPosition(double threshold) {
-        /*
-        if (motors[0].getTargetPosition() == 0 && stopDirection == -1) {
-            setPower(0);
+        // If limit switch is triggered and we are trying to go higher,
+        // artificially say we are at our setPosition (highest value)
+        if (atTop && goingUp()) {
             return true;
         }
-         */
+        // If limit switch is triggered and we are trying to go lower,
+        // artificially say we are at our setPosition (lowest value)
+        if (atBottom && goingDown()) {
+            return true;
+        }
         double sum = 0;
         for (DcMotorEx motor : motors) {
             sum += motor.getCurrentPosition();
@@ -133,51 +127,26 @@ public class VerticalSlide extends MotorGroup {
 
     @Override
     public void update() {
-        super.update();
-        if (disabled) return;
+        //super.update();
 
         // If switch is pressed
         if (getLimitState()) {
-            // If going upwards and at the top, stop
-            if (getPosition() > VS_ENCODER_CENTER) {// && getDirection() > 0) {
-                stopDirection = 1;
-                // stop()
-                // If going downwards and at the bottom, stop
-            } else if (getPosition() <= VS_ENCODER_CENTER) { // && getDirection() < 0) {
-                if (motors[0].getMode() == DcMotorEx.RunMode.RUN_USING_ENCODER) {
-                    hardReset();
-                } else if (motors[0].getMode() == DcMotor.RunMode.RUN_TO_POSITION &&
-                        getPosition() > getTargetPosition()) {
-                    hardReset();
-                }
-                stopDirection = -1;
+            // If triggered above halfway point => at top
+            if (getPosition() > VS_ENCODER_CENTER && goingUp()) {
+                // Consider changing highest setPosition value to current position?
+                // Don't reset if we are trying to go downwards
+                atTop = true;
+                setPower(0);
+            // If triggered below halfway point => at bottom
+            } else if (getPosition() <= VS_ENCODER_CENTER && goingDown()) {
+                // Don't reset if we are trying to go upwards
+                atBottom = true;
+                setPower(0);
+                hardReset();
             }
+        } else {
+            atBottom = false;
+            atTop = false;
         }
-
-        /*
-        for (DcMotorEx motor : motors) {
-            if (motor.isOverCurrent()) {
-                disabled = true;
-            }
-        }
-
-        if (disabled) disable_slide();
-         */
-    }
-
-    /*
-    public void disable_slide() {
-        for (DcMotorEx motor : motors) {
-            motor.setMotorDisable();
-        }
-    }
-     */
-
-    public enum SetPosition {
-        GROUND,
-        LOW,
-        MEDIUM,
-        HIGH,
-        AUTO,
     }
 }

@@ -202,22 +202,22 @@ public class Tele extends RobotOpMode {
 
         if (pad2.dpad_down_pressed) {
             multiTelemetry.addLine("Down pressed");
-            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+            robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
         }
 
         if (pad2.dpad_left_pressed) {
             multiTelemetry.addLine("Left pressed");
-            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.LOW);
+            robot.verticalSlide.goToSetPosition(VerticalSlide.Position.LOW);
         }
 
         if (pad2.dpad_up_pressed) {
             multiTelemetry.addLine("Up pressed");
-            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.MEDIUM);
+            robot.verticalSlide.goToSetPosition(VerticalSlide.Position.MEDIUM);
         }
 
         if (pad2.dpad_right_pressed) {
             multiTelemetry.addLine("Right pressed");
-            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+            robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         }
 
         if (pad2.right_bumper_pressed && !overrideMain) {
@@ -305,7 +305,6 @@ public class Tele extends RobotOpMode {
         // multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
         // multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
         multiTelemetry.addLine();
-        multiTelemetry.addData("Vertical stopDir", robot.verticalSlide.stopDirection);
         multiTelemetry.addData("Horizontal stopDir", robot.horizontalSlide.stopDirection);
         multiTelemetry.addData("Retracting", robot.isRetracting);
         multiTelemetry.addData("Depositing", robot.isDepositing);

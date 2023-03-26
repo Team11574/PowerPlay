@@ -22,21 +22,40 @@ public class WorldSlideConstants {
     public static double VS_KG = 0.04;
 
     // TODO: UPDATE
-    public static double VS_ENCODER_CENTER = 1000;
+    public static double VS_ENCODER_CENTER = 300;
+
+    // TODO: Set correct slide positions (UPDATE after new slide is added)
+    public static int VS_SLIDE_INTAKE = 0;
+    public static int VS_SLIDE_LOW = 100;
+    public static int VS_SLIDE_MEDIUM = 0;
+    public static int VS_SLIDE_HIGH = 200;
+
+
+
+    // TODO: Set correct positions for vertical lever
+    public static double VS_LEVER_START = 0.03; // Start = lever in
+    public static double VS_LEVER_END = 1; // End = lever out
+    public static double VS_LEVER_INTAKE = VS_LEVER_START;
+    public static double VS_LEVER_LOW = VS_LEVER_END;
+    public static double VS_LEVER_MEDIUM = 0.6;
+    public static double VS_LEVER_HIGH = 0.55;
+
+
+    // TODO: Set correct positions for vertical hinge
+    public static double VS_HINGE_START = 0.15; // Start = min
+    public static double VS_HINGE_END = 0.8; // End = max
+    public static double VS_HINGE_INTAKE = 0.2;
+    public static double VS_HINGE_LOW_UP = VS_HINGE_END;
+    public static double VS_HINGE_LOW_DOWN = 0.7;
+    public static double VS_HINGE_MEDIUM_UP = 0.4;
+    public static double VS_HINGE_MEDIUM_DOWN = 0.25;
+    public static double VS_HINGE_HIGH_UP = 0.3;
+    public static double VS_HINGE_HIGH_DOWN = 0.15;
 
     // TODO: Find correct vertical claw open/closed positions
-    public static double VS_CLAW_OPEN = 0.5;
-    public static double VS_CLAW_CLOSED = 0.78;
-    // TODO: Set correct positions for vertical hinge
-    public static double VS_HINGE_START = 0; // Start = in
-    public static double VS_HINGE_END = 1; // End = out
-    // TODO: Set correct positions for vertical lever
-    public static double VS_LEVER_START = 0.5; // Start = in
-    public static double VS_LEVER_GROUND = 0.5;
-    public static double VS_LEVER_LOW = 0.5;
-    public static double VS_LEVER_MEDIUM = 0.5;
-    public static double VS_LEVER_HIGH = 0.5;
-    public static double VS_LEVER_END = 1; // End = out
+    public static double VS_CLAW_OPEN = 0.3;
+    public static double VS_CLAW_CLOSED = 0.35;
+
 
 
 

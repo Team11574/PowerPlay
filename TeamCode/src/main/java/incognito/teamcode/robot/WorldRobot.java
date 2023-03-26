@@ -5,13 +5,24 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_MIN_ENCODER;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_CLOSED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_OPEN;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_END;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_HIGH_DOWN;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_HIGH_UP;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_INTAKE;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_LOW_DOWN;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_LOW_UP;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_MEDIUM_DOWN;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_MEDIUM_UP;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_START;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_END;
-import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_GROUND;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_HIGH;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_INTAKE;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_LOW;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_MEDIUM;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_START;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_HIGH;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_INTAKE;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_LOW;
+import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_MEDIUM;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -27,6 +38,8 @@ import incognito.cog.actions.Scheduler;
 import incognito.cog.hardware.component.drive.Drivetrain;
 import incognito.cog.hardware.component.servo.ContinuousServo;
 import incognito.cog.robot.RobotCog;
+import incognito.teamcode.robot.component.arm.HorizontalArm;
+import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 import incognito.teamcode.robot.component.servoImplementations.Claw;
 import incognito.teamcode.robot.component.servoImplementations.Flipper;
@@ -48,14 +61,18 @@ public class WorldRobot extends RobotCog {
     // -- Components --
     public AutoCamera autoCamera;
     public Drivetrain drivetrain;
-    public VerticalSlide verticalSlide;
-    public HorizontalSlide horizontalSlide;
-    public Claw verticalClaw;
-    public Lever verticalLever;
-    public Hinge verticalHinge;
-    public Claw horizontalClaw;
-    public Lever horizontalLever;
-    public Hinge horizontalHinge;
+
+    public VerticalArm verticalArm;
+    private VerticalSlide verticalSlide;
+    private Claw verticalClaw;
+    private Lever verticalLever;
+    private Hinge verticalHinge;
+
+    public HorizontalArm horizontalArm;
+    private HorizontalSlide horizontalSlide;
+    private Claw horizontalClaw;
+    private Lever horizontalLever;
+    private Hinge horizontalHinge;
     public DistanceSensor horizontalDistanceSensor;
 
     public Scheduler horizontalScheduler;
@@ -102,22 +119,31 @@ public class WorldRobot extends RobotCog {
         VS_slideRight_M.setDirection(DcMotorEx.Direction.REVERSE);
         DigitalChannel VS_limitSwitch_D = hardwareMap.get(DigitalChannel.class, "VS_limitSwitch_D");
         verticalSlide = new VerticalSlide(hardwareMap, telemetry, new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M}, VS_limitSwitch_D);
-        //verticalSlide.addSetPositionLengths(new double[]{0, VS_SP_LOW, VS_SP_MEDIUM, VS_SP_HIGH, VS_SP_AUTO});
+        verticalSlide.addSetPositions(new int[]{VS_SLIDE_INTAKE, VS_SLIDE_LOW, VS_SLIDE_MEDIUM, VS_SLIDE_HIGH});
+        verticalSlide.goToSetPosition(0);
         verticalSlide.setPower(0);
     }
 
     private void configureVerticalArm() {
+        Servo VS_lever_S = hardwareMap.get(Servo.class, "VS_lever_S");
+        verticalLever = new Lever(hardwareMap, telemetry, VS_lever_S, new double[] {
+                VS_LEVER_INTAKE, VS_LEVER_LOW, VS_LEVER_MEDIUM, VS_LEVER_HIGH
+        }, VS_LEVER_START, VS_LEVER_END
+        );
+
+        Servo VS_hinge_S = hardwareMap.get(Servo.class, "VS_hinge_S");
+        verticalHinge = new Hinge(hardwareMap, telemetry, VS_hinge_S,
+                new double[] {
+                        VS_HINGE_INTAKE,
+                        VS_HINGE_LOW_UP, VS_HINGE_LOW_DOWN,
+                        VS_HINGE_MEDIUM_UP, VS_HINGE_MEDIUM_DOWN,
+                        VS_HINGE_HIGH_UP, VS_HINGE_HIGH_DOWN
+                }, VS_HINGE_START, VS_HINGE_END);
+
         Servo VS_claw_S = hardwareMap.get(Servo.class, "VS_claw_S");
         verticalClaw = new Claw(hardwareMap, telemetry, VS_claw_S, VS_CLAW_OPEN, VS_CLAW_CLOSED);
 
-        Servo VS_hinge_S = hardwareMap.get(Servo.class, "VS_hinge_S");
-        verticalHinge = new Hinge(hardwareMap, telemetry, VS_hinge_S, VS_HINGE_START, VS_HINGE_START, VS_HINGE_END);
-
-        Servo VS_lever_S = hardwareMap.get(Servo.class, "VS_lever_S");
-        verticalLever = new Lever(hardwareMap, telemetry, VS_lever_S, new double[] {
-                VS_LEVER_START, VS_LEVER_GROUND, VS_LEVER_LOW, VS_LEVER_MEDIUM, VS_LEVER_HIGH, VS_LEVER_END
-        }, VS_LEVER_START, VS_LEVER_END
-        );
+        verticalArm = new VerticalArm(verticalSlide, verticalLever, verticalHinge, verticalClaw);
     }
 
     private void configureHorizontalArm() {

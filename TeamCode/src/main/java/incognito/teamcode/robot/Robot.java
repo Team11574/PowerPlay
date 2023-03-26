@@ -167,7 +167,7 @@ public class Robot extends RobotCog {
                         HS_LEVER_SECOND,
                         HS_LEVER_OUT},
                 HS_LEVER_OUT, HS_LEVER_IN);
-        lever.goToSetPosition(Lever.LeverPosition.IN);
+        lever.goToSetPosition(Lever.HorizontalLeverPosition.IN);
         lever.setOffsetFactor(HS_LEVER_SPEED);
     }
 
@@ -208,7 +208,7 @@ public class Robot extends RobotCog {
             isRetracting = true;
             // Lever mid
             horizontalClaw.close();
-            lever.goToSetPosition(Lever.LeverPosition.MID, false);
+            lever.goToSetPosition(Lever.HorizontalLeverPosition.MID, false);
             horizontalScheduler.linearSchedule(
                     when -> true,
                     then -> {
@@ -223,7 +223,7 @@ public class Robot extends RobotCog {
                     when -> horizontalSlide.atSetPosition(),
                     // Lever in
                     then -> {
-                        lever.goToSetPosition(Lever.LeverPosition.IN, false);
+                        lever.goToSetPosition(Lever.HorizontalLeverPosition.IN, false);
                         if (!drop && !doReturn) {
                             isRetracting = false;
                         }
@@ -366,7 +366,7 @@ public class Robot extends RobotCog {
     public void dropHorizontalArm() {
         // TODO: Figure out how to input what height the lever is at
         horizontalClaw.open();
-        lever.goToSetPosition(Lever.LeverPosition.OUT, true);
+        lever.goToSetPosition(Lever.HorizontalLeverPosition.OUT, true);
         levelHinge();
     }
 

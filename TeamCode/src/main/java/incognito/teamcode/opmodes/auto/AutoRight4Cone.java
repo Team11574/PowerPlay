@@ -110,7 +110,7 @@ public class AutoRight4Cone extends RobotLinearOpMode {
 
         if (isStopRequested()) return;
 
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         drivetrain.followTrajectorySequence(initialPos);
         runCones();
 
@@ -124,14 +124,14 @@ public class AutoRight4Cone extends RobotLinearOpMode {
 
     void runCones() {
         robot.depositCone();
-        robot.lever.goToSetPosition(Lever.LeverPosition.FIFTH); // 5th cone height
+        robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.FIFTH); // 5th cone height
         robot.levelHinge();
         robot.horizontalSlide.setTargetPosition(1620);
         robot.horizontalClaw.open();
         while (robot.isDepositing) {
             robot.update();
         }
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
         robot.verticalClaw.open();
         while (!robot.horizontalSlide.atSetPosition()) {
             // wait
@@ -144,12 +144,12 @@ public class AutoRight4Cone extends RobotLinearOpMode {
         robot.waitForRetract();
         nap(350);
         robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         scheduler.linearSchedule(
                 when -> true,
                 then -> {
                     robot.returnOut();
-                    robot.lever.goToSetPosition(Lever.LeverPosition.FOURTH);
+                    robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.FOURTH);
                     robot.levelHinge();
                 },
                 500
@@ -161,7 +161,7 @@ public class AutoRight4Cone extends RobotLinearOpMode {
         }
         robot.depositCone();
         robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
         robot.horizontalClaw.close();
         nap(350);
         robot.retractArm(false, false);
@@ -175,12 +175,12 @@ public class AutoRight4Cone extends RobotLinearOpMode {
         robot.horizontalClaw.open();
         nap(250);
         robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         scheduler.linearSchedule(
                 when -> true,
                 then -> {
                     robot.returnOut();
-                    robot.lever.goToSetPosition(Lever.LeverPosition.THIRD);
+                    robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.THIRD);
                     robot.levelHinge();
                 },
                 500
@@ -192,7 +192,7 @@ public class AutoRight4Cone extends RobotLinearOpMode {
         }
         robot.depositCone();
         robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
         robot.horizontalClaw.close();
         nap(350);
         robot.retractArm(false, false);
@@ -206,14 +206,14 @@ public class AutoRight4Cone extends RobotLinearOpMode {
         robot.horizontalClaw.open();
         nap(250);
         robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         while (!robot.verticalSlide.atSetPosition()) {
             // wait
             robot.update();
         }
         robot.depositCone();
         robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
     }
 
     void park(int parkingSpot) {

@@ -24,34 +24,34 @@ public class ServoTesting extends OpMode {
     long waitTimeLong = 1000;
     GamepadPlus pad1;
     double moveSpeed = 0.01;
+    int servoIndex = 0;
+    SetServo[] servoList;
 
     @Override
     public void init() {
-        clearLog("Welcome to Servo Testing! Press start to begin.");
-    }
-
-    @Override
-    public void loop() {
-
         this.robot = new WorldRobot(hardwareMap, telemetry, false);
         this.drivetrain = robot.drivetrain;
         this.multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         this.scheduler = new Scheduler();
         this.pad1 = new GamepadPlus(gamepad1);
 
-        SetServo[] servoList = new SetServo[] {
-                robot.verticalClaw,
-                robot.verticalHinge,
-                robot.verticalLever,
-                robot.horizontalClaw,
-                robot.horizontalHinge,
-                robot.horizontalLever
+        servoList = new SetServo[] {
+                robot.verticalArm.claw,
+                robot.verticalArm.hinge,
+                robot.verticalArm.lever,
+                robot.horizontalArm.claw,
+                robot.horizontalArm.claw,
+                robot.horizontalArm.claw
         };
+        clearLog("Welcome to Servo Testing! Press start to begin.");
+    }
 
+    @Override
+    public void loop() {
         SetServo currentServo = servoList[0];
-        int servoIndex = 0;
 
         while (!pad1.a_pressed) {
+            pad1.update();
             log("Select a servo, then press A to begin.");
             clearLog(">" + currentServo.toString());
             servoIndex += pad1.dpad_up_pressed ? 1 : (pad1.dpad_down_pressed ? -1 : 0);
@@ -68,6 +68,7 @@ public class ServoTesting extends OpMode {
 
     public void testServo(SetServo servo, String name) {
         while (!pad1.b_pressed) {
+            pad1.update();
             log("Testing [" + name + "]");
             servo.setPosition(servo.getPosition() + pad1.last_right_stick_y * moveSpeed);
             clearLog("Current servo position: " + servo.getPosition());

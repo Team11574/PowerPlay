@@ -169,13 +169,13 @@ public class AutoRight1Cone extends RobotLinearOpMode {
     }
 
     void runCone() {
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         while (!robot.verticalSlide.atSetPosition()) {
             robot.update();
         }
         robot.depositCone();
         robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
         while (!robot.verticalSlide.atSetPosition()) {
             robot.update();
         }

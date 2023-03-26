@@ -10,6 +10,16 @@ import java.util.Collections;
 import incognito.cog.hardware.component.servo.ContinuousServo;
 
 public class Hinge extends ContinuousServo {
+    public enum Position {
+        INTAKE,
+        LOW_UP,
+        LOW_DOWN,
+        MEDIUM_UP,
+        MEDIUM_DOWN,
+        HIGH_UP,
+        HIGH_DOWN,
+    }
+
     public Hinge(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo, double startPos) {
         this(hardwareMap, telemetry, crServo, startPos, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
@@ -27,5 +37,13 @@ public class Hinge extends ContinuousServo {
     public Hinge(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
                            double[] startPositions, double lowBound, double upBound) {
         super(hardwareMap, telemetry, crServo, startPositions, lowBound, upBound);
+    }
+
+    public void goToSetPosition(Position position) {
+        goToSetPosition(position, true);
+    }
+
+    public void goToSetPosition(Position position, boolean updateLastPosition) {
+        goToSetPosition(position.ordinal(), updateLastPosition);
     }
 }

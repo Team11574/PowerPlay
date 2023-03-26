@@ -15,11 +15,19 @@ public class Lever extends ContinuousServo {
         super(hardwareMap, telemetry, crServo, positions, max, min);
     }
 
-    public void goToSetPosition(LeverPosition pos) {
-        goToSetPosition(pos.ordinal());
+    public void goToSetPosition(HorizontalLeverPosition pos) {
+        goToSetPosition(pos, true);
     }
 
-    public void goToSetPosition(LeverPosition pos, boolean updateLastPosition) {
+    public void goToSetPosition(HorizontalLeverPosition pos, boolean updateLastPosition) {
+        goToSetPosition(pos.ordinal(), updateLastPosition);
+    }
+
+    public void goToSetPosition(VerticalLeverPosition pos) {
+        goToSetPosition(pos, true);
+    }
+
+    public void goToSetPosition(VerticalLeverPosition pos, boolean updateLastPosition) {
         goToSetPosition(pos.ordinal(), updateLastPosition);
     }
 
@@ -41,11 +49,11 @@ public class Lever extends ContinuousServo {
         }
     }
 
-    public double getSetPositionAtIndex(LeverPosition pos) {
+    public double getSetPositionAtIndex(HorizontalLeverPosition pos) {
         return getSetPositionAtIndex(pos.ordinal());
     }
 
-    public enum LeverPosition {
+    public enum HorizontalLeverPosition {
         IN,
         MID,
         FIFTH,
@@ -53,6 +61,13 @@ public class Lever extends ContinuousServo {
         THIRD,
         SECOND,
         OUT,
+    }
+
+    public enum VerticalLeverPosition {
+        INTAKE,
+        LOW,
+        MEDIUM,
+        HIGH
     }
 
 }

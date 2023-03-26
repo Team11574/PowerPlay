@@ -96,12 +96,12 @@ public class TeleTesting extends RobotOpMode {
 
         if (pad2.dpad_up_pressed) {
             multiTelemetry.addLine("Up pressed");
-            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.MEDIUM);
+            robot.verticalSlide.goToSetPosition(VerticalSlide.Position.MEDIUM);
         }
 
         if (pad2.dpad_right_pressed) {
             multiTelemetry.addLine("Right pressed");
-            robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+            robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         }
 
         if (pad2.left_bumper_pressed) {

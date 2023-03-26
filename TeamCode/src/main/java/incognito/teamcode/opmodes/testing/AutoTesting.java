@@ -36,7 +36,7 @@ public class AutoTesting extends RobotLinearOpMode {
         waitForStart();
         robot.autoCamera.stopCamera();
 
-        robot.lever.goToSetPosition(Lever.LeverPosition.FIFTH); // 5th cone height
+        robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.FIFTH); // 5th cone height
         robot.levelHinge();
         robot.horizontalSlide.setTargetPosition(1640);
         robot.horizontalClaw.open();
@@ -54,12 +54,12 @@ public class AutoTesting extends RobotLinearOpMode {
         robot.waitForRetract();
         sleep(350);
         robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         scheduler.linearSchedule(
                 when -> true,
                 then -> {
                     robot.returnOut();
-                    robot.lever.goToSetPosition(Lever.LeverPosition.FOURTH);
+                    robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.FOURTH);
                     robot.levelHinge();
                 },
                 500
@@ -71,7 +71,7 @@ public class AutoTesting extends RobotLinearOpMode {
         }
         robot.depositCone();
         robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
         robot.horizontalClaw.close();
         sleep(350);
         robot.retractArm(false, false);
@@ -85,20 +85,20 @@ public class AutoTesting extends RobotLinearOpMode {
         robot.horizontalClaw.open();
         sleep(250);
         robot.verticalClaw.close();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.HIGH);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.HIGH);
         while (!robot.verticalSlide.atSetPosition()) {
             // wait
             robot.update();
         }
         robot.depositCone();
         robot.waitForDeposit();
-        robot.verticalSlide.goToSetPosition(VerticalSlide.SetPosition.GROUND);
+        robot.verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
         while (!robot.verticalSlide.atSetPosition()) {
             // wait
             robot.update();
         }
         robot.horizontalSlide.goToSetPosition(0);
-        robot.lever.goToSetPosition(Lever.LeverPosition.IN);
+        robot.lever.goToSetPosition(Lever.HorizontalLeverPosition.IN);
         while (!robot.horizontalSlide.atSetPosition()) {
             // wait
             robot.update();
