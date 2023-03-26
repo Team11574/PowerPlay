@@ -25,10 +25,10 @@ public class WorldSlideConstants {
     public static double VS_ENCODER_CENTER = 300;
 
     // TODO: Set correct slide positions (UPDATE after new slide is added)
-    public static int VS_SLIDE_INTAKE = 0;
-    public static int VS_SLIDE_LOW = 100;
-    public static int VS_SLIDE_MEDIUM = 0;
-    public static int VS_SLIDE_HIGH = 200;
+    public static int VS_SLIDE_INTAKE = -10;
+    public static int VS_SLIDE_LOW = 400;
+    public static int VS_SLIDE_MEDIUM = VS_SLIDE_INTAKE;
+    public static int VS_SLIDE_HIGH = 750;
 
 
 

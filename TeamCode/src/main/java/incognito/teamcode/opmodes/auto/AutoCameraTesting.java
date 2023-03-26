@@ -20,7 +20,7 @@ public class AutoCameraTesting extends LinearOpMode {
         AutoCamera camera = new AutoCamera(hardwareMap, multiTelemetry);
         Robot r = new Robot(hardwareMap, telemetry);
 
-        camera.swapMode();
+        camera.swapDoingJunctions();
         while (!isStarted()) {
             multiTelemetry.addData("Junction distance", camera.getJunctionDistance());
             multiTelemetry.addData("Junction area", camera.getJunctionWidth());

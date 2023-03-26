@@ -63,6 +63,10 @@ public class VerticalArm extends Arm {
         claw.close();
     }
 
+    public void toggleClaw() {
+        claw.toggle();
+    }
+
     public void levelHinge() {
 
     }

@@ -59,7 +59,7 @@ public class TeleNewTesting extends RobotOpMode {
     public void init() {
         //super.init();
         this.robot = new Robot(hardwareMap, telemetry, true);
-        robot.autoCamera.swapMode(); // enable target locking mode
+        robot.autoCamera.swapDoingJunctions(); // enable target locking mode
         robot.verticalClaw.open();
         this.drivetrain = robot.drivetrain;
         drivetrain.setPoseEstimate(PoseStorage.lastPose);

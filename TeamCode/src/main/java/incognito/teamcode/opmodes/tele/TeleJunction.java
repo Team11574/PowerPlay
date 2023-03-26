@@ -46,7 +46,7 @@ public class TeleJunction extends RobotOpMode {
         robot = new Robot(hardwareMap, telemetry, true);
         pad1 = new GamepadPlus(gamepad1);
         TelemetryBigError.initialize(multiTelemetry);
-        robot.autoCamera.swapMode();
+        robot.autoCamera.swapDoingJunctions();
     }
 
     @Override

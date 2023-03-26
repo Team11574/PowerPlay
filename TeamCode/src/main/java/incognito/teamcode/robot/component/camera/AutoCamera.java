@@ -55,11 +55,11 @@ public class AutoCamera extends CameraSuper {
         return pipeline.getParkingSpot();
     }
 
-    public void swapMode() {
+    public void swapDoingJunctions() {
         pipeline.doingJunctions = !pipeline.doingJunctions;
     }
 
-    public void setMode(boolean b) {
+    public void setDoingJunctions(boolean b) {
         pipeline.doingJunctions = b;
     }
 

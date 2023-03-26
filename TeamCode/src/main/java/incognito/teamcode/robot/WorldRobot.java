@@ -116,21 +116,14 @@ public class WorldRobot extends RobotCog {
     private void configureVerticalSlide() {
         DcMotorEx VS_slideRight_M = hardwareMap.get(DcMotorEx.class, "VS_slideRight_M");
         DcMotorEx VS_slideLeft_M = hardwareMap.get(DcMotorEx.class, "VS_slideLeft_M");
-        VS_slideRight_M.setDirection(DcMotorEx.Direction.REVERSE);
+        VS_slideLeft_M.setDirection(DcMotorEx.Direction.REVERSE);
         DigitalChannel VS_limitSwitch_D = hardwareMap.get(DigitalChannel.class, "VS_limitSwitch_D");
         verticalSlide = new VerticalSlide(hardwareMap, telemetry, new DcMotorEx[]{VS_slideLeft_M, VS_slideRight_M}, VS_limitSwitch_D);
         verticalSlide.addSetPositions(new int[]{VS_SLIDE_INTAKE, VS_SLIDE_LOW, VS_SLIDE_MEDIUM, VS_SLIDE_HIGH});
-        verticalSlide.goToSetPosition(0);
-        verticalSlide.setPower(0);
+        verticalSlide.goToSetPosition(VerticalSlide.Position.INTAKE);
     }
 
     private void configureVerticalArm() {
-        Servo VS_lever_S = hardwareMap.get(Servo.class, "VS_lever_S");
-        verticalLever = new Lever(hardwareMap, telemetry, VS_lever_S, new double[] {
-                VS_LEVER_INTAKE, VS_LEVER_LOW, VS_LEVER_MEDIUM, VS_LEVER_HIGH
-        }, VS_LEVER_START, VS_LEVER_END
-        );
-
         Servo VS_hinge_S = hardwareMap.get(Servo.class, "VS_hinge_S");
         verticalHinge = new Hinge(hardwareMap, telemetry, VS_hinge_S,
                 new double[] {
@@ -139,6 +132,12 @@ public class WorldRobot extends RobotCog {
                         VS_HINGE_MEDIUM_UP, VS_HINGE_MEDIUM_DOWN,
                         VS_HINGE_HIGH_UP, VS_HINGE_HIGH_DOWN
                 }, VS_HINGE_START, VS_HINGE_END);
+
+        Servo VS_lever_S = hardwareMap.get(Servo.class, "VS_lever_S");
+        verticalLever = new Lever(hardwareMap, telemetry, VS_lever_S, new double[] {
+                VS_LEVER_INTAKE, VS_LEVER_LOW, VS_LEVER_MEDIUM, VS_LEVER_HIGH
+        }, VS_LEVER_START, VS_LEVER_END
+        );
 
         Servo VS_claw_S = hardwareMap.get(Servo.class, "VS_claw_S");
         verticalClaw = new Claw(hardwareMap, telemetry, VS_claw_S, VS_CLAW_OPEN, VS_CLAW_CLOSED);

@@ -315,8 +315,6 @@ public class Pipeline extends OpenCvPipeline {
         yellowMask.release();
         junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
 
-        telemetry.update();
-
         Imgproc.drawContours(input, yellowContours, -1, yellowUpper, 2);
 
         yellowMaxWidth = 0;

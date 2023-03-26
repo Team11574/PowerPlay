@@ -268,6 +268,10 @@ public class TileMovementPretty {
         sequenceStartPose = null;
     }
 
+    public boolean hasMoves() {
+        return directions.size() > 0;
+    }
+
     /**
      * Get the last direction that the robot moved in.
      * @return The last direction that the robot moved in, or null if the robot hasn't moved.

@@ -48,8 +48,8 @@ public class VerticalSlide extends MotorGroup {
         this.MIN_ENCODER_POSITION = minEncoderPosition;
         this.MAX_ENCODER_POSITION = maxEncoderPosition;
         this.limitSwitch = limitSwitch;
-        setTargetPosition(0);
         initializeHardware();
+        setTargetPosition(0);
     }
 
     public boolean goingUp() {

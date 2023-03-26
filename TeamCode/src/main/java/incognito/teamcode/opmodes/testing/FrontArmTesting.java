@@ -77,7 +77,9 @@ public class FrontArmTesting extends RobotOpMode {
 
     public void fullTelemetry() {
         multiTelemetry.addData("Vertical slide motor encoder", robot.verticalArm.slide.getPosition());
-        multiTelemetry.addData("Limit switch:", robot.verticalArm.slide.getLimitState());
+        multiTelemetry.addData("Vertical slide target position", robot.verticalArm.slide.getTargetPosition());
+        multiTelemetry.addData("Vertical slide motor power", robot.verticalArm.slide.getPower());
+        multiTelemetry.addData("Vertical slide limit switch:", robot.verticalArm.slide.getLimitState());
         multiTelemetry.addLine();
         multiTelemetry.addData("Vertical slide atTop", robot.verticalArm.slide.atTop);
         multiTelemetry.addData("Vertical slide atBottom", robot.verticalArm.slide.atBottom);
@@ -88,5 +90,6 @@ public class FrontArmTesting extends RobotOpMode {
         multiTelemetry.addData("Vertical hinge pos", robot.verticalArm.hinge.getPosition());
         multiTelemetry.addData("Vertical arm pos", robot.verticalArm.getPosition());
         multiTelemetry.addLine();
+        multiTelemetry.update();
     }
 }
