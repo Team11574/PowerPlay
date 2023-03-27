@@ -120,7 +120,7 @@ public class Robot extends RobotCog {
         horizontalSlide.setPower(0);
         horizontalSlide.goToSetPosition(0);
 
-        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_distanceSensor");
+        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_DS");
     }
 
     private void configureVerticalSlide() {

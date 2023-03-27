@@ -100,8 +100,15 @@ public class WorldSlideConstants {
     public static double HS_LEVER_TICKS_PER_RAD = (HS_LEVER_FLAT - HS_LEVER_NEG_PI_6) / (Math.PI / 6);
     public static double HS_HINGE_TICKS_PER_RAD = (HS_HINGE_FLAT - HS_HINGE_NEG_PI_6) / (Math.PI / 6);
 
-    public static double HS_SENSOR_DISTANCE_CM = 2;
-    //public static double HS_LEVER_
+    /* == Horizontal Slide Cone Distance == */
+    public static double HS_DS_CONE_DISTANCE_CM = 2;
+
+    /* == Front Distance Sensor Junction Distances == */
+    public static double FRONT_DS_THRESHOLD = 80;
+    public static double FRONT_DS_LOW = 26; // with cone, 30 without...
+    public static double FRONT_DS_MEDIUM = 32; // with cone, 37 without...
+    public static double FRONT_DS_HIGH = 29; // with cone, 34 without...
+
 
     /* == Slides General == */
     public static double S_SET_POSITION_THRESHOLD = 20;

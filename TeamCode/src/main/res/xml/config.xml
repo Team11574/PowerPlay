@@ -56,6 +56,18 @@
             <Servo
                 name="HS_lever_S"
                 port="2" />
+
+            <!-- Front Distance Sensor -->
+            <ModernRoboticsI2cRangeSensor
+                name="front_DS"
+                port="0"
+                bus="1" />
+            <!--
+            <REV_VL53L0X_RANGE_SENSOR
+                name="front_DS"
+                port="0"
+                bus="1" />
+                -->
         </LynxModule>
         <LynxModule
             name="Control Hub"
@@ -100,7 +112,7 @@
                 bus="0" />
 
             <REV_VL53L0X_RANGE_SENSOR
-                name="HS_distanceSensor"
+                name="HS_DS"
                 port="0"
                 bus="1" />
         </LynxModule>

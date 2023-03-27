@@ -59,8 +59,8 @@ public class TeleWorld extends RobotOpMode {
     @Override
     public void init() {
         //super.init();
-        this.robot = new WorldRobot(hardwareMap, telemetry, false);
-        //robot.autoCamera.setDoingJunctions(true); // prep target locking mode
+        this.robot = new WorldRobot(hardwareMap, telemetry, true);
+        robot.autoCamera.setDoingJunctions(true); // prep target locking mode
         this.drivetrain = robot.drivetrain;
         drivetrain.setPoseEstimate(PoseStorage.lastPose);
         pad1 = new GamepadPlus(gamepad1);
@@ -75,6 +75,12 @@ public class TeleWorld extends RobotOpMode {
     public void loop() {
         //super.loop();
         update();
+        //multiTelemetry.addData("Front distance (cm):", robot.frontDistanceSensor.getDistance(DistanceUnit.CM));
+        multiTelemetry.addData("raw ultrasonic", robot.frontDistanceSensor.rawUltrasonic());
+        multiTelemetry.addData("raw optical", robot.frontDistanceSensor.rawOptical());
+        multiTelemetry.addData("cm optical", "%.2f cm", robot.frontDistanceSensor.cmOptical());
+        multiTelemetry.addData("cm", "%.2f cm", robot.frontDistanceSensor.getDistance(DistanceUnit.CM));
+        multiTelemetry.update();
 
         // Adjust drivetrain
         if (!targetLocking) {
@@ -119,7 +125,8 @@ public class TeleWorld extends RobotOpMode {
             robot.verticalArm.hingeUp();
         }
 
-        fullTelemetry();
+        update();
+        //fullTelemetry();
     }
 
     TileMovement queueMovement(int move_direction) {
@@ -143,6 +150,17 @@ public class TeleWorld extends RobotOpMode {
     }
 
     public void adjustDrivetrain() {
+        if (pad1.right_trigger_pressed) {
+            drivetrain.updatePoseEstimate();
+        }
+        if (pad1.right_trigger_depressed) {
+            // If we have just finished queueing some actions, execute them
+            if (tileMovement.hasMoves()) {
+                drivetrain.updatePoseEstimate();
+                drivetrain.followTrajectorySequenceAsync(tileMovement.build());
+            }
+            tileMovement.reset();
+        }
         if (pad1.right_trigger_active()) {
             // Cancel trajectory mid queue
             if (pad1.b_pressed) {
@@ -180,13 +198,7 @@ public class TeleWorld extends RobotOpMode {
 
             drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
         }
-        if (pad1.right_trigger_depressed) {
-            // If we have just finished queueing some actions, execute them
-            if (tileMovement.hasMoves()) {
-                drivetrain.followTrajectorySequenceAsync(tileMovement.build());
-            }
-            tileMovement.reset();
-        }
+
     }
 
     public void targetLock() {
@@ -295,7 +307,6 @@ public class TeleWorld extends RobotOpMode {
         pad1.update();
         pad2.update();
         scheduler.update();
-        drivetrain.updatePoseEstimate();
         if (drivetrain.isBusy()) {
             drivetrain.update();
         }

@@ -292,8 +292,6 @@ public class Pipeline extends OpenCvPipeline {
     public void updateJunctionDistance(Mat input) {
         // Use moments to find the center of yellow blobs
 
-        telemetry.addLine("Junction distance update is running!");
-
         imageROI = input.clone();
         // TODO: Adjust ROI w/ imageROI.adjustROI()
         /*imageROI = imageROI.adjustROI(
@@ -329,7 +327,7 @@ public class Pipeline extends OpenCvPipeline {
                 y = moments.get_m01() / moments.get_m00();
                 Imgproc.putText(input, df.format(yellowWidth), new Point(x-20, y), 5, 1, new Scalar(255, 255, 30));
                 yellowMaxWidth = yellowWidth;
-                telemetry.addData("Yellow max width", yellowMaxWidth);
+                //telemetry.addData("Yellow max width", yellowMaxWidth);
                 // why is this 170?
                 junctionHorizontalDistanceInternal = 170 - x;
             }

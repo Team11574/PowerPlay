@@ -498,7 +498,7 @@ public class TileMovement {
         if (directions.size() == 0) {
             return null;
         }
-        TrajectorySequenceBuilder sequenceBuilder = drivetrain.trajectorySequenceBuilder(sequenceStartPose);
+        TrajectorySequenceBuilder sequenceBuilder = drivetrain.trajectorySequenceBuilder(getSequenceStartPose());
         Vector2d lastPos = new Vector2d(getSequenceStartPose().getX(), getSequenceStartPose().getY());
         for (int i = 0; i < directions.size(); i++) {
             MoveDirection direction = directions.get(i);

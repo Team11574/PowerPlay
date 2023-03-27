@@ -24,6 +24,7 @@ import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_INTAKE;
 import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_LOW;
 import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_MEDIUM;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -68,6 +69,9 @@ public class WorldRobot extends RobotCog {
     private Lever verticalLever;
     private Hinge verticalHinge;
 
+    public ModernRoboticsI2cRangeSensor frontDistanceSensor;
+    //public DistanceSensor frontDistanceSensor;
+
     public HorizontalArm horizontalArm;
     private HorizontalSlide horizontalSlide;
     private Claw horizontalClaw;
@@ -98,6 +102,7 @@ public class WorldRobot extends RobotCog {
 
         horizontalScheduler = new Scheduler();
         verticalScheduler = new Scheduler();
+        frontDistanceSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "front_DS");
         configureDrivetrain();
         configureHorizontalSlide();
         configureHorizontalArm();
@@ -179,7 +184,7 @@ public class WorldRobot extends RobotCog {
         horizontalSlide.setPower(0);
         horizontalSlide.goToSetPosition(0);
 
-        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_distanceSensor");
+        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_DS");
     }
 
     // Turned to public variables

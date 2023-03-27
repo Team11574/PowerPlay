@@ -18,12 +18,13 @@ import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.TileMovement;
+import incognito.teamcode.robot.WorldRobot;
 
 @TeleOp(name = "Tile Test", group = "tele")
 public class TeleTile extends RobotOpMode {
     MultipleTelemetry multiTelemetry;
     GamepadPlus pad1;
-    Robot robot;
+    WorldRobot robot;
     Drivetrain drivetrain;
     TileMovement tileMovement;
     ArrayList<TileMovement.BuildState> buildStates = new ArrayList<>();
@@ -33,7 +34,7 @@ public class TeleTile extends RobotOpMode {
     public void init() {
         multiTelemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
         //camera = new AutoCamera(hardwareMap, multiTelemetry);
-        robot = new Robot(hardwareMap, telemetry, false);
+        robot = new WorldRobot(hardwareMap, telemetry, false);
         drivetrain = robot.drivetrain;
         drivetrain.setPoseEstimate(PoseStorage.lastPose);
         pad1 = new GamepadPlus(gamepad1);

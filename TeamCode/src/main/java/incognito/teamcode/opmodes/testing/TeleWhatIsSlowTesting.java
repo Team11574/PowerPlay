@@ -1,4 +1,4 @@
-package incognito.teamcode.opmodes.tele;
+package incognito.teamcode.opmodes.testing;
 
 import static incognito.teamcode.config.CameraConstants.JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
@@ -8,22 +8,28 @@ import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import incognito.cog.hardware.component.drive.PoseStorage;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.util.TelemetryBigError;
-import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.WorldRobot;
+import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
-@TeleOp(name = "Junction Test", group = "tele")
-public class TeleJunction extends RobotOpMode {
+@Disabled
+@TeleOp(name = "AGH WHAT IS SLOW Test", group = "tele")
+public class TeleWhatIsSlowTesting extends RobotOpMode {
     double junctionDistance;
     double junctionArea;
     MultipleTelemetry multiTelemetry;
     AutoCamera camera;
     GamepadPlus pad1;
+    GamepadPlus pad2;
 
     WorldRobot robot;
     double velX;
@@ -42,25 +48,27 @@ public class TeleJunction extends RobotOpMode {
 
     @Override
     public void init() {
-        multiTelemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
-        //camera = new AutoCamera(hardwareMap, multiTelemetry);
         robot = new WorldRobot(hardwareMap, telemetry, true);
+        drivetrain = robot.drivetrain;
+        drivetrain.setPoseEstimate(PoseStorage.lastPose);
         pad1 = new GamepadPlus(gamepad1);
-        TelemetryBigError.initialize(multiTelemetry);
+        pad2 = new GamepadPlus(gamepad2);
+        multiTelemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
         robot.autoCamera.swapDoingJunctions();
+        TelemetryBigError.initialize(multiTelemetry);
     }
 
     @Override
     public void init_loop() {
         multiTelemetry.addData("Junction distance", robot.autoCamera.getJunctionDistance());
         multiTelemetry.addData("Junction area", robot.autoCamera.getJunctionWidth());
-        multiTelemetry.addData("Segment index", robot.drivetrain.getCurrentSegmentIndex());
-        multiTelemetry.addData("Last segment index", robot.drivetrain.getLastSegmentIndex());
         multiTelemetry.update();
     }
 
     @Override
     public void loop() {
+
+        update();
 
         if (pad1.a_pressed) {
             // TOGGLE TARGET LOCKING
@@ -77,19 +85,55 @@ public class TeleJunction extends RobotOpMode {
         else
             adjustDrivetrain();
 
+        // TOGGLE B to toggle front claw
+        if (pad2.b_pressed) {
+            robot.verticalArm.toggleClaw();
+        }
 
-        double normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
-        double frontRight_Power = (velY - velX - theta) / normalFactor;
-        double backRight_Power = (velY + velX - theta) / normalFactor;
-        double frontLeft_Power = (velY + velX + theta) / normalFactor;
-        double backLeft_Power = (velY - velX + theta) / normalFactor;
+        if (pad2.dpad_down_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+        }
+        if (pad2.dpad_left_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.LOW);
+        }
+        if (pad2.dpad_up_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM);
+        }
+        if (pad2.dpad_right_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
+        }
 
-        robot.drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+        // HOLD right trigger to move down hinge
+        if (pad2.right_trigger_pressed) {
+            robot.verticalArm.hingeDown();
+        }
+        if (pad2.right_trigger_depressed) {
+            robot.verticalArm.hingeUp();
+        }
 
+        if (!drivetrain.isBusy()) {
+            double normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
+            double frontRight_Power = (velY - velX - theta) / normalFactor;
+            double backRight_Power = (velY + velX - theta) / normalFactor;
+            double frontLeft_Power = (velY + velX + theta) / normalFactor;
+            double backLeft_Power = (velY - velX + theta) / normalFactor;
+
+            robot.drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+        }
+
+        update();
+    }
+
+    public void update() {
+        TelemetryBigError.update();
+        //fullTelemetry();
         multiTelemetry.update();
-
         robot.update();
         pad1.update();
+        pad2.update();
+        if (drivetrain.isBusy()) {
+            drivetrain.update();
+        }
     }
 
     public void targetLock() {
@@ -193,5 +237,24 @@ public class TeleJunction extends RobotOpMode {
         }
 
         return newValue;
+    }
+
+    public void fullTelemetry() {
+        multiTelemetry.addData("Vertical slide motor encoder", robot.verticalArm.slide.getPosition());
+        multiTelemetry.addData("Vertical slide target position", robot.verticalArm.slide.getTargetPosition());
+        multiTelemetry.addData("Vertical slide motor power", robot.verticalArm.slide.getPower());
+        multiTelemetry.addData("Vertical slide limit switch:", robot.verticalArm.slide.getLimitState());
+        multiTelemetry.addLine();
+        multiTelemetry.addData("Vertical slide atTop", robot.verticalArm.slide.atTop);
+        multiTelemetry.addData("Vertical slide atBottom", robot.verticalArm.slide.atBottom);
+        multiTelemetry.addData("Vertical slide goingDown", robot.verticalArm.slide.goingDown());
+        multiTelemetry.addData("Vertical slide goingUp", robot.verticalArm.slide.goingUp());
+        multiTelemetry.addLine();
+        multiTelemetry.addData("Vertical lever pos", robot.verticalArm.lever.getPosition());
+        multiTelemetry.addData("Vertical hinge pos", robot.verticalArm.hinge.getPosition());
+        multiTelemetry.addData("Vertical arm pos", robot.verticalArm.getPosition());
+        multiTelemetry.addLine();
+        //multiTelemetry.addData("Pose", drivetrain.getPoseEstimate());
+        //multiTelemetry.addData("Distance (cm)", robot.horizontalDistanceSensor.getDistance(DistanceUnit.CM));
     }
 }
