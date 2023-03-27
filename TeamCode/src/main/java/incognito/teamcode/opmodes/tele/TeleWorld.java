@@ -19,8 +19,8 @@ import incognito.cog.hardware.component.drive.TileCalculation;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.cog.trajectory.TrajectorySequence;
+import incognito.cog.util.AsciiTrajectory;
 import incognito.cog.util.TelemetryBigError;
-import incognito.teamcode.robot.TileMovement;
 import incognito.teamcode.robot.TileMovementPretty;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.VerticalArm;
@@ -41,7 +41,7 @@ public class TeleWorld extends RobotOpMode {
     boolean yRetraction = false;
 
     int queueMoveDirection = -1;
-    TileMovement/*Pretty*/ tileMovement;
+    TileMovementPretty tileMovement;
     boolean trajectoryRunning = false;
 
     boolean targetLocking = false;
@@ -67,7 +67,7 @@ public class TeleWorld extends RobotOpMode {
         pad2 = new GamepadPlus(gamepad2);
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         scheduler = new Scheduler();
-        tileMovement = new TileMovement/*Pretty*/(robot.drivetrain);
+        tileMovement = new TileMovementPretty(robot.drivetrain, new AsciiTrajectory());
         TelemetryBigError.initialize(multiTelemetry);
     }
 
@@ -75,12 +75,6 @@ public class TeleWorld extends RobotOpMode {
     public void loop() {
         //super.loop();
         update();
-        //multiTelemetry.addData("Front distance (cm):", robot.frontDistanceSensor.getDistance(DistanceUnit.CM));
-        multiTelemetry.addData("raw ultrasonic", robot.frontDistanceSensor.rawUltrasonic());
-        multiTelemetry.addData("raw optical", robot.frontDistanceSensor.rawOptical());
-        multiTelemetry.addData("cm optical", "%.2f cm", robot.frontDistanceSensor.cmOptical());
-        multiTelemetry.addData("cm", "%.2f cm", robot.frontDistanceSensor.getDistance(DistanceUnit.CM));
-        multiTelemetry.update();
 
         // Adjust drivetrain
         if (!targetLocking) {
@@ -125,24 +119,27 @@ public class TeleWorld extends RobotOpMode {
             robot.verticalArm.hingeUp();
         }
 
-        update();
-        //fullTelemetry();
+        // update();
+        // multiTelemetry.addData("Front distance (cm):", "%.2f cm", robot.frontDistanceSensor.getDistance(DistanceUnit.CM));
+        multiTelemetry.addData("Front distance (cm): cm", robot.frontDistanceSensor.getDistance(DistanceUnit.CM));
+        multiTelemetry.update();
+        // fullTelemetry();
     }
 
-    TileMovement queueMovement(int move_direction) {
+    TileMovementPretty queueMovement(int move_direction) {
         if (move_direction % 2 == 0) {
             switch (move_direction / 2) {
-                case 0: return tileMovement.move(TileMovement.MoveDirection.RIGHT);
-                case 1: return tileMovement.move(TileMovement.MoveDirection.UP);
-                case 2: return tileMovement.move(TileMovement.MoveDirection.LEFT);
-                case 3: return tileMovement.move(TileMovement.MoveDirection.DOWN);
+                case 0: return tileMovement.move(TileMovementPretty.MoveDirection.RIGHT);
+                case 1: return tileMovement.move(TileMovementPretty.MoveDirection.UP);
+                case 2: return tileMovement.move(TileMovementPretty.MoveDirection.LEFT);
+                case 3: return tileMovement.move(TileMovementPretty.MoveDirection.DOWN);
             }
         } else {
             switch ((move_direction + 1) / 2) {
-                case 1: return tileMovement.moveToJunction(TileMovement.MoveDirection.J_UP_RIGHT);
-                case 2: return tileMovement.moveToJunction(TileMovement.MoveDirection.J_UP_LEFT);
-                case 3: return tileMovement.moveToJunction(TileMovement.MoveDirection.J_DOWN_LEFT);
-                case 4: return tileMovement.moveToJunction(TileMovement.MoveDirection.DOWN_RIGHT);
+                case 1: return tileMovement.moveToJunction(TileMovementPretty.MoveDirection.J_UP_RIGHT);
+                case 2: return tileMovement.moveToJunction(TileMovementPretty.MoveDirection.J_UP_LEFT);
+                case 3: return tileMovement.moveToJunction(TileMovementPretty.MoveDirection.J_DOWN_LEFT);
+                case 4: return tileMovement.moveToJunction(TileMovementPretty.MoveDirection.DOWN_RIGHT);
             }
         }
         // never happens but Java is mad if I don't have a default return
@@ -152,6 +149,7 @@ public class TeleWorld extends RobotOpMode {
     public void adjustDrivetrain() {
         if (pad1.right_trigger_pressed) {
             drivetrain.updatePoseEstimate();
+            tileMovement.resetTrajectoryOutput();
         }
         if (pad1.right_trigger_depressed) {
             // If we have just finished queueing some actions, execute them
@@ -177,7 +175,10 @@ public class TeleWorld extends RobotOpMode {
                 queueMovement(queueMoveDirection);
                 queueMoveDirection = move_direction;
             }
-            multiTelemetry.addData("Direction: ", move_direction);
+            multiTelemetry.addLine(tileMovement.getTrajectoryOutput());
+            multiTelemetry.addLine();
+            multiTelemetry.addLine(AsciiTrajectory.octantOutput(move_direction));
+            multiTelemetry.addLine();
         } else if (!drivetrain.isBusy()) {
             queueMoveDirection = -1;
             double inputVelY = -pad1.gamepad.left_stick_y;

@@ -205,14 +205,9 @@ public class TileMovementPretty {
         }
     }
 
-    public enum OutputState {
-        STARTED, SAME, ADJUSTED, FINISHED
-    }
-
     Drivetrain drivetrain;
     AsciiTrajectory trajectoryOutput;
     ArrayList<MoveDirection> directions = new ArrayList<>();
-    int lastOutputIndex = -1;
     Pose2d sequenceStartPose;
     static final double TILE_SIZE = 24; // in
     static final double EDGE_THRESHOLD = 8; // half of the robot width (roughly), in
@@ -231,32 +226,13 @@ public class TileMovementPretty {
         this.trajectoryOutput = trajectoryOutput;
     }
 
-    /**
-     * Output index is the number of items that have been outputted.
-     * @return int
-     */
-    public int getOutputIndex() {
-        return directions.size();
+    public void resetTrajectoryOutput() {
+        trajectoryOutput.resetTiles();
+        trajectoryOutput.setRobotPosition(getSequenceStartPose().getX(), getSequenceStartPose().getY());
     }
 
-    /**
-     * Last output index is the last index to be outputted.
-     * @return int
-     */
-    public int getLastOutputIndex() {
-        return lastOutputIndex;
-    }
-
-    public OutputState getOutputState() {
-        if (getOutputIndex() == -1) {
-            return OutputState.FINISHED;
-        } else if (getOutputIndex() == getLastOutputIndex()) {
-            return OutputState.SAME;
-        } else if (getOutputIndex() > getLastOutputIndex()) {
-            return OutputState.ADJUSTED;
-        } else {
-            return OutputState.STARTED;
-        }
+    public String getTrajectoryOutput() {
+        return trajectoryOutput.toString();
     }
 
     /**
@@ -264,7 +240,6 @@ public class TileMovementPretty {
      */
     public void reset() {
         directions.clear();
-        lastOutputIndex = -1;
         sequenceStartPose = null;
     }
 
@@ -333,6 +308,7 @@ public class TileMovementPretty {
             // then we want to remove the last movement.
             pop();
             pop();
+            trajectoryOutput.undo(getLastDirection());
         } else if (direction == getLastDirection()
                 || getLastDirection() == null
                 || getLastDirection() == MoveDirection.CENTER) {
@@ -340,10 +316,12 @@ public class TileMovementPretty {
             // if we just started moving, then we want to add movement like normal.
             push(direction);
             push(direction);
+            trajectoryOutput.move(direction);
         } else {
             pop();
             push(getLastDirection().and(direction));
             push(direction);
+            trajectoryOutput.move(direction);
         }
         return this;
     }
@@ -359,6 +337,7 @@ public class TileMovementPretty {
             moveCenter();
         }
         push(direction);
+        trajectoryOutput.moveToJunction(direction);
         return this;
     }
 
@@ -416,24 +395,6 @@ public class TileMovementPretty {
         );
     }
 
-    public void updateTrajectoryOutput() {
-        trajectoryOutput.setRobotPosition(getSequenceStartPose().getX(), getSequenceStartPose().getY());
-        for (MoveDirection direction : directions) {
-            if (direction.isCenter()) {
-                continue;
-            } else if (!direction.isJunctionMove())
-                trajectoryOutput.move(direction);
-            else {
-                switch (direction) {
-                    case J_DOWN_LEFT: trajectoryOutput.junctionDownLeft(); break;
-                    case J_DOWN_RIGHT: trajectoryOutput.junctionDownRight(); break;
-                    case J_UP_LEFT: trajectoryOutput.junctionUpLeft(); break;
-                    case J_UP_RIGHT: trajectoryOutput.junctionUpRight(); break;
-                }
-            }
-        }
-    }
-
     public TrajectorySequence build() {
         if (directions.size() == 0) {
             return null;
@@ -475,7 +436,6 @@ public class TileMovementPretty {
             }
             lastPos = lastPos.plus(direction.getVector());
         }
-        lastOutputIndex = getOutputIndex();
         return sequenceBuilder.build();
     }
 }
