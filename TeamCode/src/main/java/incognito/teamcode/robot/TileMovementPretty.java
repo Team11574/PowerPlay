@@ -417,7 +417,7 @@ public class TileMovementPretty {
     }
 
     public void updateTrajectoryOutput() {
-        trajectoryOutput.setPosition(getSequenceStartPose().getX(), getSequenceStartPose().getY());
+        trajectoryOutput.setRobotPosition(getSequenceStartPose().getX(), getSequenceStartPose().getY());
         for (MoveDirection direction : directions) {
             if (direction.isCenter()) {
                 continue;
