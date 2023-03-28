@@ -1,6 +1,9 @@
 package incognito.teamcode.robot.component.camera.cv;
 
+import static incognito.teamcode.config.CameraConstants.BLUE_WIDTH_THRESHOLD;
+import static incognito.teamcode.config.CameraConstants.RED_WIDTH_THRESHOLD;
 import static incognito.teamcode.config.CameraConstants.VIEWPORT_WIDTH;
+import static incognito.teamcode.config.CameraConstants.YELLOW_WIDTH_THRESHOLD;
 import static incognito.teamcode.config.CameraConstants.aprilWeight;
 import static incognito.teamcode.config.CameraConstants.blueLower;
 import static incognito.teamcode.config.CameraConstants.blueThreshold;
@@ -65,7 +68,7 @@ public class Pipeline extends OpenCvPipeline {
 
     List<Scalar> colorRange;
 
-    int i, j, k, n;
+    int i, j, k, n, m;
     int maxIndex;
 
     double area;
@@ -87,19 +90,32 @@ public class Pipeline extends OpenCvPipeline {
     ArrayList<Mat> junctionChannels;
     MatOfPoint maxJunctionContour;
     MatOfPoint junctionWidestContour;
+    MatOfPoint junctionContourInternal;
     ArrayList<MatOfPoint> junctionWidestContours = new ArrayList<>();
+    ArrayList<MatOfPoint> junctionContoursNonNull = new ArrayList<>();
     double currentWidth;
     Moments moments;
     double currentMaxWidth = 0;
     int currentMaxWidthIndex;
     Mat output;
     Scalar whiteScalar;
+    Scalar blackScalar;
     public double junctionHorizontalDistance = Double.POSITIVE_INFINITY;
     public double junctionWidth = 0;
     public double junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
     public boolean doingJunctions = false;
     double x;
     double y;
+    double redX = -1;
+    double redY = -1;
+    double blueX = -1;
+    double blueY = -1;
+    MatOfPoint yellowContour;
+    double yellowWidth;
+    MatOfPoint redContour;
+    double redWidth;
+    MatOfPoint blueContour;
+    double blueWidth;
     DecimalFormat df = new DecimalFormat("0.00");
 
     long aprilDetector;
@@ -126,6 +142,7 @@ public class Pipeline extends OpenCvPipeline {
         junctionV = new Mat();
         output = new Mat();
         whiteScalar = new Scalar(0, 0, 255);
+        blackScalar = new Scalar(0, 0, 0);
 
 
         // Define list of color thresholds
@@ -157,15 +174,16 @@ public class Pipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        output.release();
-        Imgproc.cvtColor(input, output, Imgproc.COLOR_RGB2HSV);
+        //output.release();
+        // Imgproc.cvtColor(input, output, Imgproc.COLOR_RGB2HSV);
         if (doingJunctions) {
-            updateJunctionDistanceYellow(input, output);
-            updateJunctionDistanceRed(input, output);
-            updateJunctionDistanceBlue(input, output);
-            input.release();
-            Imgproc.cvtColor(output, output, Imgproc.COLOR_HSV2RGB);
-            return output;
+            //updateJunctionDistanceYellow(input, output);
+            //updateJunctionDistanceRed(input, output);
+            //updateJunctionDistanceBlue(input, output);
+            updateJunctionDistanceWithCones(input);
+            //input.release();
+            //Imgproc.cvtColor(output, output, Imgproc.COLOR_HSV2RGB);
+            return input;
         } else {
             return processParking(input);
         }
@@ -320,174 +338,6 @@ public class Pipeline extends OpenCvPipeline {
         stopped = false;
     }
 
-    public void updateJunctionDistanceYellow(Mat input, Mat output) {
-        // Use moments to find the center of yellow blobs
-
-        imageROI = input.clone();
-        // TODO: Adjust ROI w/ imageROI.adjustROI()
-        /*imageROI = imageROI.adjustROI(
-                -150, 0, 0, 0
-        );*/
-        // Use moments to find the center of yellow blobs
-
-        Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
-
-        Core.inRange(imageROI, yellowLower, yellowUpper, junctionMask);
-
-        Core.split(imageROI, junctionChannels);
-
-        Core.bitwise_and(junctionChannels.get(2), junctionMask, junctionV);
-
-        Imgproc.findContours(junctionV, junctionContours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        imageROI.release();
-        junctionMask.release();
-        junctionV.release();
-        junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
-
-        Imgproc.drawContours(output, junctionContours, -1, yellowUpper, 2);
-
-        currentMaxWidth = 0;
-
-        for (k = 0; k < junctionContours.size(); k++) {
-            currentJunctionContour = junctionContours.get(k);
-            // Create adjusted contour area to only take into account the width of the bounding rectangle
-            currentWidth = Imgproc.contourArea(currentJunctionContour) / Imgproc.boundingRect(currentJunctionContour).height;
-            if (currentWidth > currentMaxWidth) {
-                moments = Imgproc.moments(currentJunctionContour, true);
-                x = moments.get_m10() / moments.get_m00();
-                y = moments.get_m01() / moments.get_m00();
-                currentMaxWidth = currentWidth;
-                //telemetry.addData("Yellow max width", yellowMaxWidth);
-                // why is this 170?
-                junctionHorizontalDistanceInternal = 170 - x;
-            }
-            currentJunctionContour.release();
-        }
-        Imgproc.putText(output, df.format(currentMaxWidth), new Point(x-20, y), 5, 1, whiteScalar);
-        Imgproc.drawMarker(output, new Point(x, y), new Scalar(0, 0, 0));
-
-        junctionWidth = currentMaxWidth;
-
-        junctionContours.clear();
-        junctionHorizontalDistance = junctionHorizontalDistanceInternal;
-    }
-
-
-
-
-    public void updateJunctionDistanceRed(Mat input, Mat output) {
-        // Use moments to find the center of yellow blobs
-
-        imageROI = input.clone();
-        // TODO: Adjust ROI w/ imageROI.adjustROI()
-        /*imageROI = imageROI.adjustROI(
-                -150, 0, 0, 0
-        );*/
-        // Use moments to find the center of yellow blobs
-
-        Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
-
-        Core.inRange(imageROI, redLower, redUpper, junctionMask);
-
-        Core.split(imageROI, junctionChannels);
-
-        Core.bitwise_and(junctionChannels.get(2), junctionMask, junctionV);
-
-        Imgproc.findContours(junctionV, junctionContours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        imageROI.release();
-        junctionMask.release();
-        junctionV.release();
-        junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
-
-        Imgproc.drawContours(output, junctionContours, -1, redUpper, 2);
-
-        currentMaxWidth = 0;
-
-        for (k = 0; k < junctionContours.size(); k++) {
-            currentJunctionContour = junctionContours.get(k);
-            // Create adjusted contour area to only take into account the width of the bounding rectangle
-            currentWidth = Imgproc.contourArea(currentJunctionContour) / Imgproc.boundingRect(currentJunctionContour).height;
-            if (currentWidth > currentMaxWidth) {
-                moments = Imgproc.moments(currentJunctionContour, true);
-                x = moments.get_m10() / moments.get_m00();
-                y = moments.get_m01() / moments.get_m00();
-                currentMaxWidth = currentWidth;
-                //telemetry.addData("Yellow max width", yellowMaxWidth);
-                // why is this 170?
-                junctionHorizontalDistanceInternal = 170 - x;
-            }
-            currentJunctionContour.release();
-        }
-        Imgproc.putText(output, df.format(currentMaxWidth), new Point(x-20, y), 5, 1, whiteScalar);
-        Imgproc.drawMarker(output, new Point(x, y), new Scalar(0, 0, 0));
-
-        junctionWidth = currentMaxWidth;
-
-        junctionContours.clear();
-        junctionHorizontalDistance = junctionHorizontalDistanceInternal;
-    }
-
-    public void updateJunctionDistanceBlue(Mat input, Mat output) {
-        // Use moments to find the center of yellow blobs
-
-        imageROI = input.clone();
-        // TODO: Adjust ROI w/ imageROI.adjustROI()
-        /*imageROI = imageROI.adjustROI(
-                -150, 0, 0, 0
-        );*/
-        // Use moments to find the center of yellow blobs
-
-        Imgproc.cvtColor(imageROI, imageROI, Imgproc.COLOR_RGB2HSV);
-
-        Core.inRange(imageROI, blueLower, blueUpper, junctionMask);
-
-        Core.split(imageROI, junctionChannels);
-
-        Core.bitwise_and(junctionChannels.get(2), junctionMask, junctionV);
-
-        Imgproc.findContours(junctionV, junctionContours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        imageROI.release();
-        junctionMask.release();
-        junctionV.release();
-        junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
-
-        Imgproc.drawContours(output, junctionContours, -1, blueUpper, 2);
-
-        currentMaxWidth = 0;
-
-        for (k = 0; k < junctionContours.size(); k++) {
-            currentJunctionContour = junctionContours.get(k);
-            // Create adjusted contour area to only take into account the width of the bounding rectangle
-            currentWidth = Imgproc.contourArea(currentJunctionContour) / Imgproc.boundingRect(currentJunctionContour).height;
-            if (currentWidth > currentMaxWidth) {
-                moments = Imgproc.moments(currentJunctionContour, true);
-                x = moments.get_m10() / moments.get_m00();
-                y = moments.get_m01() / moments.get_m00();
-                currentMaxWidth = currentWidth;
-                //telemetry.addData("Yellow max width", yellowMaxWidth);
-                // why is this 170?
-                junctionHorizontalDistanceInternal = 170 - x;
-            }
-            currentJunctionContour.release();
-        }
-        Imgproc.putText(output, df.format(currentMaxWidth), new Point(x-20, y), 5, 1, whiteScalar);
-        Imgproc.drawMarker(output, new Point(x, y), new Scalar(0, 0, 0));
-
-        junctionWidth = currentMaxWidth;
-
-        junctionContours.clear();
-        junctionHorizontalDistance = junctionHorizontalDistanceInternal;
-    }
-
-
-
-
-
-
-
     public MatOfPoint getWidestContour(Mat input, Scalar lower, Scalar upper) {
         // Use moments to find the center of yellow blobs
         Core.inRange(input, lower, upper, junctionMask);
@@ -506,47 +356,116 @@ public class Pipeline extends OpenCvPipeline {
         currentMaxWidth = 0;
         currentMaxWidthIndex = -1;
 
-        telemetry.addData("CONTOURS2", junctionContours);
-
         for (k = 0; k < junctionContours.size(); k++) {
             currentJunctionContour = junctionContours.get(k);
             // Create adjusted contour area to only take into account the width of the bounding rectangle
             currentWidth = Imgproc.contourArea(currentJunctionContour) / Imgproc.boundingRect(currentJunctionContour).height;
             if (currentWidth > currentMaxWidth) {
-                if (maxJunctionContour != null)
-                    maxJunctionContour.release();
-                maxJunctionContour = junctionContours.get(k);
                 currentMaxWidthIndex = k;
+                currentMaxWidth = currentWidth;
             }
         }
+        if (currentMaxWidthIndex == -1) return null;
         for (k = 0; k < junctionContours.size(); k++) {
-            if (k != currentMaxWidthIndex && currentMaxWidthIndex != -1) {
+            if (k != currentMaxWidthIndex) {
                 junctionContours.get(k).release();
             }
         }
-        telemetry.addData("MAX", maxJunctionContour);
-        return maxJunctionContour;
+        return junctionContours.get(currentMaxWidthIndex);
     }
 
     public void updateJunctionDistanceWithCones(Mat input) {
         // Make input into HSV
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+        x = -1;
+        y = -1;
+        redX = -1;
+        redY = -1;
+        blueX = -1;
+        blueY = -1;
 
-
-        junctionWidestContours.add(getWidestContour(input, yellowLower, yellowUpper));
-        junctionWidestContours.add(getWidestContour(input, redLower, redUpper));
-        junctionWidestContours.add(getWidestContour(input, blueLower, blueUpper));
-
-
-        Imgproc.drawContours(input, junctionWidestContours, -1, yellowUpper, 2);
-
-
-        telemetry.addData("Length", junctionWidestContours.size());
-        //telemetry.addData("Area", Imgproc.contourArea(junctionWidestContours.get(2)));
-        telemetry.addData("CONTOURS", junctionWidestContours);
-        telemetry.addData("CONTOUR2", junctionWidestContours.get(2));
-        telemetry.update();
         junctionWidestContours.clear();
+        junctionContoursNonNull.clear();
+
+
+        for (n = 0; n < 3; n++) {
+            maxJunctionContour = getWidestContour(input, junctionRanges.get(n).get(0), junctionRanges.get(n).get(1));
+            junctionWidestContours.add(maxJunctionContour);
+            if (maxJunctionContour != null) {
+                junctionContoursNonNull.add(maxJunctionContour);
+                Imgproc.drawContours(input, junctionContoursNonNull, 0, junctionRanges.get(n).get(1), 2);
+                junctionContoursNonNull.clear();
+            }
+        }
+
+        yellowContour = junctionWidestContours.get(0);
+        if (yellowContour != null && !yellowContour.empty()) {
+            // We have a yellow contour, see if its width is within a usable threshold
+            yellowWidth = Imgproc.contourArea(yellowContour) / Imgproc.boundingRect(yellowContour).height;
+            if (yellowWidth > YELLOW_WIDTH_THRESHOLD) {
+                moments = Imgproc.moments(yellowContour, true);
+                x = moments.get_m10() / moments.get_m00();
+                y = moments.get_m01() / moments.get_m00();
+                telemetry.addData("Yellow width used", yellowWidth);
+            }
+        }
+        // If no yellow was found
+        if (x == -1) {
+            telemetry.addData("No yellow found in threshold! Finding widest", "Blue and Red");
+            redContour = junctionWidestContours.get(1);
+            if (redContour != null) {
+                redWidth = Imgproc.contourArea(redContour) / Imgproc.boundingRect(redContour).height;
+                if (redWidth > RED_WIDTH_THRESHOLD) {
+                    moments = Imgproc.moments(redContour, true);
+                    redX = moments.get_m10() / moments.get_m00();
+                    redY = moments.get_m01() / moments.get_m00();
+                    telemetry.addData("Red width", redWidth);
+                    telemetry.addData("Red x", redX);
+                } else {
+                    yellowWidth = -1;
+                }
+            }
+            blueContour = junctionWidestContours.get(2);
+            if (blueContour != null) {
+                blueWidth = Imgproc.contourArea(blueContour) / Imgproc.boundingRect(blueContour).height;
+                if (blueWidth > BLUE_WIDTH_THRESHOLD) {
+                    moments = Imgproc.moments(blueContour, true);
+                    blueX = moments.get_m10() / moments.get_m00();
+                    blueY = moments.get_m01() / moments.get_m00();
+                    telemetry.addData("Blue width", blueWidth);
+                    telemetry.addData("Blue x", blueX);
+                } else {
+                    blueWidth = -1;
+                }
+            }
+            if (redWidth > blueWidth) {
+                telemetry.addData("Color used", "RED");
+                x = redX;
+                y = redY;
+            } else if (blueWidth > redWidth) {
+                telemetry.addData("Color used", "BLUE");
+                x = blueX;
+                y = blueY;
+            } else {
+                telemetry.addData("Color used", "NONE");
+            }
+        }
+
+        for (m = 0; m < junctionWidestContours.size(); m++) {
+            if (junctionWidestContours.get(m) != null)
+                junctionWidestContours.get(m).release();
+        }
+        junctionWidestContours.clear();
+
+        if (x < 0) {
+            junctionHorizontalDistance = Double.POSITIVE_INFINITY;
+        } else {
+            junctionHorizontalDistance = VIEWPORT_WIDTH/2 - x;
+            Imgproc.putText(input, df.format(junctionHorizontalDistance), new Point(x-20, y), 5, 1, whiteScalar);
+            Imgproc.drawMarker(input, new Point(x, y), blackScalar);
+        }
+        telemetry.addData("Horizontal distance:", junctionHorizontalDistance);
+        telemetry.update();
 
         Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
     }

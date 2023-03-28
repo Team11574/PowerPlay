@@ -27,16 +27,20 @@ public class CameraConstants {
     public static final List<Scalar> purpleThreshold = Arrays.asList(purpleLow, purpleHigh);
 
     public static Scalar yellowLower = new Scalar(16, 52, 113);
-    public static Scalar yellowUpper = new Scalar(41, 255, 255);
+    public static Scalar yellowUpper = new Scalar(31, 255, 255);
     public static final List<Scalar> yellowThreshold = Arrays.asList(yellowLower, yellowUpper);
 
-    public static Scalar redLower = new Scalar(90, 50, 50);
-    public static Scalar redUpper = new Scalar(180, 255, 255);
+    public static Scalar redLower = new Scalar(140, 31, 62);
+    public static Scalar redUpper = new Scalar(183, 255, 255);
     public static final List<Scalar> redThreshold = Arrays.asList(redLower, redUpper);
 
-    public static Scalar blueLower = new Scalar(0, 50, 50);
-    public static Scalar blueUpper = new Scalar(90, 255, 255);
+    public static Scalar blueLower = new Scalar(105, 101, 79);
+    public static Scalar blueUpper = new Scalar(123, 255, 255);
     public static final List<Scalar> blueThreshold = Arrays.asList(blueLower, blueUpper);
+
+    public static double YELLOW_WIDTH_THRESHOLD = 20;
+    public static double RED_WIDTH_THRESHOLD = 80;
+    public static double BLUE_WIDTH_THRESHOLD = 80;
 
     // Junction movement
 
