@@ -9,6 +9,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import incognito.cog.hardware.component.camera.CameraSuper;
+import incognito.teamcode.config.CameraConstants;
 import incognito.teamcode.robot.component.camera.cv.Pipeline;
 
 public class AutoCamera extends CameraSuper {
@@ -34,7 +35,7 @@ public class AutoCamera extends CameraSuper {
             @Override
             public void onOpened() {
                 //cvCamera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-                cvCamera.startStreaming(432, 240, OpenCvCameraRotation.UPRIGHT);
+                cvCamera.startStreaming(CameraConstants.VIEWPORT_WIDTH, CameraConstants.VIEWPORT_HEIGHT, OpenCvCameraRotation.UPRIGHT);
                 startCamera();
             }
 

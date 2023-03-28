@@ -9,6 +9,10 @@ import java.util.List;
 
 @Config
 public class CameraConstants {
+
+    public static int VIEWPORT_WIDTH = 432;
+    public static int VIEWPORT_HEIGHT = 240;
+
     // === Color Thresholds ===
     public static Scalar greenLow = new Scalar(43, 14, 99);
     public static Scalar greenHigh = new Scalar(94, 197, 204);
@@ -24,8 +28,18 @@ public class CameraConstants {
 
     public static Scalar yellowLower = new Scalar(16, 52, 113);
     public static Scalar yellowUpper = new Scalar(41, 255, 255);
+    public static final List<Scalar> yellowThreshold = Arrays.asList(yellowLower, yellowUpper);
+
+    public static Scalar redLower = new Scalar(90, 50, 50);
+    public static Scalar redUpper = new Scalar(180, 255, 255);
+    public static final List<Scalar> redThreshold = Arrays.asList(redLower, redUpper);
+
+    public static Scalar blueLower = new Scalar(0, 50, 50);
+    public static Scalar blueUpper = new Scalar(90, 255, 255);
+    public static final List<Scalar> blueThreshold = Arrays.asList(blueLower, blueUpper);
 
     // Junction movement
+
     public static double JUNCTION_MAX_WIDTH = 35;
     public static double JUNCTION_MIN_WIDTH = 10;
     public static double JUNCTION_Y_POWER_FACTOR = 8;
