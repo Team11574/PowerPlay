@@ -5,13 +5,16 @@ import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_DISTANCE_PID;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
+import incognito.cog.util.PIDController;
 import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.WorldRobot;
@@ -39,6 +42,8 @@ public class TeleJunction extends RobotOpMode {
     double backLeft_Power;
 
     boolean targetLocking = true;
+
+    PIDController junctionDistancePID = new PIDController(JUNCTION_DISTANCE_PID);
 
     @Override
     public void init() {
@@ -93,9 +98,12 @@ public class TeleJunction extends RobotOpMode {
     }
 
     public void targetLock() {
-
         junctionWidth = robot.autoCamera.getJunctionWidth();
         junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
+
+        junctionDistancePID.setDesiredValue(0);
+        double rotationPower = junctionDistancePID.update(junctionHorizontalDistance);
+
         // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when
         //  far away from the junction but slowly when close.
         if (junctionWidth == 0) {
@@ -126,7 +134,7 @@ public class TeleJunction extends RobotOpMode {
         if (Math.abs(junctionHorizontalDistance) < JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD) {
             theta = 0;
         } else {
-            theta = junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
+            theta = rotationPower; // junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
         }
 
         multiTelemetry.addData("Junction distance", junctionHorizontalDistance);
