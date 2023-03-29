@@ -88,7 +88,8 @@ public class WorldSlideConstants {
     public static double HS_CLAW_OPEN = 0.5;
     public static double HS_CLAW_CLOSED = 0.78;
 
-    public static double HS_HINGE_START = 0.56;
+    public static double HS_HINGE_START = 0;
+    public static double HS_HINGE_END = 1;
     public static double HS_HINGE_SPEED = 0.01;
 
     public static double HS_LEVER_START = 0.7;
@@ -100,16 +101,9 @@ public class WorldSlideConstants {
     public static double HS_LEVER_END = 0.13;
 
     public static double HS_LEVER_SPEED = 0.05;
-    // Extra Hinge Levelling Variables
-    public static final double HS_LEVER_FLAT = 0.267;
-    public static final double HS_LEVER_NEG_PI_6 = 0.1;
-    public static final double HS_HINGE_FLAT = 0.635;
-    public static final double HS_HINGE_NEG_PI_6 = 0.505;
-    public static double HS_LEVER_TICKS_PER_RAD = (HS_LEVER_FLAT - HS_LEVER_NEG_PI_6) / (Math.PI / 6);
-    public static double HS_HINGE_TICKS_PER_RAD = (HS_HINGE_FLAT - HS_HINGE_NEG_PI_6) / (Math.PI / 6);
 
     /* == Horizontal Slide Cone Distance == */
-    public static double HS_DS_CONE_DISTANCE_CM = 2;
+    public static double HS_DS_CONE_DISTANCE_CM = 4;
 
 
     /* == Slides General == */

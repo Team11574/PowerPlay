@@ -15,7 +15,6 @@ import incognito.teamcode.robot.component.servoImplementations.Claw;
 import incognito.teamcode.robot.component.servoImplementations.Hinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.HorizontalSlide;
-import incognito.teamcode.robot.component.slide.VerticalSlide;
 
 public class HorizontalArm extends Arm {
 
@@ -90,6 +89,21 @@ public class HorizontalArm extends Arm {
 
     }
 
+    public void storeLeverHeight(Lever.HorizontalLeverPosition position) {
+        leverOutPositionStorage = position;
+        if (getPosition() == OUT) {
+            lever.goToSetPosition(leverOutPositionStorage);
+        }
+    }
+
+    public void incrementLeverHeight() {
+        storeLeverHeight(leverOutPositionStorage.increment());
+    }
+
+    public void decrementLeverHeight() {
+        storeLeverHeight(leverOutPositionStorage.decrement());
+    }
+
     public boolean atPosition() {
         return slide.atSetPosition()
                 && lever.atSetPosition(HS_LEVER_WAIT_TIME)
@@ -97,12 +111,12 @@ public class HorizontalArm extends Arm {
                 && claw.atSetPosition(HS_CLAW_WAIT_TIME);
     }
 
-    public Position getCurrentPosition() {
+    public Position getPosition() {
         return currentPosition;
     }
 
     public void update() {
-        if (getCurrentPosition() == OUT) {
+        if (getPosition() == OUT) {
             if (distanceSensor.getDistance(DistanceUnit.CM) < HS_DS_CONE_DISTANCE_CM) {
                 slide.setTargetPosition(slide.getPosition());
             }

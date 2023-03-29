@@ -26,8 +26,8 @@ public class MeepMeepTesting {
         
         double deltaX = 0.5;
 
-        //Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
-        Pose2d startPos = new Pose2d(invertX(36), -62.5, Math.toRadians(90));
+        Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
+        //Pose2d startPos = new Pose2d(invertX(36), -62.5, Math.toRadians(90));
         //Pose2d startPos = new Pose2d(36, -60, Math.toRadians(330));
         //Pose2d startPos = new Pose2d(12, 12, Math.toRadians(270));
 
@@ -60,7 +60,7 @@ public class MeepMeepTesting {
 
                     return drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
                             .splineToSplineHeading(
-                                    new Pose2d(invertX(33.5), -3.5, invertHeading(Math.toRadians(170.8))),
+                                    new Pose2d(33.5, -3.5, Math.toRadians(170.8)),
                                     directionalHeading
                             )
                             // Cones 1-6
