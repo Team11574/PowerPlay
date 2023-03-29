@@ -70,6 +70,10 @@ public class AutoCamera extends CameraSuper {
         return pipeline.junctionHorizontalDistance;
     }
 
+    public boolean coneOnJunction() {
+        return pipeline.coneOnJunction();
+    }
+
     // In pixels
     public double getJunctionWidth() {
         return pipeline.junctionWidth;

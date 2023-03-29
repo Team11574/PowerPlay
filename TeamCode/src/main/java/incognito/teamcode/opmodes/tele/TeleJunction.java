@@ -5,6 +5,11 @@ import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_CONE_OFFSET;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_HIGH;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_LOW;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_MAX;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_MEDIUM;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_DISTANCE_PID;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -12,11 +17,15 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
+import incognito.cog.util.Generic;
 import incognito.cog.util.PIDController;
 import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
+import incognito.teamcode.robot.TileMovementPretty;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
@@ -97,13 +106,51 @@ public class TeleJunction extends RobotOpMode {
         pad1.update();
     }
 
+    public double getFrontDistance() {
+        // In CM
+        return robot.frontDistanceSensor.getDistance(DistanceUnit.CM);
+    }
+
+    public double getPreferredJunctionDistance() {
+        double distance = Double.POSITIVE_INFINITY;
+
+        switch (TileMovementPretty.Junction.getJunctionTowards(robot.drivetrain.getPoseEstimate())) {
+            case LOW: distance = FRONT_DS_LOW; break;
+            case MEDIUM: distance = FRONT_DS_MEDIUM; break;
+            case HIGH: distance = FRONT_DS_HIGH; break;
+        }
+
+        if (robot.autoCamera.coneOnJunction()) {
+            distance += FRONT_DS_CONE_OFFSET;
+        }
+        return distance;
+    }
+
     public void targetLock() {
-        junctionWidth = robot.autoCamera.getJunctionWidth();
         junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
 
         junctionDistancePID.setDesiredValue(0);
         double rotationPower = junctionDistancePID.update(junctionHorizontalDistance);
+        if (Math.abs(junctionHorizontalDistance) < JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD) {
+            theta = 0;
+        } else {
+            theta = rotationPower; // junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
+        }
+        velX = pad1.gamepad.left_stick_x;
+        velY = -pad1.gamepad.left_stick_y;
+        // Only move forward once we are locked on horizontally to the junction
+        if (theta == 0) {
+            double junctionMinDistance = getPreferredJunctionDistance();
+            if (getFrontDistance() < getPreferredJunctionDistance() || getFrontDistance() > FRONT_DS_MAX) {
+                velY += 0;
+            } else {
+                // Add an amount of power proportional to the distance from the junction
+                //  to the robot
+                velY += (getFrontDistance() - junctionMinDistance) / (FRONT_DS_MAX - junctionMinDistance);
+            }
+        }
 
+        /*
         // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when
         //  far away from the junction but slowly when close.
         if (junctionWidth == 0) {
@@ -114,6 +161,7 @@ public class TeleJunction extends RobotOpMode {
         } else {
             junctionYPower = 1 / junctionWidth * JUNCTION_Y_POWER_FACTOR;
         }
+
 
         // TODO: Test, and consider removing. My thinking is that having the ability
         //  to move the robot in and out along the the autolock for precise movements
@@ -130,12 +178,7 @@ public class TeleJunction extends RobotOpMode {
         } else {
             velY += Math.max(0, junctionYPower);
         }
-        velX = pad1.get_partitioned_left_stick_x();
-        if (Math.abs(junctionHorizontalDistance) < JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD) {
-            theta = 0;
-        } else {
-            theta = rotationPower; // junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
-        }
+        */
 
         multiTelemetry.addData("Junction distance", junctionHorizontalDistance);
         multiTelemetry.addData("Junction width", junctionWidth);

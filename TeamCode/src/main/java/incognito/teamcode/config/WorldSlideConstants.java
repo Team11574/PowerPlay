@@ -103,12 +103,6 @@ public class WorldSlideConstants {
     /* == Horizontal Slide Cone Distance == */
     public static double HS_DS_CONE_DISTANCE_CM = 2;
 
-    /* == Front Distance Sensor Junction Distances == */
-    public static double FRONT_DS_THRESHOLD = 80;
-    public static double FRONT_DS_LOW = 26; // with cone, 30 without...
-    public static double FRONT_DS_MEDIUM = 32; // with cone, 37 without...
-    public static double FRONT_DS_HIGH = 29; // with cone, 34 without...
-
 
     /* == Slides General == */
     public static double S_SET_POSITION_THRESHOLD = 20;
