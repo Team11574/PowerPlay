@@ -15,16 +15,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import incognito.cog.actions.Scheduler;
 import incognito.cog.hardware.component.drive.Drivetrain;
 import incognito.cog.hardware.component.drive.PoseStorage;
-import incognito.cog.hardware.component.drive.TileCalculation;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
-import incognito.cog.trajectory.TrajectorySequence;
 import incognito.cog.util.AsciiTrajectory;
 import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.TileMovementPretty;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.VerticalArm;
-import incognito.teamcode.robot.component.slide.VerticalSlide;
 
 @TeleOp(name = "Tele WORLD", group = "tele")
 public class TeleWorld extends RobotOpMode {
@@ -317,7 +314,7 @@ public class TeleWorld extends RobotOpMode {
         multiTelemetry.addData("Vertical slide motor encoder", robot.verticalArm.slide.getPosition());
         multiTelemetry.addData("Vertical slide target position", robot.verticalArm.slide.getTargetPosition());
         multiTelemetry.addData("Vertical slide motor power", robot.verticalArm.slide.getPower());
-        multiTelemetry.addData("Vertical slide limit switch:", robot.verticalArm.slide.getLimitState());
+        multiTelemetry.addData("Vertical slide limit switch:", robot.verticalArm.slide.getDangerState());
         multiTelemetry.addLine();
         multiTelemetry.addData("Vertical slide atTop", robot.verticalArm.slide.atTop);
         multiTelemetry.addData("Vertical slide atBottom", robot.verticalArm.slide.atBottom);

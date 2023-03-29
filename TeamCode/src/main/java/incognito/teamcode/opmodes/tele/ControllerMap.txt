@@ -1,10 +1,10 @@
                                 _=====_      SECONDARY CONTROLLER:      _=====_
-                   LT = NONE   / _____ \                               / _____ \    RT = NONE
+                   LT = NONE   / _____ \                               / _____ \    RT = Front Hinge
                   LB = NONE   +.-'_____'-.---------------------------.-'_____'-.+   RB = NONE
                              /   |     |  '.                       .'  |     |   \
                             / ___| /|\ |___ \                     / ___| (Y) |___ \
     ↑ = Vert Slide MED     / |      |      | ;  __           __  ; |             | ;   Y = NONE
-    ← = Vert Slide LOW     | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = Extend/Retract
+    ← = Vert Slide LOW     | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = Extend/Retract Back
     → = Vert Slide HIGH    | |___   |   ___| ;                   ; |___       ___| ;   A = Back Claw
     ↓ = Vert Slide GROUND  |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = Front Claw
                            | \   |_____|  .','" "', |___|  ,'" "', '.  |_____|  .' |
@@ -25,7 +25,7 @@
 
 
                                _=====_        PRIMARY CONTROLLER:      _=====_
-                LT = NONE     / _____ \                               / _____ \    RT = Tile lock
+                LT = NONE     / _____ \                               / _____ \    RT = Tile lock (^)
                 LB = NONE    +.-'_____'-.---------------------------.-'_____'-.+   RB = NONE
                             /   |     |  '.                       .'  |     |   \
                            / ___| /|\ |___ \                     / ___| (Y) |___ \
@@ -38,8 +38,10 @@
                           |               | (   ) |------| (   ) |                |
                           |              /\  @~@  /      \  @"@  /\               |
                           |             /  '.___.'        '.___.'  \              |
-                          |            / ⊙ = Center        ⊙ = NONE \             |
-                           \          /  ↕ = Forward/Back  ↕ = NONE  \           /
+                          |            / ⊙ = ^Center       ⊙ = NONE \             |
+                           \          / ↕ = Translate/^Tile ↕ = NONE \           /
                             \________/  ←→ = Strafe       ←→ = Rotate \_________/
 
+    ^ = Commands that are only available during Tile Lock, aka when RT is held down
+    ^Center = Manually center the robot on the tile. ONLY USE THIS if you do not plan on adding tile trajectories.
     Needed controls:

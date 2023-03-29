@@ -1,5 +1,14 @@
 package incognito.teamcode.robot;
 
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_CLOSED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_OPEN;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_END;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FIFTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FOURTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_SECOND;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_START;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_THIRD;
 import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
 import static incognito.teamcode.config.WorldSlideConstants.HS_MIN_ENCODER;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_CLOSED;
@@ -82,10 +91,6 @@ public class WorldRobot extends RobotCog {
     public Scheduler horizontalScheduler;
     public Scheduler verticalScheduler;
 
-    public boolean isRetracting = false;
-    public boolean isExtending = false;
-    public boolean isDepositing = false;
-
 
     public WorldRobot(HardwareMap hardwareMap, Telemetry telemetry) {
         this(hardwareMap, telemetry, false);
@@ -151,40 +156,33 @@ public class WorldRobot extends RobotCog {
     }
 
     private void configureHorizontalArm() {
-        /*Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
-        horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, HS_CLAW_OPEN, HS_CLAW_CLOSED);
-
-        Servo HS_turret_S = hardwareMap.get(Servo.class, "HS_turret_S");
-        turret = new ContinuousServo(hardwareMap, telemetry, HS_turret_S, HS_TURRET_START, HS_TURRET_MIN, HS_TURRET_MAX);
-        turret.setOffsetFactor(HS_TURRET_SPEED);
-
         Servo HS_hinge_S = hardwareMap.get(Servo.class, "HS_hinge_S");
-        hinge = new ContinuousServo(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
-        hinge.setOffsetFactor(HS_HINGE_SPEED);
+        horizontalHinge = new Hinge(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
+        //horizontalHinge.setOffsetFactor(HS_HINGE_SPEED);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
-        telemetry.addLine("Creating lever");
-        lever = new Lever(hardwareMap, telemetry, HS_lever_S,
-                new double[]{HS_LEVER_IN,
-                        HS_LEVER_MID,
+        horizontalLever = new Lever(hardwareMap, telemetry, HS_lever_S,
+                new double[]{HS_LEVER_START,
                         HS_LEVER_FIFTH,
                         HS_LEVER_FOURTH,
                         HS_LEVER_THIRD,
                         HS_LEVER_SECOND,
-                        HS_LEVER_OUT},
-                HS_LEVER_OUT, HS_LEVER_IN);
-        lever.goToSetPosition(Lever.LeverPosition.IN);
-        lever.setOffsetFactor(HS_LEVER_SPEED);*/
+                        HS_LEVER_END},
+                HS_LEVER_START, HS_LEVER_END);
+        //horizontalLever.setOffsetFactor(HS_LEVER_SPEED);
+
+        Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
+        horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, HS_CLAW_OPEN, HS_CLAW_CLOSED);
+
+        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_DS");
+
+        horizontalArm = new HorizontalArm(horizontalSlide, horizontalLever, horizontalHinge, horizontalClaw, horizontalDistanceSensor);
     }
 
     private void configureHorizontalSlide() {
         DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
         horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, HS_MIN_ENCODER, HS_MAX_ENCODER);
-        horizontalSlide.addSetPosition(0);
-        horizontalSlide.setPower(0);
-        horizontalSlide.goToSetPosition(0);
-
-        horizontalDistanceSensor = hardwareMap.get(DistanceSensor.class, "HS_DS");
+        horizontalSlide.goToSetPosition(HorizontalSlide.Position.IN);
     }
 
     // Turned to public variables
@@ -395,9 +393,8 @@ public class WorldRobot extends RobotCog {
     }*/
 
     public void update() {
-        verticalSlide.update();
-        if (!isRetracting)
-            horizontalSlide.update();
+        verticalArm.slide.update();
+        horizontalSlide.update();
         horizontalScheduler.update();
         verticalScheduler.update();
     }

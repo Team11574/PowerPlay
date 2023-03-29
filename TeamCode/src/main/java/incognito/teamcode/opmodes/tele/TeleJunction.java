@@ -5,6 +5,7 @@ import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_AVERAGE;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_CONE_OFFSET;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_HIGH;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_LOW;
@@ -27,6 +28,7 @@ import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.TileMovementPretty;
 import incognito.teamcode.robot.WorldRobot;
+import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
 @TeleOp(name = "Junction Test", group = "tele")
@@ -50,7 +52,7 @@ public class TeleJunction extends RobotOpMode {
     double frontLeft_Power;
     double backLeft_Power;
 
-    boolean targetLocking = true;
+    boolean targetLocking = false;
 
     PIDController junctionDistancePID = new PIDController(JUNCTION_DISTANCE_PID);
 
@@ -86,6 +88,19 @@ public class TeleJunction extends RobotOpMode {
             }
         }
 
+        if (pad1.dpad_down_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+        }
+        if (pad1.dpad_left_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.LOW);
+        }
+        if (pad1.dpad_up_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM);
+        }
+        if (pad1.dpad_right_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
+        }
+
         if (targetLocking)
             targetLock();
         else
@@ -112,15 +127,15 @@ public class TeleJunction extends RobotOpMode {
     }
 
     public double getPreferredJunctionDistance() {
-        double distance = Double.POSITIVE_INFINITY;
-
-        switch (TileMovementPretty.Junction.getJunctionTowards(robot.drivetrain.getPoseEstimate())) {
+        double distance;
+        switch (robot.verticalArm.getPosition()) {
             case LOW: distance = FRONT_DS_LOW; break;
             case MEDIUM: distance = FRONT_DS_MEDIUM; break;
             case HIGH: distance = FRONT_DS_HIGH; break;
+            default: distance = FRONT_DS_AVERAGE; break;
         }
 
-        if (robot.autoCamera.coneOnJunction()) {
+        if (!robot.autoCamera.coneOnJunction()) {
             distance += FRONT_DS_CONE_OFFSET;
         }
         return distance;
@@ -138,17 +153,17 @@ public class TeleJunction extends RobotOpMode {
         }
         velX = pad1.gamepad.left_stick_x;
         velY = -pad1.gamepad.left_stick_y;
-        // Only move forward once we are locked on horizontally to the junction
-        if (theta == 0) {
-            double junctionMinDistance = getPreferredJunctionDistance();
-            if (getFrontDistance() < getPreferredJunctionDistance() || getFrontDistance() > FRONT_DS_MAX) {
-                velY += 0;
-            } else {
-                // Add an amount of power proportional to the distance from the junction
-                //  to the robot
-                velY += (getFrontDistance() - junctionMinDistance) / (FRONT_DS_MAX - junctionMinDistance);
-            }
+        // Only move forward once we are locked on horizontally to the junction if using REV sensor
+        //if (theta == 0) {
+        double junctionMinDistance = getPreferredJunctionDistance();
+        if (getFrontDistance() < getPreferredJunctionDistance() || getFrontDistance() > FRONT_DS_MAX) {
+            velY += 0;
+        } else {
+            // Add an amount of power proportional to the distance from the junction
+            //  to the robot
+            velY += (getFrontDistance() - junctionMinDistance) / (FRONT_DS_MAX - junctionMinDistance);
         }
+        //}
 
         /*
         // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when

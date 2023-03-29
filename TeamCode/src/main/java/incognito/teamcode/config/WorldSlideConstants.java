@@ -24,6 +24,10 @@ public class WorldSlideConstants {
     // TODO: UPDATE
     public static double VS_ENCODER_CENTER = 300;
 
+    public static double VS_LEVER_WAIT_TIME = 500; // ms
+    public static double VS_HINGE_WAIT_TIME = 150; // ms
+    public static double VS_CLAW_WAIT_TIME = 100; // ms
+
     // TODO: Set correct slide positions (UPDATE after new slide is added)
     public static int VS_SLIDE_INTAKE = -10;
     public static int VS_SLIDE_LOW = 400;
@@ -68,6 +72,10 @@ public class WorldSlideConstants {
 
     public static double HS_MIN_ENCODER = 0;
     public static double HS_MAX_ENCODER = 2100;
+
+    public static double HS_LEVER_WAIT_TIME = 500; // ms
+    public static double HS_HINGE_WAIT_TIME = 150; // ms
+    public static double HS_CLAW_WAIT_TIME = 250; // ms
 
     public static double HS_BRAKE_THRESHOLD = 75;
 

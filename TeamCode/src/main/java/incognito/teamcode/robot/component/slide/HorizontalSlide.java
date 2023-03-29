@@ -13,7 +13,9 @@ import incognito.cog.hardware.component.motor.MotorGroup;
 
 public class HorizontalSlide extends MotorGroup {
 
-    public double stopDirection = 0;
+    public enum Position {
+        IN, OUT
+    }
 
     public HorizontalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor});
@@ -44,6 +46,11 @@ public class HorizontalSlide extends MotorGroup {
         }
     }
 
+    public void goToSetPosition(Position position) {
+        goToSetPosition(position.ordinal());
+    }
+
+    /*
     public void setPower(double power) {
         if (disabled)
             return;
@@ -75,4 +82,5 @@ public class HorizontalSlide extends MotorGroup {
             stopDirection = -1;
         }
     }
+     */
 }

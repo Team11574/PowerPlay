@@ -1,5 +1,16 @@
 package incognito.teamcode.robot.component.arm;
 
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_CM;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
+import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.HOLD_CONE;
+import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.OUT;
+
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import incognito.teamcode.robot.component.servoImplementations.Claw;
 import incognito.teamcode.robot.component.servoImplementations.Hinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
@@ -9,52 +20,62 @@ import incognito.teamcode.robot.component.slide.VerticalSlide;
 public class HorizontalArm extends Arm {
 
     public enum Position {
-        INTAKE, LOW, MEDIUM, HIGH
+        IN, HOLD_CONE, OUT //, MANUAL
     }
 
     public HorizontalSlide slide;
     public Lever lever;
     public Hinge hinge;
     public Claw claw;
+    public DistanceSensor distanceSensor;
     private Position currentPosition;
+    private Lever.HorizontalLeverPosition leverOutPositionStorage = Lever.HorizontalLeverPosition.OUT;
 
-    public HorizontalArm(HorizontalSlide slide, Lever lever, Hinge hinge, Claw claw) {
+    public HorizontalArm(HorizontalSlide slide, Lever lever, Hinge hinge, Claw claw, DistanceSensor distanceSensor) {
         this.slide = slide;
         this.lever = lever;
         this.hinge = hinge;
         this.claw = claw;
-        //goToPosition(Position.INTAKE);
+        this.distanceSensor = distanceSensor;
+        goToPosition(Position.IN);
     }
+
     /*
+    - extending
+    - stopping for unknown reasons
+    - stopping at a cone
+    - moving lever to different heights
+
+    button(s) to increase/decrease current height by 1
+    auto decrement height on next run?
+    queue what you want next height to be?
+    set next height as its going out?
+
+     */
 
     public void goToPosition(Position position) {
         switch (position) {
-            case INTAKE:
-                slide.goToSetPosition(VerticalSlide.Position.INTAKE);
-                lever.goToSetPosition(Lever.VerticalLeverPosition.INTAKE);
-                hinge.goToSetPosition(Hinge.Position.INTAKE);
+            case IN:
+            case HOLD_CONE:
+                slide.goToSetPosition(HorizontalSlide.Position.IN);
+                closeClaw();
+                break;
+            case OUT:
+                extendSlide();
                 openClaw();
                 break;
-            case LOW:
-                slide.goToSetPosition(VerticalSlide.Position.LOW);
-                lever.goToSetPosition(Lever.VerticalLeverPosition.LOW);
-                hinge.goToSetPosition(Hinge.Position.LOW_UP);
-                closeClaw();
-                break;
-            case MEDIUM:
-                slide.goToSetPosition(VerticalSlide.Position.MEDIUM);
-                lever.goToSetPosition(Lever.VerticalLeverPosition.MEDIUM);
-                hinge.goToSetPosition(Hinge.Position.MEDIUM_UP);
-                closeClaw();
-                break;
-            case HIGH:
-                slide.goToSetPosition(VerticalSlide.Position.HIGH);
-                lever.goToSetPosition(Lever.VerticalLeverPosition.HIGH);
-                hinge.goToSetPosition(Hinge.Position.HIGH_UP);
-                closeClaw();
-                break;
+        }
+        lever.goToSetPosition(leverOutPositionStorage);
+        if (position != HOLD_CONE) {
+            levelHinge();
+        } else {
+            // do later, unlevel hinge
         }
         currentPosition = position;
+    }
+
+    public void extendSlide() {
+        slide.goToSetPosition(HorizontalSlide.Position.OUT);
     }
 
     public void openClaw() {
@@ -69,41 +90,22 @@ public class HorizontalArm extends Arm {
 
     }
 
-    public void hingeUp() {
-        switch (currentPosition) {
-            case INTAKE:
-                hinge.goToSetPosition(Hinge.Position.INTAKE);
-                break;
-            case LOW:
-                hinge.goToSetPosition(Hinge.Position.LOW_UP);
-                break;
-            case MEDIUM:
-                hinge.goToSetPosition(Hinge.Position.MEDIUM_UP);
-                break;
-            case HIGH:
-                hinge.goToSetPosition(Hinge.Position.HIGH_UP);
-                break;
-        }
-    }
-
-    public void hingeDown() {
-        switch (currentPosition) {
-            case INTAKE:
-                hinge.goToSetPosition(Hinge.Position.INTAKE);
-                break;
-            case LOW:
-                hinge.goToSetPosition(Hinge.Position.LOW_DOWN);
-                break;
-            case MEDIUM:
-                hinge.goToSetPosition(Hinge.Position.MEDIUM_DOWN);
-                break;
-            case HIGH:
-                hinge.goToSetPosition(Hinge.Position.HIGH_DOWN);
-                break;
-        }
+    public boolean atPosition() {
+        return slide.atSetPosition()
+                && lever.atSetPosition(HS_LEVER_WAIT_TIME)
+                && hinge.atSetPosition(HS_HINGE_WAIT_TIME)
+                && claw.atSetPosition(HS_CLAW_WAIT_TIME);
     }
 
     public Position getCurrentPosition() {
         return currentPosition;
-    }*/
+    }
+
+    public void update() {
+        if (getCurrentPosition() == OUT) {
+            if (distanceSensor.getDistance(DistanceUnit.CM) < HS_DS_CONE_DISTANCE_CM) {
+                slide.setTargetPosition(slide.getPosition());
+            }
+        }
+    }
 }

@@ -17,6 +17,8 @@ import incognito.cog.hardware.component.motor.MotorGroup;
 public class VerticalSlide extends MotorGroup {
 
     public enum Position {
+        MIN,
+        MAX,
         INTAKE,
         LOW,
         MEDIUM,
@@ -26,9 +28,6 @@ public class VerticalSlide extends MotorGroup {
 
     // Instance Variables
     DigitalChannel limitSwitch;
-
-    public boolean atTop = false;
-    public boolean atBottom = true;
 
     public VerticalSlide(HardwareMap hardwareMap, Telemetry telemetry, DcMotorEx slideMotor, DigitalChannel limitSwitch) {
         this(hardwareMap, telemetry, new DcMotorEx[]{slideMotor}, limitSwitch);
@@ -50,18 +49,6 @@ public class VerticalSlide extends MotorGroup {
         this.limitSwitch = limitSwitch;
         initializeHardware();
         setTargetPosition(0);
-    }
-
-    public boolean goingUp() {
-        if (isRunToPosition() && getTargetPosition() > getPosition()) return true;
-        if (isRunUsingEncoder() && getPower() > 0) return true;
-        return false;
-    }
-
-    public boolean goingDown() {
-        if (isRunToPosition() && getTargetPosition() < getPosition()) return true;
-        if (isRunUsingEncoder() && getPower() < 0) return true;
-        return false;
     }
 
     protected void initializeHardware() {
@@ -87,66 +74,8 @@ public class VerticalSlide extends MotorGroup {
         setSetPositionLength(position.ordinal(), positionValue);
     }
 
-    public boolean getLimitState() {
+    @Override
+    public boolean getDangerState() {
         return !limitSwitch.getState();
-    }
-
-    @Override
-    public void setPower(double power) {
-        if (atTop && goingUp())
-            power = 0;
-        else if (atBottom && goingDown())
-            power = 0;
-        lastPower = power;
-        double realPower = Math.min(power * maxPower, maxPower);
-        for (DcMotorEx motor : motors) {
-            motor.setPower(realPower);
-            motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        }
-    }
-
-    @Override
-    public boolean atSetPosition(double threshold) {
-        // If limit switch is triggered and we are trying to go higher,
-        // artificially say we are at our setPosition (highest value)
-        if (atTop && goingUp()) {
-            return true;
-        }
-        // If limit switch is triggered and we are trying to go lower,
-        // artificially say we are at our setPosition (lowest value)
-        if (atBottom && goingDown()) {
-            return true;
-        }
-        double sum = 0;
-        for (DcMotorEx motor : motors) {
-            sum += motor.getCurrentPosition();
-        }
-        sum /= motors.length;
-        return withinThreshold(motors[0].getTargetPosition(), sum, threshold);
-    }
-
-    @Override
-    public void update() {
-        //super.update();
-
-        // If switch is pressed
-        if (getLimitState()) {
-            // If triggered above halfway point => at top
-            if (getPosition() > VS_ENCODER_CENTER && goingUp()) {
-                // Consider changing highest setPosition value to current position?
-                // Don't reset if we are trying to go downwards
-                atTop = true;
-                setPower(0);
-            // If triggered below halfway point => at bottom
-            } else if (getPosition() <= VS_ENCODER_CENTER && goingDown()) {
-                // Don't reset if we are trying to go upwards
-                atBottom = true;
-                setPower(0);
-                hardReset();
-            }
-        } else {
-            atBottom = false;
-            atTop = false;
-        }
     }
 }

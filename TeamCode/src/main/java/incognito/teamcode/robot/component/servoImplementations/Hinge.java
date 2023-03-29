@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import java.util.Collections;
-
 import incognito.cog.hardware.component.servo.ContinuousServo;
 
 public class Hinge extends ContinuousServo {
@@ -39,11 +37,11 @@ public class Hinge extends ContinuousServo {
         super(hardwareMap, telemetry, crServo, startPositions, lowBound, upBound);
     }
 
-    public void goToSetPosition(Position position) {
-        goToSetPosition(position, true);
+    public void goToSetPosition(Position verticalHingePosition) {
+        goToSetPosition(verticalHingePosition, true);
     }
 
-    public void goToSetPosition(Position position, boolean updateLastPosition) {
-        goToSetPosition(position.ordinal(), updateLastPosition);
+    public void goToSetPosition(Position verticalHingePosition, boolean updateLastPosition) {
+        goToSetPosition(verticalHingePosition.ordinal(), updateLastPosition);
     }
 }

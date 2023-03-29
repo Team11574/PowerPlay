@@ -1,5 +1,12 @@
 package incognito.teamcode.robot.component.arm;
 
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_WAIT_TIME;
+
 import incognito.teamcode.robot.component.servoImplementations.Claw;
 import incognito.teamcode.robot.component.servoImplementations.Hinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
@@ -22,7 +29,7 @@ public class VerticalArm extends Arm {
         this.lever = lever;
         this.hinge = hinge;
         this.claw = claw;
-        goToPosition(Position.INTAKE);
+        goToPosition(VerticalArm.Position.INTAKE);
     }
 
     public void goToPosition(Position position) {
@@ -107,5 +114,12 @@ public class VerticalArm extends Arm {
 
     public Position getPosition() {
         return currentPosition;
+    }
+
+    public boolean atPosition() {
+        return slide.atSetPosition()
+                && lever.atSetPosition(VS_LEVER_WAIT_TIME)
+                && hinge.atSetPosition(VS_HINGE_WAIT_TIME)
+                && claw.atSetPosition(VS_CLAW_WAIT_TIME);
     }
 }

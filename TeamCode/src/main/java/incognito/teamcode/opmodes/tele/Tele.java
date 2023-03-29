@@ -295,7 +295,7 @@ public class Tele extends RobotOpMode {
     public void fullTelemetry() {
         multiTelemetry.addData("Horizontal motor encoder", robot.horizontalSlide.getPosition());
         multiTelemetry.addData("Vertical motor encoder", robot.verticalSlide.getPosition());
-        multiTelemetry.addData("Limit switch:", robot.verticalSlide.getLimitState());
+        multiTelemetry.addData("Limit switch:", robot.verticalSlide.getDangerState());
         multiTelemetry.addData("Vertical velocity", robot.verticalSlide.getVelocity());
         multiTelemetry.addData("Partitioned Left Y", pad2.get_partitioned_left_stick_y());
         multiTelemetry.addData("Partitioned Left X", pad2.get_partitioned_left_stick_x());
@@ -305,7 +305,6 @@ public class Tele extends RobotOpMode {
         // multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
         // multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
         multiTelemetry.addLine();
-        multiTelemetry.addData("Horizontal stopDir", robot.horizontalSlide.stopDirection);
         multiTelemetry.addData("Retracting", robot.isRetracting);
         multiTelemetry.addData("Depositing", robot.isDepositing);
         // multiTelemetry.addData("Target", robot.horizontalSlide.motors[0].getTargetPosition());

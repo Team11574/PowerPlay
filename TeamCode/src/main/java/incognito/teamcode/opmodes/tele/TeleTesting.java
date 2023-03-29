@@ -130,7 +130,7 @@ public class TeleTesting extends RobotOpMode {
     public void fullTelemetry() {
         multiTelemetry.addData("Horizontal motor encoder", robot.horizontalSlide.getPosition());
         multiTelemetry.addData("Vertical motor encoder", robot.verticalSlide.getPosition());
-        multiTelemetry.addData("Limit switch:", robot.verticalSlide.getLimitState());
+        multiTelemetry.addData("Limit switch:", robot.verticalSlide.getDangerState());
         multiTelemetry.addData("Vertical velocity", robot.verticalSlide.getVelocity());
         multiTelemetry.addData("X pressed", pad2.x_pressed);
         multiTelemetry.addData("Partitioned Left Y", pad2.get_partitioned_left_stick_y());
@@ -140,7 +140,6 @@ public class TeleTesting extends RobotOpMode {
         multiTelemetry.addData("Vertical direction", robot.verticalSlide.getDirection());
         multiTelemetry.addData("Vertical Powers", robot.verticalSlide.getPowers());
         multiTelemetry.addLine();
-        multiTelemetry.addData("Horizontal direction", robot.horizontalSlide.stopDirection);
         multiTelemetry.addData("Target", robot.horizontalSlide.motors[0].getTargetPosition());
         multiTelemetry.addData("Vel", robot.horizontalSlide.motors[0].getVelocity());
         multiTelemetry.addData("Power", robot.horizontalSlide.motors[0].getPower());

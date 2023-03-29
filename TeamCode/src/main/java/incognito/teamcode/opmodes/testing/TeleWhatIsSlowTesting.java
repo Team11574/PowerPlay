@@ -11,8 +11,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 import incognito.cog.hardware.component.drive.PoseStorage;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
@@ -243,7 +241,7 @@ public class TeleWhatIsSlowTesting extends RobotOpMode {
         multiTelemetry.addData("Vertical slide motor encoder", robot.verticalArm.slide.getPosition());
         multiTelemetry.addData("Vertical slide target position", robot.verticalArm.slide.getTargetPosition());
         multiTelemetry.addData("Vertical slide motor power", robot.verticalArm.slide.getPower());
-        multiTelemetry.addData("Vertical slide limit switch:", robot.verticalArm.slide.getLimitState());
+        multiTelemetry.addData("Vertical slide limit switch:", robot.verticalArm.slide.getDangerState());
         multiTelemetry.addLine();
         multiTelemetry.addData("Vertical slide atTop", robot.verticalArm.slide.atTop);
         multiTelemetry.addData("Vertical slide atBottom", robot.verticalArm.slide.atBottom);
