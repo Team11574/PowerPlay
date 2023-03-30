@@ -8,6 +8,7 @@ import incognito.cog.actions.Scheduler;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
 import incognito.teamcode.robot.WorldRobot;
+import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 
 @TeleOp(name = "Front Arm Testing", group = "testing")
@@ -59,15 +60,20 @@ public class FrontArmTesting extends RobotOpMode {
 
         if (pad2.dpad_down_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.IN);
         }
         if (pad2.dpad_left_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.LOW);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
         }
         if (pad2.dpad_up_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+
         }
         if (pad2.dpad_right_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
         }
 
         fullTelemetry();

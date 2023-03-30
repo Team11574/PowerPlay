@@ -33,8 +33,6 @@ import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_INTAKE;
 import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_LOW;
 import static incognito.teamcode.config.WorldSlideConstants.VS_SLIDE_MEDIUM;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -42,18 +40,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import incognito.cog.actions.Scheduler;
 import incognito.cog.hardware.component.drive.Drivetrain;
-import incognito.cog.hardware.component.servo.ContinuousServo;
 import incognito.cog.robot.RobotCog;
 import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 import incognito.teamcode.robot.component.servoImplementations.Claw;
-import incognito.teamcode.robot.component.servoImplementations.Flipper;
-import incognito.teamcode.robot.component.servoImplementations.Hinge;
+import incognito.teamcode.robot.component.servoImplementations.VerticalHinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.HorizontalSlide;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
@@ -76,7 +71,7 @@ public class WorldRobot extends RobotCog {
     private VerticalSlide verticalSlide;
     private Claw verticalClaw;
     private Lever verticalLever;
-    private Hinge verticalHinge;
+    private VerticalHinge verticalHinge;
 
     //public ModernRoboticsI2cRangeSensor frontDistanceSensor;
     public DistanceSensor frontDistanceSensor;
@@ -85,7 +80,7 @@ public class WorldRobot extends RobotCog {
     private HorizontalSlide horizontalSlide;
     private Claw horizontalClaw;
     private Lever horizontalLever;
-    private Hinge horizontalHinge;
+    private VerticalHinge horizontalHinge;
     public DistanceSensor horizontalDistanceSensor;
 
     public Scheduler horizontalScheduler;
@@ -136,7 +131,7 @@ public class WorldRobot extends RobotCog {
 
     private void configureVerticalArm() {
         Servo VS_hinge_S = hardwareMap.get(Servo.class, "VS_hinge_S");
-        verticalHinge = new Hinge(hardwareMap, telemetry, VS_hinge_S,
+        verticalHinge = new VerticalHinge(hardwareMap, telemetry, VS_hinge_S,
                 new double[] {
                         VS_HINGE_INTAKE,
                         VS_HINGE_LOW_UP, VS_HINGE_LOW_DOWN,
@@ -158,7 +153,7 @@ public class WorldRobot extends RobotCog {
 
     private void configureHorizontalArm() {
         Servo HS_hinge_S = hardwareMap.get(Servo.class, "HS_hinge_S");
-        horizontalHinge = new Hinge(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
+        horizontalHinge = new VerticalHinge(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
         //horizontalHinge.setOffsetFactor(HS_HINGE_SPEED);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
@@ -169,7 +164,7 @@ public class WorldRobot extends RobotCog {
                         HS_LEVER_THIRD,
                         HS_LEVER_SECOND,
                         HS_LEVER_END},
-                HS_LEVER_START, HS_LEVER_END);
+                HS_LEVER_END, HS_LEVER_START);
         //horizontalLever.setOffsetFactor(HS_LEVER_SPEED);
 
         Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
@@ -398,5 +393,6 @@ public class WorldRobot extends RobotCog {
         horizontalSlide.update();
         horizontalScheduler.update();
         verticalScheduler.update();
+        verticalArm.update();
     }
 }

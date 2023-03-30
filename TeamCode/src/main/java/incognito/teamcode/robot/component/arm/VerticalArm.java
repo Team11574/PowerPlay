@@ -1,14 +1,13 @@
 package incognito.teamcode.robot.component.arm;
 
-import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_WAIT_TIME;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_TO_INTAKE_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_TO_INTAKE_TIME_LOW;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_WAIT_TIME;
 
 import incognito.teamcode.robot.component.servoImplementations.Claw;
-import incognito.teamcode.robot.component.servoImplementations.Hinge;
+import incognito.teamcode.robot.component.servoImplementations.VerticalHinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
@@ -20,11 +19,11 @@ public class VerticalArm extends Arm {
 
     public VerticalSlide slide;
     public Lever lever;
-    public Hinge hinge;
+    public VerticalHinge hinge;
     public Claw claw;
     private Position currentPosition;
 
-    public VerticalArm(VerticalSlide slide, Lever lever, Hinge hinge, Claw claw) {
+    public VerticalArm(VerticalSlide slide, Lever lever, VerticalHinge hinge, Claw claw) {
         this.slide = slide;
         this.lever = lever;
         this.hinge = hinge;
@@ -37,25 +36,32 @@ public class VerticalArm extends Arm {
             case INTAKE:
                 slide.goToSetPosition(VerticalSlide.Position.INTAKE);
                 lever.goToSetPosition(Lever.VerticalLeverPosition.INTAKE);
-                hinge.goToSetPosition(Hinge.Position.INTAKE);
+                if (getPosition() == Position.LOW) {
+                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME_LOW);
+                } else {
+                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME);
+                }
                 openClaw();
                 break;
             case LOW:
                 slide.goToSetPosition(VerticalSlide.Position.LOW);
                 lever.goToSetPosition(Lever.VerticalLeverPosition.LOW);
-                hinge.goToSetPosition(Hinge.Position.LOW_UP);
+                // If position is currently intake, dont go immediately
+                hinge.goToSetPosition(VerticalHinge.Position.LOW_UP, getPosition() != Position.INTAKE);
                 closeClaw();
                 break;
             case MEDIUM:
                 slide.goToSetPosition(VerticalSlide.Position.MEDIUM);
                 lever.goToSetPosition(Lever.VerticalLeverPosition.MEDIUM);
-                hinge.goToSetPosition(Hinge.Position.MEDIUM_UP);
+                // If position is currently intake, dont go immediately
+                hinge.goToSetPosition(VerticalHinge.Position.MEDIUM_UP, getPosition() != Position.INTAKE);
                 closeClaw();
                 break;
             case HIGH:
                 slide.goToSetPosition(VerticalSlide.Position.HIGH);
                 lever.goToSetPosition(Lever.VerticalLeverPosition.HIGH);
-                hinge.goToSetPosition(Hinge.Position.HIGH_UP);
+                // If position is currently intake, dont go immediately
+                hinge.goToSetPosition(VerticalHinge.Position.HIGH_UP, getPosition() != Position.INTAKE);
                 closeClaw();
                 break;
         }
@@ -81,16 +87,16 @@ public class VerticalArm extends Arm {
     public void hingeUp() {
         switch (currentPosition) {
             case INTAKE:
-                hinge.goToSetPosition(Hinge.Position.INTAKE);
+                hinge.goToSetPosition(VerticalHinge.Position.INTAKE);
                 break;
             case LOW:
-                hinge.goToSetPosition(Hinge.Position.LOW_UP);
+                hinge.goToSetPosition(VerticalHinge.Position.LOW_UP);
                 break;
             case MEDIUM:
-                hinge.goToSetPosition(Hinge.Position.MEDIUM_UP);
+                hinge.goToSetPosition(VerticalHinge.Position.MEDIUM_UP);
                 break;
             case HIGH:
-                hinge.goToSetPosition(Hinge.Position.HIGH_UP);
+                hinge.goToSetPosition(VerticalHinge.Position.HIGH_UP);
                 break;
         }
     }
@@ -98,16 +104,16 @@ public class VerticalArm extends Arm {
     public void hingeDown() {
         switch (currentPosition) {
             case INTAKE:
-                hinge.goToSetPosition(Hinge.Position.INTAKE);
+                hinge.goToSetPosition(VerticalHinge.Position.INTAKE);
                 break;
             case LOW:
-                hinge.goToSetPosition(Hinge.Position.LOW_DOWN);
+                hinge.goToSetPosition(VerticalHinge.Position.LOW_DOWN);
                 break;
             case MEDIUM:
-                hinge.goToSetPosition(Hinge.Position.MEDIUM_DOWN);
+                hinge.goToSetPosition(VerticalHinge.Position.MEDIUM_DOWN);
                 break;
             case HIGH:
-                hinge.goToSetPosition(Hinge.Position.HIGH_DOWN);
+                hinge.goToSetPosition(VerticalHinge.Position.HIGH_DOWN);
                 break;
         }
     }
@@ -121,5 +127,9 @@ public class VerticalArm extends Arm {
                 && lever.atSetPosition(VS_LEVER_WAIT_TIME)
                 && hinge.atSetPosition(VS_HINGE_WAIT_TIME)
                 && claw.atSetPosition(VS_CLAW_WAIT_TIME);
+    }
+
+    public void update() {
+        hinge.update();
     }
 }

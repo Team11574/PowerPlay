@@ -13,25 +13,25 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import incognito.teamcode.robot.component.servoImplementations.Claw;
-import incognito.teamcode.robot.component.servoImplementations.Hinge;
+import incognito.teamcode.robot.component.servoImplementations.VerticalHinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.HorizontalSlide;
 
 public class HorizontalArm extends Arm {
 
     public enum Position {
-        IN, HOLD_CONE, OUT, MANUAL
+        IN, HOLD_CONE, OUT, MANUAL, CLAW_OUT
     }
 
     public HorizontalSlide slide;
     public Lever lever;
-    public Hinge hinge;
+    public VerticalHinge hinge;
     public Claw claw;
     public DistanceSensor distanceSensor;
     private Position currentPosition;
-    public Lever.HorizontalLeverPosition leverOutPositionStorage = Lever.HorizontalLeverPosition.IN;
+    public Lever.HorizontalLeverPosition leverOutPositionStorage = Lever.HorizontalLeverPosition.OUT;
 
-    public HorizontalArm(HorizontalSlide slide, Lever lever, Hinge hinge, Claw claw, DistanceSensor distanceSensor) {
+    public HorizontalArm(HorizontalSlide slide, Lever lever, VerticalHinge hinge, Claw claw, DistanceSensor distanceSensor) {
         this.slide = slide;
         this.lever = lever;
         this.hinge = hinge;
@@ -58,14 +58,19 @@ public class HorizontalArm extends Arm {
             case IN:
             case HOLD_CONE:
                 slide.goToSetPosition(HorizontalSlide.Position.IN);
+                lever.goToSetPosition(Lever.HorizontalLeverPosition.IN);
                 closeClaw();
+                break;
+            case CLAW_OUT:
+                lever.goToSetPosition(leverOutPositionStorage);
+                openClaw();
                 break;
             case OUT:
                 extendSlide();
+                lever.goToSetPosition(leverOutPositionStorage);
                 openClaw();
                 break;
         }
-        lever.goToSetPosition(leverOutPositionStorage);
         if (position != HOLD_CONE && position != MANUAL) {
             levelHinge();
         } else {

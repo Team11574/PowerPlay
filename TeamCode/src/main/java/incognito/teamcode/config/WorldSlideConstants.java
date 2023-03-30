@@ -46,7 +46,7 @@ public class WorldSlideConstants {
 
 
     // TODO: Set correct positions for vertical hinge
-    public static double VS_HINGE_START = 0.15; // Start = min
+    public static double VS_HINGE_START = 0.1; // Start = min
     public static double VS_HINGE_END = 0.8; // End = max
     public static double VS_HINGE_INTAKE = 0.2;
     public static double VS_HINGE_LOW_UP = VS_HINGE_END;
@@ -55,6 +55,9 @@ public class WorldSlideConstants {
     public static double VS_HINGE_MEDIUM_DOWN = 0.25;
     public static double VS_HINGE_HIGH_UP = 0.3;
     public static double VS_HINGE_HIGH_DOWN = 0.15;
+    public static double VS_HINGE_PAUSE_TIME = 250; // ms
+    public static double VS_HINGE_TO_INTAKE_TIME = 400; // ms
+    public static double VS_HINGE_TO_INTAKE_TIME_LOW = 900; // ms
 
     // TODO: Find correct vertical claw open/closed positions
     public static double VS_CLAW_OPEN = 0.3;
@@ -92,13 +95,13 @@ public class WorldSlideConstants {
     public static double HS_HINGE_END = 1;
     public static double HS_HINGE_SPEED = 0.01;
 
-    public static double HS_LEVER_START = 0.7;
+    public static double HS_LEVER_START = 0.92;
     public static double HS_LEVER_MID = 0.5;
     public static double HS_LEVER_FIFTH = 0.315;
     public static double HS_LEVER_FOURTH = 0.28;
     public static double HS_LEVER_THIRD = 0.235;
     public static double HS_LEVER_SECOND = 0.19;
-    public static double HS_LEVER_END = 0.13;
+    public static double HS_LEVER_END = 0;
 
     public static double HS_LEVER_SPEED = 0.05;
 
