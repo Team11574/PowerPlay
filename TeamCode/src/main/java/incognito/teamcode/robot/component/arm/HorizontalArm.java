@@ -5,6 +5,7 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.HOLD_CONE;
+import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.MANUAL;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.OUT;
 
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -19,7 +20,7 @@ import incognito.teamcode.robot.component.slide.HorizontalSlide;
 public class HorizontalArm extends Arm {
 
     public enum Position {
-        IN, HOLD_CONE, OUT //, MANUAL
+        IN, HOLD_CONE, OUT, MANUAL
     }
 
     public HorizontalSlide slide;
@@ -28,7 +29,7 @@ public class HorizontalArm extends Arm {
     public Claw claw;
     public DistanceSensor distanceSensor;
     private Position currentPosition;
-    private Lever.HorizontalLeverPosition leverOutPositionStorage = Lever.HorizontalLeverPosition.OUT;
+    public Lever.HorizontalLeverPosition leverOutPositionStorage = Lever.HorizontalLeverPosition.IN;
 
     public HorizontalArm(HorizontalSlide slide, Lever lever, Hinge hinge, Claw claw, DistanceSensor distanceSensor) {
         this.slide = slide;
@@ -65,7 +66,7 @@ public class HorizontalArm extends Arm {
                 break;
         }
         lever.goToSetPosition(leverOutPositionStorage);
-        if (position != HOLD_CONE) {
+        if (position != HOLD_CONE && position != MANUAL) {
             levelHinge();
         } else {
             // do later, unlevel hinge
@@ -91,8 +92,9 @@ public class HorizontalArm extends Arm {
 
     public void storeLeverHeight(Lever.HorizontalLeverPosition position) {
         leverOutPositionStorage = position;
-        if (getPosition() == OUT) {
-            lever.goToSetPosition(leverOutPositionStorage);
+        lever.goToSetPosition(leverOutPositionStorage);
+        if (getPosition() == OUT || getPosition() == MANUAL) {
+
         }
     }
 

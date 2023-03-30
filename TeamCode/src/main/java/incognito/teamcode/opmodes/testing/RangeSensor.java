@@ -17,7 +17,6 @@ public class RangeSensor extends OpMode {
     ModernRoboticsI2cRangeSensor range;
     DigitalChannelImpl ultraOut;
     DigitalChannelImpl ultraIn;
-    DigitalChannel
     UltrasonicSensor rangeSensor;
 
     @Override

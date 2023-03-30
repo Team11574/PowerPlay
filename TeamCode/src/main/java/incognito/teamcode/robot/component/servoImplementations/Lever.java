@@ -55,12 +55,13 @@ public class Lever extends ContinuousServo {
 
     public enum HorizontalLeverPosition {
         IN,
-        MID,
+        //MID,
         FIFTH,
         FOURTH,
         THIRD,
         SECOND,
         OUT,
+        MID,
         ;
 
         public HorizontalLeverPosition increment() {

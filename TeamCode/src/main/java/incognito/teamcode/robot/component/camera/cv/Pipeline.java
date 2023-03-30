@@ -400,19 +400,19 @@ public class Pipeline extends OpenCvPipeline {
         }
 
         yellowContour = junctionWidestContours.get(0);
-        if (yellowContour != null && !yellowContour.empty()) {
+        if (yellowContour != null) {
             // We have a yellow contour, see if its width is within a usable threshold
             yellowWidth = Imgproc.contourArea(yellowContour) / Imgproc.boundingRect(yellowContour).height;
             if (yellowWidth > YELLOW_WIDTH_THRESHOLD) {
                 moments = Imgproc.moments(yellowContour, true);
                 x = moments.get_m10() / moments.get_m00();
                 y = moments.get_m01() / moments.get_m00();
-                telemetry.addData("Yellow width used", yellowWidth);
+                //telemetry.addData("Yellow width used", yellowWidth);
             }
+            yellowContour.release();
         }
-        // If no yellow was found
         if (x == -1) {
-            telemetry.addData("No yellow found in threshold! Finding widest", "Blue and Red");
+            // telemetry.addData("No yellow found in threshold! Finding widest", "Blue and Red");
         }
         redContour = junctionWidestContours.get(1);
         if (redContour != null) {
@@ -421,11 +421,12 @@ public class Pipeline extends OpenCvPipeline {
                 moments = Imgproc.moments(redContour, true);
                 redX = moments.get_m10() / moments.get_m00();
                 redY = moments.get_m01() / moments.get_m00();
-                telemetry.addData("Red width", redWidth);
-                telemetry.addData("Red x", redX);
+                // telemetry.addData("Red width", redWidth);
+                // telemetry.addData("Red x", redX);
             } else {
                 yellowWidth = -1;
             }
+            redContour.release();
         }
         blueContour = junctionWidestContours.get(2);
         if (blueContour != null) {
@@ -434,23 +435,24 @@ public class Pipeline extends OpenCvPipeline {
                 moments = Imgproc.moments(blueContour, true);
                 blueX = moments.get_m10() / moments.get_m00();
                 blueY = moments.get_m01() / moments.get_m00();
-                telemetry.addData("Blue width", blueWidth);
-                telemetry.addData("Blue x", blueX);
+                // telemetry.addData("Blue width", blueWidth);
+                // telemetry.addData("Blue x", blueX);
             } else {
                 blueWidth = -1;
             }
+            blueContour.release();
         }
         if (x == -1) {
             if (redWidth > blueWidth) {
-                telemetry.addData("Color used", "RED");
+                // telemetry.addData("Color used", "RED");
                 x = redX;
                 y = redY;
             } else if (blueWidth > redWidth) {
-                telemetry.addData("Color used", "BLUE");
+                // telemetry.addData("Color used", "BLUE");
                 x = blueX;
                 y = blueY;
             } else {
-                telemetry.addData("Color used", "NONE");
+                // telemetry.addData("Color used", "NONE");
             }
         }
 
@@ -458,10 +460,12 @@ public class Pipeline extends OpenCvPipeline {
             if (junctionWidestContours.get(m) != null)
                 junctionWidestContours.get(m).release();
         }
+        if (maxJunctionContour != null)
+            maxJunctionContour.release();
         junctionWidestContours.clear();
 
         coneOnJunction = redWidth > RED_WIDTH_THRESHOLD || blueWidth > BLUE_WIDTH_THRESHOLD;
-        telemetry.addData("Cone on junction", coneOnJunction);
+        // telemetry.addData("Cone on junction", coneOnJunction);
 
         if (x < 0) {
             junctionHorizontalDistance = Double.POSITIVE_INFINITY;
@@ -470,8 +474,7 @@ public class Pipeline extends OpenCvPipeline {
             Imgproc.putText(input, df.format(junctionHorizontalDistance), new Point(x-20, y), 5, 1, whiteScalar);
             Imgproc.drawMarker(input, new Point(x, y), blackScalar);
         }
-        telemetry.addData("Horizontal distance:", junctionHorizontalDistance);
-        telemetry.update();
+        // telemetry.addData("Horizontal distance:", junctionHorizontalDistance);
 
         Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
     }

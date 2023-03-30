@@ -78,8 +78,8 @@ public class WorldRobot extends RobotCog {
     private Lever verticalLever;
     private Hinge verticalHinge;
 
-    public ModernRoboticsI2cRangeSensor frontDistanceSensor;
-    //public DistanceSensor frontDistanceSensor;
+    //public ModernRoboticsI2cRangeSensor frontDistanceSensor;
+    public DistanceSensor frontDistanceSensor;
 
     public HorizontalArm horizontalArm;
     private HorizontalSlide horizontalSlide;
@@ -107,7 +107,8 @@ public class WorldRobot extends RobotCog {
 
         horizontalScheduler = new Scheduler();
         verticalScheduler = new Scheduler();
-        frontDistanceSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "front_DS");
+        //frontDistanceSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "front_DS");
+        frontDistanceSensor = hardwareMap.get(DistanceSensor.class, "front_DS");
         configureDrivetrain();
         configureHorizontalSlide();
         configureHorizontalArm();

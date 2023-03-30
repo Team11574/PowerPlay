@@ -15,7 +15,7 @@ import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 
-@TeleOp(name = "Front Arm Testing", group = "testing")
+@TeleOp(name = "Back Arm Testing", group = "testing")
 public class BackArmTesting extends RobotOpMode {
     // Instance variables
     WorldRobot robot;
@@ -59,6 +59,9 @@ public class BackArmTesting extends RobotOpMode {
         if (pad2.x_pressed) {
             robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
         }
+        if (pad2.right_bumper_pressed) {
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.MANUAL);
+        }
 
         if (pad2.dpad_right_pressed) {
             robot.horizontalArm.hinge.setPosition(HS_HINGE_START);
@@ -77,6 +80,9 @@ public class BackArmTesting extends RobotOpMode {
             robot.horizontalArm.decrementLeverHeight();
         }
 
+        multiTelemetry.addData("Lever stored", robot.horizontalArm.leverOutPositionStorage);
+        multiTelemetry.addData("lever increment", robot.horizontalArm.leverOutPositionStorage.increment());
+        multiTelemetry.addData("lever increment", robot.horizontalArm.leverOutPositionStorage.decrement());
         fullTelemetry();
         robot.update();
         pad2.update();

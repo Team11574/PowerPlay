@@ -208,7 +208,7 @@ public class Robot extends RobotCog {
             isRetracting = true;
             // Lever mid
             horizontalClaw.close();
-            lever.goToSetPosition(Lever.HorizontalLeverPosition.MID, false);
+            //lever.goToSetPosition(Lever.HorizontalLeverPosition.MID, false);
             horizontalScheduler.linearSchedule(
                     when -> true,
                     then -> {

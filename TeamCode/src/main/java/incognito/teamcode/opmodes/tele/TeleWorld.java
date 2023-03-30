@@ -1,7 +1,7 @@
 package incognito.teamcode.opmodes.tele;
 
-import static incognito.teamcode.config.CameraConstants.JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
+import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
@@ -230,7 +230,7 @@ public class TeleWorld extends RobotOpMode {
             velY += Math.max(0, junctionYPower);
         }
         velX = pad1.get_partitioned_left_stick_x();
-        if (Math.abs(junctionHorizontalDistance) < JUNCTION_HORIZONTAL_DISTANCE_THRESHOLD) {
+        if (Math.abs(junctionHorizontalDistance) < JUNCTION_MIN_HORIZONTAL_DISTANCE) {
             theta = 0;
         } else {
             theta = junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
