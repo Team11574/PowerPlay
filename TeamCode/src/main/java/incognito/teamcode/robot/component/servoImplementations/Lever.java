@@ -65,11 +65,11 @@ public class Lever extends ContinuousServo {
         ;
 
         public HorizontalLeverPosition increment() {
-            return values()[(ordinal() + 1) % values().length];
+            return values()[(ordinal() + 1) % (values().length-1)];
         }
 
         public HorizontalLeverPosition decrement() {
-            return values()[(ordinal() - 1 + values().length) % values().length];
+            return values()[(ordinal() - 1 + (values().length-1)) % (values().length-1)];
         }
     }
 

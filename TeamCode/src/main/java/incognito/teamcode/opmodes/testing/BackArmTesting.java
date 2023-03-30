@@ -73,11 +73,17 @@ public class BackArmTesting extends RobotOpMode {
 
 
         if (pad2.dpad_up_pressed) {
-            robot.horizontalArm.incrementLeverHeight();
+            robot.horizontalArm.lever.goToSetPosition(0);
+            //robot.horizontalArm.incrementLeverHeight();
         }
 
         if (pad2.dpad_down_pressed) {
-            robot.horizontalArm.decrementLeverHeight();
+            robot.horizontalArm.lever.goToSetPosition(5);
+            //robot.horizontalArm.decrementLeverHeight();
+        }
+
+        if (pad2.left_bumper_pressed) {
+            robot.horizontalArm.lever.goToSetPosition(1);
         }
 
         multiTelemetry.addData("Lever stored", robot.horizontalArm.leverOutPositionStorage);
