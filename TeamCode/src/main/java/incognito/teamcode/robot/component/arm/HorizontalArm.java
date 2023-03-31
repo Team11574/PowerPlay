@@ -112,6 +112,10 @@ public class HorizontalArm extends Arm {
         claw.close();
     }
 
+    public void toggleClaw() {
+        claw.toggle();
+    }
+
     public void levelHinge() {
         hinge.goToSetPosition(HorizontalHinge.Position.IN);
     }

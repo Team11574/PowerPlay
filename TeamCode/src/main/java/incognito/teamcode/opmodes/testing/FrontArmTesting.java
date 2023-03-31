@@ -45,16 +45,10 @@ public class FrontArmTesting extends RobotOpMode {
     @Override
     public void loop() {
         if (pad2.x_pressed) {
-            robot.verticalArm.openClaw();
-        }
-        if (pad2.y_pressed) {
-            robot.verticalArm.closeClaw();
+            robot.verticalArm.toggleClaw();
         }
         if (pad2.a_pressed) {
-            robot.horizontalArm.openClaw();
-        }
-        if (pad2.b_pressed) {
-            robot.horizontalArm.closeClaw();
+            robot.horizontalArm.toggleClaw();
         }
 
         if (pad2.right_trigger_pressed) {
@@ -85,6 +79,8 @@ public class FrontArmTesting extends RobotOpMode {
         if (robot.horizontalArm.atPosition()) {
             if (robot.horizontalArm.getPosition() == HorizontalArm.Position.UP) {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+            } else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.HOLD_CONE) {
+                robot.horizontalArm.openClaw();
             }
         }
         if (pad2.dpad_left_pressed) {
