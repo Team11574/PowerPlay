@@ -47,6 +47,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import incognito.cog.actions.Scheduler;
 import incognito.cog.hardware.component.drive.Drivetrain;
 import incognito.cog.robot.RobotCog;
+import incognito.teamcode.robot.component.arm.Arm;
 import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
@@ -399,10 +400,11 @@ public class WorldRobot extends RobotCog {
     }*/
 
     public void update() {
-        verticalArm.slide.update();
+        verticalArm.update();
+        horizontalArm.update();
+        verticalSlide.update();
         horizontalSlide.update();
         horizontalScheduler.update();
         verticalScheduler.update();
-        verticalArm.update();
     }
 }

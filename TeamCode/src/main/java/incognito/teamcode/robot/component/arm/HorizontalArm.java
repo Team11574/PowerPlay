@@ -58,6 +58,7 @@ public class HorizontalArm extends Arm {
      */
 
     public void goToPosition(Position position) {
+        if (position == lastPosition) return;
         if (position == MANUAL) {
             slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             slide.setPower(0);

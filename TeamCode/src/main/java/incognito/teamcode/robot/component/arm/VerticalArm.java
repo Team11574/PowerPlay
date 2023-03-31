@@ -41,6 +41,7 @@ public class VerticalArm extends Arm {
     }
 
     public void goToPosition(Position position) {
+        if (position == lastPosition) return;
         switch (position) {
             case INTAKE:
                 slide.goToSetPosition(VerticalSlide.Position.INTAKE);
@@ -131,6 +132,10 @@ public class VerticalArm extends Arm {
 
     public Position getPosition() {
         return currentPosition;
+    }
+
+    public Position getLastPosition() {
+        return lastPosition;
     }
 
     public boolean atPosition() {
