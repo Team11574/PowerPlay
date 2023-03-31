@@ -55,9 +55,40 @@ public class WorldSlideConstants {
     public static double VS_HINGE_MEDIUM_DOWN = 0.25;
     public static double VS_HINGE_HIGH_UP = 0.3;
     public static double VS_HINGE_HIGH_DOWN = 0.15;
+
     public static double VS_HINGE_PAUSE_TIME = 250; // ms
     public static double VS_HINGE_TO_INTAKE_TIME = 400; // ms
     public static double VS_HINGE_TO_INTAKE_TIME_LOW = 900; // ms
+
+    public enum VS_TIME_TO {
+        INTAKE_TO_LOW(VS_INTAKE_TO_LOW_TIME),
+        INTAKE_TO_MEDIUM(VS_INTAKE_TO_MEDIUM_TIME),
+        INTAKE_TO_HIGH(VS_INTAKE_TO_HIGH_TIME),
+        DEFAULT(VS_DEFAULT_TIME)
+        ;
+        private final double time;
+
+        VS_TIME_TO(double time) {
+            this.time = time;
+        }
+
+        public static double getTime(String pos1, String pos2) {
+            try {
+                return VS_TIME_TO.valueOf(pos1 + "_TO_" + pos2).time;
+            } catch (IllegalArgumentException e1) {
+                try {
+                    return VS_TIME_TO.valueOf(pos2 + "_TO_" + pos1).time;
+                } catch (IllegalArgumentException e2) {
+                    return DEFAULT.time;
+                }
+            }
+        }
+    }
+
+    public static double VS_INTAKE_TO_LOW_TIME = 950; // ms
+    public static double VS_INTAKE_TO_MEDIUM_TIME = 400; // ms
+    public static double VS_INTAKE_TO_HIGH_TIME = 400; // ms
+    public static double VS_DEFAULT_TIME = 250; // ms
 
     // TODO: Find correct vertical claw open/closed positions
     public static double VS_CLAW_OPEN = 0.3;
@@ -88,15 +119,16 @@ public class WorldSlideConstants {
     // TODO: Insert correct set positions for horizontal slide
 
     // TODO: Find correct values
-    public static double HS_CLAW_OPEN = 0.5;
-    public static double HS_CLAW_CLOSED = 0.78;
+    public static double HS_CLAW_OPEN = 0.3;
+    public static double HS_CLAW_CLOSED = 0.5;
 
-    public static double HS_HINGE_START = 0;
-    public static double HS_HINGE_END = 1;
+    public static double HS_HINGE_START = .6;
+    public static double HS_HINGE_MID = .3;
+    public static double HS_HINGE_END = 0;
     public static double HS_HINGE_SPEED = 0.01;
 
     public static double HS_LEVER_START = 0.92;
-    public static double HS_LEVER_MID = 0.5;
+    public static double HS_LEVER_MID = 0.8;
     public static double HS_LEVER_FIFTH = 0.315;
     public static double HS_LEVER_FOURTH = 0.28;
     public static double HS_LEVER_THIRD = 0.235;

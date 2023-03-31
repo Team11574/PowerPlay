@@ -5,33 +5,37 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.HOLD_CONE;
+import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.IN;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.MANUAL;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.OUT;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import incognito.teamcode.robot.component.servoImplementations.Claw;
-import incognito.teamcode.robot.component.servoImplementations.VerticalHinge;
+import incognito.teamcode.robot.component.servoImplementations.HorizontalHinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.HorizontalSlide;
 
 public class HorizontalArm extends Arm {
 
     public enum Position {
-        IN, HOLD_CONE, OUT, MANUAL, CLAW_OUT
+        IN, HOLD_CONE, UP, OUT, MANUAL, CLAW_OUT
     }
 
     public HorizontalSlide slide;
     public Lever lever;
-    public VerticalHinge hinge;
+    public HorizontalHinge hinge;
     public Claw claw;
     public DistanceSensor distanceSensor;
     private Position currentPosition;
+    private Position lastPosition = null;
     public Lever.HorizontalLeverPosition leverOutPositionStorage = Lever.HorizontalLeverPosition.OUT;
 
-    public HorizontalArm(HorizontalSlide slide, Lever lever, VerticalHinge hinge, Claw claw, DistanceSensor distanceSensor) {
+    public HorizontalArm(HorizontalSlide slide, Lever lever, HorizontalHinge hinge, Claw claw, DistanceSensor distanceSensor) {
         this.slide = slide;
         this.lever = lever;
         this.hinge = hinge;
@@ -54,28 +58,44 @@ public class HorizontalArm extends Arm {
      */
 
     public void goToPosition(Position position) {
+        if (position == MANUAL) {
+            slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            slide.setPower(0);
+            return;
+        } else if (slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
         switch (position) {
             case IN:
-            case HOLD_CONE:
                 slide.goToSetPosition(HorizontalSlide.Position.IN);
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.IN);
+                hinge.goToSetPosition(HorizontalHinge.Position.IN);
+                closeClaw();
+                break;
+            case HOLD_CONE:
+                slide.goToSetPosition(HorizontalSlide.Position.IN);
+                lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
+                hinge.goToSetPosition(HorizontalHinge.Position.IN);
                 closeClaw();
                 break;
             case CLAW_OUT:
                 lever.goToSetPosition(leverOutPositionStorage);
+                levelHinge();
+                openClaw();
+                break;
+            case UP:
+                lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
+                hinge.goToSetPosition(HorizontalHinge.Position.MID);
                 openClaw();
                 break;
             case OUT:
                 extendSlide();
                 lever.goToSetPosition(leverOutPositionStorage);
+                levelHinge();
                 openClaw();
                 break;
         }
-        if (position != HOLD_CONE && position != MANUAL) {
-            levelHinge();
-        } else {
-            // do later, unlevel hinge
-        }
+        lastPosition = currentPosition;
         currentPosition = position;
     }
 
@@ -92,14 +112,14 @@ public class HorizontalArm extends Arm {
     }
 
     public void levelHinge() {
-
+        hinge.goToSetPosition(HorizontalHinge.Position.IN);
     }
 
     public void storeLeverHeight(Lever.HorizontalLeverPosition position) {
         leverOutPositionStorage = position;
         lever.goToSetPosition(leverOutPositionStorage);
         if (getPosition() == OUT || getPosition() == MANUAL) {
-
+            // i dont know what i wanted to do here...
         }
     }
 
@@ -120,6 +140,10 @@ public class HorizontalArm extends Arm {
 
     public Position getPosition() {
         return currentPosition;
+    }
+
+    public Position getLastPosition() {
+        return lastPosition;
     }
 
     public void update() {

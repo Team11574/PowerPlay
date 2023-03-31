@@ -11,6 +11,7 @@ public class Claw extends SetServo {
     public Claw(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo,
                 double openPos, double closedPos) {
         super(hardwareMap, telemetry, crServo, openPos, closedPos);
+        close();
     }
 
     public void open() {

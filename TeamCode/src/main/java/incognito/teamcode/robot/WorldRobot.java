@@ -2,10 +2,13 @@ package incognito.teamcode.robot;
 
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_CLOSED;
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_OPEN;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_END;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_MID;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_END;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FIFTH;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FOURTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_MID;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_SECOND;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_START;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_THIRD;
@@ -48,6 +51,7 @@ import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 import incognito.teamcode.robot.component.servoImplementations.Claw;
+import incognito.teamcode.robot.component.servoImplementations.HorizontalHinge;
 import incognito.teamcode.robot.component.servoImplementations.VerticalHinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.HorizontalSlide;
@@ -80,7 +84,7 @@ public class WorldRobot extends RobotCog {
     private HorizontalSlide horizontalSlide;
     private Claw horizontalClaw;
     private Lever horizontalLever;
-    private VerticalHinge horizontalHinge;
+    private HorizontalHinge horizontalHinge;
     public DistanceSensor horizontalDistanceSensor;
 
     public Scheduler horizontalScheduler;
@@ -153,12 +157,18 @@ public class WorldRobot extends RobotCog {
 
     private void configureHorizontalArm() {
         Servo HS_hinge_S = hardwareMap.get(Servo.class, "HS_hinge_S");
-        horizontalHinge = new VerticalHinge(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
+        horizontalHinge = new HorizontalHinge(hardwareMap, telemetry, HS_hinge_S,
+                new double[] {
+                        HS_HINGE_START,
+                        HS_HINGE_MID,
+                        HS_HINGE_END
+                }, HS_HINGE_END, HS_HINGE_START);
         //horizontalHinge.setOffsetFactor(HS_HINGE_SPEED);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
         horizontalLever = new Lever(hardwareMap, telemetry, HS_lever_S,
                 new double[]{HS_LEVER_START,
+                        HS_LEVER_MID,
                         HS_LEVER_FIFTH,
                         HS_LEVER_FOURTH,
                         HS_LEVER_THIRD,

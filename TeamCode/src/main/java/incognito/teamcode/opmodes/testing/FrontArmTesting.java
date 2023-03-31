@@ -44,11 +44,17 @@ public class FrontArmTesting extends RobotOpMode {
 
     @Override
     public void loop() {
-        if (pad2.a_pressed) {
+        if (pad2.x_pressed) {
             robot.verticalArm.openClaw();
         }
-        if (pad2.b_pressed) {
+        if (pad2.y_pressed) {
             robot.verticalArm.closeClaw();
+        }
+        if (pad2.a_pressed) {
+            robot.horizontalArm.openClaw();
+        }
+        if (pad2.b_pressed) {
+            robot.horizontalArm.closeClaw();
         }
 
         if (pad2.right_trigger_pressed) {
@@ -58,22 +64,33 @@ public class FrontArmTesting extends RobotOpMode {
             robot.verticalArm.hingeUp();
         }
 
-        if (pad2.dpad_down_pressed) {
+        if (pad2.dpad_down_pressed && robot.verticalArm.getPosition() != VerticalArm.Position.INTAKE) {
             robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.IN);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.HOLD_CONE);
+        }
+        if (robot.verticalArm.atPosition()) {
+            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.HOLD_CONE) {
+                //if (robot.verticalArm.lever.atSetPosition(900)); {
+                robot.horizontalArm.goToPosition(HorizontalArm.Position.IN);
+            }
+        }
+        if (robot.horizontalArm.atPosition()) {
+            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.UP) {
+                robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+            }
         }
         if (pad2.dpad_left_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.LOW);
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
         }
         if (pad2.dpad_up_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM);
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
 
         }
         if (pad2.dpad_right_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
         }
 
         fullTelemetry();
@@ -96,6 +113,8 @@ public class FrontArmTesting extends RobotOpMode {
         multiTelemetry.addData("Vertical hinge pos", robot.verticalArm.hinge.getPosition());
         multiTelemetry.addData("Vertical arm pos", robot.verticalArm.getPosition());
         multiTelemetry.addLine();
+        multiTelemetry.addData("Vertical arm atPosition", robot.verticalArm.atPosition());
+        multiTelemetry.addData("Horizontal arm atPosition", robot.horizontalArm.atPosition());
         multiTelemetry.update();
     }
 }

@@ -6,6 +6,9 @@ import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_TO_INTAKE_T
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_WAIT_TIME;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import incognito.teamcode.config.WorldSlideConstants;
 import incognito.teamcode.robot.component.servoImplementations.Claw;
 import incognito.teamcode.robot.component.servoImplementations.VerticalHinge;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
@@ -14,7 +17,11 @@ import incognito.teamcode.robot.component.slide.VerticalSlide;
 public class VerticalArm extends Arm {
 
     public enum Position {
-        INTAKE, LOW, MEDIUM, HIGH
+        INTAKE, LOW, MEDIUM, HIGH;
+
+        public double getWaitTime(Position currentPosition) {
+            return WorldSlideConstants.VS_TIME_TO.getTime(this.name(), currentPosition.name());
+        }
     }
 
     public VerticalSlide slide;
@@ -22,6 +29,8 @@ public class VerticalArm extends Arm {
     public VerticalHinge hinge;
     public Claw claw;
     private Position currentPosition;
+    private Position lastPosition;
+    private ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     public VerticalArm(VerticalSlide slide, Lever lever, VerticalHinge hinge, Claw claw) {
         this.slide = slide;
@@ -65,6 +74,8 @@ public class VerticalArm extends Arm {
                 closeClaw();
                 break;
         }
+        timer.reset();
+        lastPosition = getPosition();
         currentPosition = position;
     }
 
@@ -123,10 +134,17 @@ public class VerticalArm extends Arm {
     }
 
     public boolean atPosition() {
+        if (lastPosition == null || getPosition() == null) {
+            return true;
+        }
+        return timer.time() > getPosition().getWaitTime(lastPosition);
+        /*
         return slide.atSetPosition()
                 && lever.atSetPosition(VS_LEVER_WAIT_TIME)
                 && hinge.atSetPosition(VS_HINGE_WAIT_TIME)
                 && claw.atSetPosition(VS_CLAW_WAIT_TIME);
+
+         */
     }
 
     public void update() {

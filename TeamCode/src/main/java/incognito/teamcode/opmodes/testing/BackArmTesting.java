@@ -73,17 +73,15 @@ public class BackArmTesting extends RobotOpMode {
 
 
         if (pad2.dpad_up_pressed) {
-            robot.horizontalArm.lever.goToSetPosition(0);
-            //robot.horizontalArm.incrementLeverHeight();
+            robot.horizontalArm.decrementLeverHeight();
         }
 
         if (pad2.dpad_down_pressed) {
-            robot.horizontalArm.lever.goToSetPosition(5);
-            //robot.horizontalArm.decrementLeverHeight();
+            robot.horizontalArm.incrementLeverHeight();
         }
 
         if (pad2.left_bumper_pressed) {
-            robot.horizontalArm.lever.goToSetPosition(1);
+            robot.horizontalArm.lever.goToSetPosition(0);
         }
 
         multiTelemetry.addData("Lever stored", robot.horizontalArm.leverOutPositionStorage);
@@ -107,6 +105,7 @@ public class BackArmTesting extends RobotOpMode {
         multiTelemetry.addLine();
         multiTelemetry.addData("Vertical lever pos", robot.horizontalArm.lever.getPosition());
         multiTelemetry.addData("Vertical hinge pos", robot.horizontalArm.hinge.getPosition());
+        multiTelemetry.addData("Vertical claw pos", robot.horizontalArm.claw.getPosition());
         multiTelemetry.addData("Vertical arm pos", robot.horizontalArm.getPosition());
         multiTelemetry.addLine();
         multiTelemetry.update();
