@@ -75,6 +75,10 @@ public class HorizontalArm extends Arm {
                 closeClaw();
                 break;
             case WAIT_IN:
+                if (getPosition() == Position.IN) {
+                    // ignore
+                    return;
+                }
                 slide.goToSetPosition(HorizontalSlide.Position.IN);
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
                 hinge.goToSetPosition(HorizontalHinge.Position.IN);
@@ -92,6 +96,10 @@ public class HorizontalArm extends Arm {
                 hinge.goToSetPosition(HorizontalHinge.Position.IN);
                 break;
             case WAIT_OUT:
+                if (getPosition() == Position.OUT) {
+                    // ignore
+                    return;
+                }
                 // no slide
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
                 hinge.goToSetPosition(HorizontalHinge.Position.MID);

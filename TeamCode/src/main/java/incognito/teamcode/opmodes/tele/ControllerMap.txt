@@ -3,11 +3,11 @@
   LB = Back Lever Step Down   +.-'_____'-.---------------------------.-'_____'-.+   RB = Back Lever Step Up
                              /   |     |  '.                       .'  |     |   \
                             / ___| /|\ |___ \                     / ___| (Y) |___ \
-    ↑ = Vert Slide MED     / |      |      | ;  __           __  ; |             | ;   Y = NONE
-    ← = Vert Slide LOW     | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = Extend/Retract Back
-    → = Vert Slide HIGH    | |___   |   ___| ;                   ; |___       ___| ;   A = Back Claw
-    ↓ = Vert Slide GROUND  |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = Front Claw
-                           | \   |_____|  .','" "', |___|  ,'" "', '.  |_____|  .' |
+    ↑ = Vert Slide MED     / |      |      | ;  ___         ___  ; |             | ;   Y = Back claw extend until cone
+    ← = Vert Slide LOW     | | <---   ---> | | |_M_|   L   |_S_| | |(X)       (B)| |   X = Back claw retract and transfer
+    → = Vert Slide HIGH    | |___   |   ___| ;                   ; |___       ___| ;   A = Back Claw grab
+    ↓ = Hori Slide GROUND  |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = Front Claw let go
+                           | \   |_____|  .','" "', |_B_|  ,'" "', '.  |_____|  .' |
                            |  '-.______.-' /  @"@ \       /  @"@  \  '-._____.-'   |
                            |               | (   ) |------| (   ) |                |
                            |              /\  @~@  /      \  @"@  /\               |

@@ -26,13 +26,39 @@ public class MeepMeepTesting {
         
         double deltaX = 0.5;
 
+        /* ACTUAL GOOD TRAJEECTORY FOR 8 CONE AUTO
+        .splineToSplineHeading(
+                new Pose2d(33.5, -3.5, Math.toRadians(170.8)),
+                directionalHeading
+        )
+        // Cones 1-6
+        .waitSeconds(cycleTime * 6)
+        .setTangent(Math.toRadians(270))
+        // Center out
+        .splineToSplineHeading(
+                new Pose2d(24, -12, Math.toRadians(90)),
+                Math.toRadians(180)
+        )
+        .splineToSplineHeading(
+                new Pose2d(-24, -12, Math.toRadians(90)),
+                Math.toRadians(180)
+        )
+        .splineToSplineHeading(
+                new Pose2d(-33.5, -3.5, Math.toRadians(180-170.8)),
+                Math.toRadians(90)
+        )
+        .waitSeconds(cycleTime * 2)
+        .setTangent(Math.toRadians(270))
+        .splineToSplineHeading(
+                new Pose2d(-12, -12, Math.toRadians(90)),
+                Math.toRadians(0)
+        )
+         */
+
         Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
         //Pose2d startPos = new Pose2d(invertX(36), -62.5, Math.toRadians(90));
         //Pose2d startPos = new Pose2d(36, -60, Math.toRadians(330));
         //Pose2d startPos = new Pose2d(12, 12, Math.toRadians(270));
-
-
-        // Forward 57, left 2, rotate 160 degrees
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -40,18 +66,6 @@ public class MeepMeepTesting {
                 .setDimensions(16.5, 17)
                 .followTrajectorySequence(drivetrain -> {
                     drivetrain.setPoseEstimate(startPos);
-                    /*
-                    TileCalculation t = new TileCalculation(drivetrain);
-                    returnThingy r = t.queueMove(TileCalculation.Move.DOWN);
-                    TileCalculation.Tile target1 = t.targetTile;
-                    returnThingy r2 = t.queueMove(TileCalculation.Move.RIGHT);
-                    TileCalculation.Tile target2 = t.targetTile;
-                    System.out.println(t.targetTile);
-                    System.out.println(r.nextTile);
-                    System.out.println(r.startHeading);
-                    System.out.println(r.endHeading);
-                    System.out.println(r.startPose);
-                     */
                     double cycleTime = 2.5; // seconds
 
                     double directionalHeading = Math.toRadians(90);
@@ -59,16 +73,85 @@ public class MeepMeepTesting {
                     double y = startPos.getY();
 
                     return drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
-                            .splineToSplineHeading(
-                                    new Pose2d(33.5, -3.5, Math.toRadians(170.8)),
+                            .splineToConstantHeading(
+                                    new Vector2d(36, -24),
                                     directionalHeading
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(35, -12, Math.toRadians(130)),
+                                    Math.toRadians(90)
+                            )
+                            // 1
+                            .waitSeconds(.25)
+                            .setTangent(Math.toRadians(0))
+                            .splineToSplineHeading(
+                                    new Pose2d(42, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            .waitSeconds(1)
+                            .setTangent(Math.toRadians(180))
+                            .splineToSplineHeading(
+                                    new Pose2d(35, -12, Math.toRadians(130)),
+                                    Math.toRadians(180)
+                            )
+                            // 2
+                            .waitSeconds(.25)
+                            .setTangent(Math.toRadians(0))
+                            .splineToSplineHeading(
+                                    new Pose2d(42, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            .waitSeconds(1)
+                            .setTangent(Math.toRadians(180))
+                            .splineToSplineHeading(
+                                    new Pose2d(35, -12, Math.toRadians(130)),
+                                    Math.toRadians(180)
+                            )
+                            //3
+                            .waitSeconds(.25)
+                            .setTangent(Math.toRadians(0))
+                            .splineToSplineHeading(
+                                    new Pose2d(42, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            .waitSeconds(1)
+                            .setTangent(Math.toRadians(180))
+                            .splineToSplineHeading(
+                                    new Pose2d(35, -12, Math.toRadians(130)),
+                                    Math.toRadians(180)
+                            )
+                            // 4
+                            .waitSeconds(.25)
+                            .setTangent(Math.toRadians(0))
+                            .splineToSplineHeading(
+                                    new Pose2d(42, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            .waitSeconds(1)
+                            .setTangent(Math.toRadians(180))
+                            .splineToSplineHeading(
+                                    new Pose2d(35, -12, Math.toRadians(130)),
+                                    Math.toRadians(180)
+                            )
+                            // 5
+                            .waitSeconds(.25)
+                            .setTangent(Math.toRadians(0))
+                            .splineToSplineHeading(
+                                    new Pose2d(42, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            .waitSeconds(1)
+                            .setTangent(Math.toRadians(180))
+                            .splineToSplineHeading(
+                                    new Pose2d(35, -12, Math.toRadians(130)),
+                                    Math.toRadians(180)
                             )
                             // Cones 1-6
                             .waitSeconds(cycleTime * 6)
                             .setTangent(Math.toRadians(270))
                             // Center out
                             .splineToSplineHeading(
-                                    new Pose2d(24, -12, Math.toRadians(90)),
+                                    new Pose2d(24, -11, Math.toRadians(90)),
                                     Math.toRadians(180)
                             )
                             .splineToSplineHeading(
