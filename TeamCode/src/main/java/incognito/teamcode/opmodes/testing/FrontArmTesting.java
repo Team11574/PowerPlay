@@ -60,26 +60,26 @@ public class FrontArmTesting extends RobotOpMode {
         
         if (robot.verticalArm.getLastPosition() != VerticalArm.Position.INTAKE
             && robot.verticalArm.getPosition() == VerticalArm.Position.INTAKE) {
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.HOLD_CONE);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_IN);
         }
         if (robot.verticalArm.getLastPosition() == VerticalArm.Position.INTAKE
             && robot.verticalArm.getPosition() != VerticalArm.Position.INTAKE) {
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT);
         }
 
         if (pad2.dpad_down_pressed) {
             robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
         }
         if (robot.verticalArm.atPosition()) {
-            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.HOLD_CONE) {
+            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.WAIT_IN) {
                 //if (robot.verticalArm.lever.atSetPosition(900)); {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.IN);
             }
         }
         if (robot.horizontalArm.atPosition()) {
-            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.UP) {
+            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.WAIT_OUT) {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
-            } else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.HOLD_CONE) {
+            } else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.WAIT_IN) {
                 robot.horizontalArm.openClaw();
             }
         }

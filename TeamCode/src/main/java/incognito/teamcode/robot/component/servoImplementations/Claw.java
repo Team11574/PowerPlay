@@ -21,4 +21,7 @@ public class Claw extends SetServo {
     public void close() {
         goToSetPosition(1);
     }
+
+    public boolean isClosed() { return getPosition() == getSetPositionAtIndex(1); }
+    public boolean isOpened() { return getPosition() == getSetPositionAtIndex(0); }
 }

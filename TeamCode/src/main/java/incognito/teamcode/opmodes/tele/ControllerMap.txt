@@ -1,6 +1,6 @@
                                 _=====_      SECONDARY CONTROLLER:      _=====_
-                   LT = NONE   / _____ \                               / _____ \    RT = Front Hinge
-                  LB = NONE   +.-'_____'-.---------------------------.-'_____'-.+   RB = NONE
+                   LT = NONE   / _____ \                               / _____ \    RT = Front Hinge Down
+  LB = Back Lever Step Down   +.-'_____'-.---------------------------.-'_____'-.+   RB = Back Lever Step Up
                              /   |     |  '.                       .'  |     |   \
                             / ___| /|\ |___ \                     / ___| (Y) |___ \
     ↑ = Vert Slide MED     / |      |      | ;  __           __  ; |             | ;   Y = NONE

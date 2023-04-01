@@ -4,8 +4,6 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_CM;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
-import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.HOLD_CONE;
-import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.IN;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.MANUAL;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.OUT;
 
@@ -23,7 +21,7 @@ import incognito.teamcode.robot.component.slide.HorizontalSlide;
 public class HorizontalArm extends Arm {
 
     public enum Position {
-        IN, HOLD_CONE, UP, OUT, MANUAL, CLAW_OUT
+        IN, WAIT_IN, WAIT_OUT, OUT, MANUAL, CLAW_OUT, GROUND
     }
 
     public HorizontalSlide slide;
@@ -73,7 +71,7 @@ public class HorizontalArm extends Arm {
                 hinge.goToSetPosition(HorizontalHinge.Position.IN);
                 closeClaw();
                 break;
-            case HOLD_CONE:
+            case WAIT_IN:
                 slide.goToSetPosition(HorizontalSlide.Position.IN);
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
                 hinge.goToSetPosition(HorizontalHinge.Position.IN);
@@ -84,7 +82,7 @@ public class HorizontalArm extends Arm {
                 levelHinge();
                 openClaw();
                 break;
-            case UP:
+            case WAIT_OUT:
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
                 hinge.goToSetPosition(HorizontalHinge.Position.MID);
                 openClaw();
