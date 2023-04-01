@@ -2,7 +2,10 @@ package incognito.teamcode.robot.component.arm;
 
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_CM;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_END;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_MID;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.MANUAL;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.OUT;
@@ -78,11 +81,18 @@ public class HorizontalArm extends Arm {
                 closeClaw();
                 break;
             case CLAW_OUT:
+                // no slide
                 lever.goToSetPosition(leverOutPositionStorage);
                 levelHinge();
                 openClaw();
                 break;
+            case GROUND:
+                slide.goToSetPosition(HorizontalSlide.Position.IN);
+                lever.goToSetPosition(Lever.HorizontalLeverPosition.OUT);
+                hinge.goToSetPosition(HorizontalHinge.Position.IN);
+                break;
             case WAIT_OUT:
+                // no slide
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
                 hinge.goToSetPosition(HorizontalHinge.Position.MID);
                 openClaw();
@@ -115,7 +125,14 @@ public class HorizontalArm extends Arm {
     }
 
     public void levelHinge() {
-        hinge.goToSetPosition(HorizontalHinge.Position.IN);
+        /*
+        hingeLow = 0
+        hingeHigh = 0.6
+
+        leverLow = 0
+        leverHigh = 0.8
+         */
+        hinge.setPosition(lever.getPosition() / HS_LEVER_MID * HS_HINGE_START);
     }
 
     public void storeLeverHeight(Lever.HorizontalLeverPosition position) {

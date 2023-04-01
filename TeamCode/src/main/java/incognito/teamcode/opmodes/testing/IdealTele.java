@@ -50,6 +50,7 @@ public class IdealTele extends RobotOpMode {
         claw_out_of_way = new Action(
                 () -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
                 .until(robot.verticalArm.claw::isOpened)
+                .delay(100)
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
     }
 
@@ -67,7 +68,6 @@ public class IdealTele extends RobotOpMode {
                 .onRise(claw_out_of_way);
         pad2.right_bumper.onRise(robot.horizontalArm::incrementLeverHeight);
         pad2.left_bumper.onRise(robot.horizontalArm::decrementLeverHeight);
-
     }
 
     @Override
