@@ -1,4 +1,4 @@
-package incognito.teamcode.opmodes.testing;
+package incognito.teamcode.opmodes.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -12,7 +12,7 @@ import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 
-@TeleOp(name = "Front Arm Testing", group = "testing")
+@TeleOp(name = "Ideal Tele", group = "testing")
 public class IdealTele extends RobotOpMode {
     // Instance variables
     WorldRobot robot;
