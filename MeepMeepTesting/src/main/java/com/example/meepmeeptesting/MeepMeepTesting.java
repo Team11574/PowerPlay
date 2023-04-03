@@ -146,9 +146,7 @@ public class MeepMeepTesting {
                                     new Pose2d(35, -12, Math.toRadians(130)),
                                     Math.toRadians(180)
                             )
-                            // Cones 1-6
-                            .waitSeconds(cycleTime * 6)
-                            .setTangent(Math.toRadians(270))
+                            .setTangent(Math.toRadians(180))
                             // Center out
                             .splineToSplineHeading(
                                     new Pose2d(24, -11, Math.toRadians(90)),
