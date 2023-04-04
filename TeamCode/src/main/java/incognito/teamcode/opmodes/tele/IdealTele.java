@@ -98,12 +98,15 @@ public class IdealTele extends RobotOpMode {
         multiTelemetry.addData("Button A", pad2.a);
         multiTelemetry.addData("Button A value", pad2.a.value);
         multiTelemetry.addData("Button A lastValue", pad2.a.lastValue);
+        multiTelemetry.addData("Button A actions", pad2.a.actions);
         multiTelemetry.addData("Button A onRise", pad2.a.onRise);
         multiTelemetry.addData("Button A onRise value", pad2.a.onRise.value);
         multiTelemetry.addData("Button A onRise lastValue", pad2.a.onRise.lastValue);
+        multiTelemetry.addData("Button A onRise actions", pad2.a.onRise.actions);
         multiTelemetry.addData("Button A onFall", pad2.a.onFall);
         multiTelemetry.addData("Button A onFall value", pad2.a.onFall.value);
         multiTelemetry.addData("Button A onFall lastValue", pad2.a.onFall.lastValue);
+        multiTelemetry.addData("Button A onFall actions", pad2.a.onFall.actions);
         multiTelemetry.addLine();
         multiTelemetry.addData("Vertical slide motor encoder", robot.verticalArm.slide.getPosition());
         multiTelemetry.addData("Vertical slide target position", robot.verticalArm.slide.getTargetPosition());
