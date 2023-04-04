@@ -1,7 +1,5 @@
 package incognito.teamcode.robot.component.slide;
 
-import static incognito.cog.util.Generic.withinThreshold;
-import static incognito.teamcode.config.WorldSlideConstants.VS_ENCODER_CENTER;
 import static incognito.teamcode.config.WorldSlideConstants.VS_TICKS_PER_IN;
 
 import com.qualcomm.robotcore.hardware.DcMotor;

@@ -51,6 +51,10 @@ public class FrontArmTesting extends RobotOpMode {
             robot.horizontalArm.toggleClaw();
         }
 
+        if (pad2.y_pressed) {
+            robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE_LIMIT);
+        }
+
         if (pad2.right_trigger_pressed) {
             robot.verticalArm.hingeDown();
         }

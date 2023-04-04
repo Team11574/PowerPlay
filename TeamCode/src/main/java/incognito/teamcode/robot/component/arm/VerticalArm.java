@@ -17,7 +17,7 @@ import incognito.teamcode.robot.component.slide.VerticalSlide;
 public class VerticalArm extends Arm {
 
     public enum Position {
-        INTAKE, LOW, MEDIUM, HIGH;
+        INTAKE, LOW, MEDIUM, HIGH, INTAKE_LIMIT;
 
         public double getWaitTime(Position currentPosition) {
             return WorldSlideConstants.VS_TIME_TO.getTime(this.name(), currentPosition.name());
@@ -30,7 +30,7 @@ public class VerticalArm extends Arm {
     public Claw claw;
     private Position currentPosition;
     private Position lastPosition;
-    private ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    private final ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     public VerticalArm(VerticalSlide slide, Lever lever, VerticalHinge hinge, Claw claw) {
         this.slide = slide;
@@ -43,6 +43,16 @@ public class VerticalArm extends Arm {
     public void goToPosition(Position position) {
         if (position == lastPosition) return;
         switch (position) {
+            case INTAKE_LIMIT:
+                slide.setPower(-1);
+                lever.goToSetPosition(Lever.VerticalLeverPosition.INTAKE);
+                if (getPosition() == Position.LOW) {
+                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME_LOW);
+                } else {
+                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME);
+                }
+                openClaw();
+                break;
             case INTAKE:
                 slide.goToSetPosition(VerticalSlide.Position.INTAKE);
                 lever.goToSetPosition(Lever.VerticalLeverPosition.INTAKE);
@@ -78,6 +88,9 @@ public class VerticalArm extends Arm {
         timer.reset();
         lastPosition = getPosition();
         currentPosition = position;
+        if (currentPosition == Position.INTAKE_LIMIT) {
+            currentPosition = Position.INTAKE;
+        }
     }
 
     public void openClaw() {
@@ -90,10 +103,6 @@ public class VerticalArm extends Arm {
 
     public void toggleClaw() {
         claw.toggle();
-    }
-
-    public void levelHinge() {
-
     }
 
     public void hingeUp() {

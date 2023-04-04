@@ -21,9 +21,6 @@ public class WorldSlideConstants {
 
     public static double VS_KG = 0.04;
 
-    // TODO: UPDATE
-    public static double VS_ENCODER_CENTER = 300;
-
     public static double VS_LEVER_WAIT_TIME = 500; // ms
     public static double VS_HINGE_WAIT_TIME = 150; // ms
     public static double VS_CLAW_WAIT_TIME = 100; // ms
@@ -145,6 +142,8 @@ public class WorldSlideConstants {
     public static double S_SET_POSITION_THRESHOLD = 20;
     public static double S_RUN_TO_POSITION_POWER = 0.75;
     public static double S_AUTO_EXTEND_POWER = 0.75;
+    // TODO: UPDATE
+    public static double S_ENCODER_CENTER_ISH = 300;
 
 
     // REMOVE ONCE CURRENT ALERT TESTING IS FINISHED
