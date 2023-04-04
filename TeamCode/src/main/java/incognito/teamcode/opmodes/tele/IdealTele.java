@@ -59,7 +59,7 @@ public class IdealTele extends RobotOpMode {
         pad2.y.onRise(intake);
         pad2.x.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT));
         pad2.b.onRise(robot.verticalArm::toggleClaw);
-        pad2.a.onRise(robot.horizontalArm::toggleClaw);
+        pad2.a.onRise(() -> robot.horizontalArm.toggleClaw());
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
         pad2.right_trigger.onFall(robot.verticalArm::hingeUp);
         pad2.dpad_down.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND));
@@ -82,8 +82,8 @@ public class IdealTele extends RobotOpMode {
 
     @Override
     public void loop() {
-        //fullTelemetry();
         update();
+        fullTelemetry();
     }
 
     public void update() {
@@ -94,6 +94,7 @@ public class IdealTele extends RobotOpMode {
     }
 
     public void fullTelemetry() {
+        multiTelemetry.addData("Gamepad a", pad2.gamepad.a);
         multiTelemetry.addData("Button A", pad2.a);
         multiTelemetry.addData("Button A value", pad2.a.value);
         multiTelemetry.addData("Button A lastValue", pad2.a.lastValue);
