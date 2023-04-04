@@ -41,13 +41,16 @@ public class VerticalArm extends Arm {
     }
 
     public void goToPosition(Position position) {
-        if (position == lastPosition) return;
+        if (position == currentPosition) return;
+        if (currentPosition == null) {
+            currentPosition = position;
+        }
         switch (position) {
             case INTAKE_LIMIT:
                 slide.setPower(-1);
                 lever.goToSetPosition(Lever.VerticalLeverPosition.INTAKE);
                 if (getPosition() == Position.LOW) {
-                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME_LOW);
+                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, false, VS_HINGE_TO_INTAKE_TIME_LOW);
                 } else {
                     hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME);
                 }
@@ -57,7 +60,7 @@ public class VerticalArm extends Arm {
                 slide.goToSetPosition(VerticalSlide.Position.INTAKE);
                 lever.goToSetPosition(Lever.VerticalLeverPosition.INTAKE);
                 if (getPosition() == Position.LOW) {
-                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME_LOW);
+                    hinge.goToSetPosition(VerticalHinge.Position.INTAKE, false, VS_HINGE_TO_INTAKE_TIME_LOW);
                 } else {
                     hinge.goToSetPosition(VerticalHinge.Position.INTAKE, getPosition() == Position.INTAKE, VS_HINGE_TO_INTAKE_TIME);
                 }

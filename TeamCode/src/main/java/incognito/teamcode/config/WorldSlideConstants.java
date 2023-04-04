@@ -104,7 +104,7 @@ public class WorldSlideConstants {
     public static double HS_MIN_ENCODER = 0;
     public static double HS_MAX_ENCODER = 2100;
 
-    public static double HS_LEVER_WAIT_TIME = 500; // ms
+    public static double HS_LEVER_WAIT_TIME = 750; // ms
     public static double HS_HINGE_WAIT_TIME = 150; // ms
     public static double HS_CLAW_WAIT_TIME = 250; // ms
 
@@ -125,7 +125,7 @@ public class WorldSlideConstants {
     public static double HS_HINGE_SPEED = 0.01;
 
     public static double HS_LEVER_START = 0.92;
-    public static double HS_LEVER_MID = 0.8;
+    public static double HS_LEVER_MID = 0.7;
     public static double HS_LEVER_FIFTH = 0.315;
     public static double HS_LEVER_FOURTH = 0.28;
     public static double HS_LEVER_THIRD = 0.235;

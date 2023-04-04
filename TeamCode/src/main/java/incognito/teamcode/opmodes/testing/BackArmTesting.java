@@ -74,10 +74,12 @@ public class BackArmTesting extends RobotOpMode {
 
         if (pad2.dpad_up_pressed) {
             robot.horizontalArm.decrementLeverHeight();
+            robot.horizontalArm.levelHinge();
         }
 
         if (pad2.dpad_down_pressed) {
             robot.horizontalArm.incrementLeverHeight();
+            robot.horizontalArm.levelHinge();
         }
 
         if (pad2.left_bumper_pressed) {

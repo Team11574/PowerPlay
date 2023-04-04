@@ -143,6 +143,7 @@ public class WorldRobot extends RobotCog {
                         VS_HINGE_MEDIUM_UP, VS_HINGE_MEDIUM_DOWN,
                         VS_HINGE_HIGH_UP, VS_HINGE_HIGH_DOWN
                 }, VS_HINGE_START, VS_HINGE_END);
+        verticalHinge.goToSetPosition(VerticalHinge.Position.INTAKE);
 
         Servo VS_lever_S = hardwareMap.get(Servo.class, "VS_lever_S");
         verticalLever = new Lever(hardwareMap, telemetry, VS_lever_S, new double[] {

@@ -19,7 +19,6 @@ import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
-@Disabled
 @TeleOp(name = "AGH WHAT IS SLOW Test", group = "tele")
 public class TeleWhatIsSlowTesting extends RobotOpMode {
     double junctionDistance;
@@ -58,6 +57,7 @@ public class TeleWhatIsSlowTesting extends RobotOpMode {
 
     @Override
     public void init_loop() {
+        robot.update();
         multiTelemetry.addData("Junction distance", robot.autoCamera.getJunctionDistance());
         multiTelemetry.addData("Junction area", robot.autoCamera.getJunctionWidth());
         multiTelemetry.update();
@@ -184,9 +184,9 @@ public class TeleWhatIsSlowTesting extends RobotOpMode {
 
         double rampSpeed = 0.1;
 
-        velY = ramp(inputVelY, velY, rampSpeed, rampSpeed * 3);
-        velX = ramp(inputVelX, velX, rampSpeed * 2, rampSpeed * 3);
-        theta = ramp(inputTheta, theta, 0.8);
+        velY = inputVelY; //ramp(inputVelY, velY, rampSpeed, rampSpeed * 3);
+        velX = inputVelX; //ramp(inputVelX, velX, rampSpeed * 2, rampSpeed * 3);
+        theta = inputTheta; //ramp(inputTheta, theta, 0.8);
     }
 
     private double ramp(double input, double currentValue, double speed) {

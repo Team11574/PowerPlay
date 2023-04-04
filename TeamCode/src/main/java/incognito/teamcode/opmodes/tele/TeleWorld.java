@@ -69,6 +69,12 @@ public class TeleWorld extends RobotOpMode {
     }
 
     @Override
+    public void init_loop() {
+        super.init_loop();
+        update();
+    }
+
+    @Override
     public void loop() {
         //super.loop();
         update();

@@ -140,7 +140,7 @@ public class HorizontalArm extends Arm {
         leverLow = 0
         leverHigh = 0.8
          */
-        hinge.setPosition(lever.getPosition() / HS_LEVER_MID * HS_HINGE_START);
+        hinge.setPosition((1 - lever.getPosition()) / HS_LEVER_MID * HS_HINGE_START);
     }
 
     public void storeLeverHeight(Lever.HorizontalLeverPosition position) {

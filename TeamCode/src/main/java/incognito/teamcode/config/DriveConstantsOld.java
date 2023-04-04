@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
  * and op modes themselves.
  */
 @Config
-public class DriveConstants {
+public class DriveConstantsOld {
 
     /*
      * These are motor constants that should be listed online for your motors.
@@ -45,7 +45,7 @@ public class DriveConstants {
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
     public static double WHEEL_RADIUS = 1.8898; // in
-    public static double GEAR_RATIO = 1.9; // output (wheel) speed / input (motor) speed
+    public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
     public static double TRACK_WIDTH = 12.75; // in, ESTIMATE: 12.75, working well with 13, but that yield an angle of 182
 
     /*
@@ -54,8 +54,8 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM); // ATTEMPT 1: 0.0365; // ORIGINAL: 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0; // ATTEMPT 1: 0.006; // ORIGINAL: 0;
+    public static double kV = 0.0353; // ATTEMPT 1: 0.0365; // ORIGINAL: 1.0 / rpmToVelocity(MAX_RPM);
+    public static double kA = 0.003; // ATTEMPT 1: 0.006; // ORIGINAL: 0;
     public static double kStatic = 0;
 
     /*
@@ -65,10 +65,8 @@ public class DriveConstants {
      * small and gradually increase them later after everything is working. All distance units are
      * inches.
      */
-    public static double MAX_VEL = 51.13720320937437;
-    public static double MAX_ACCEL = 51.13720320937437;
-    public static double MAX_ANG_VEL = Math.toRadians(229.79967999999997);
-    public static double MAX_ANG_ACCEL = Math.toRadians(229.79967999999997);
+    public static double MAX_VEL = 26.914317478618088;
+    public static double MAX_ACCEL = 26.914317478618088;
 
     /* Results from MaxAngularVeloTuner:
     Max Angular Velocity (deg): 142.63475847510625
@@ -76,6 +74,8 @@ public class DriveConstants {
     Max Recommended Angular Velocity (deg): 114.10780678008499
     Max Recommended Angular Velocity (rad): 1.9915569305419922
      */
+    public static double MAX_ANG_VEL = Math.toRadians(114.10780678008499); // ORIGINAL: Math.toRadians(118.62129230769227);
+    public static double MAX_ANG_ACCEL = Math.toRadians(118.62129230769227);
 
     /*
      * Adjust the orientations here to match your robot. See the FTC SDK documentation for details.

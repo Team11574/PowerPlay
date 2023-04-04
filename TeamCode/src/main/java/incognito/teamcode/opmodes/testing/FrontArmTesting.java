@@ -83,7 +83,7 @@ public class FrontArmTesting extends RobotOpMode {
         if (robot.horizontalArm.atPosition()) {
             if (robot.horizontalArm.getPosition() == HorizontalArm.Position.WAIT_OUT) {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
-            } else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.WAIT_IN) {
+            } else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.IN) {
                 robot.horizontalArm.openClaw();
             }
         }
