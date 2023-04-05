@@ -62,7 +62,7 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(26.914317478618088*2, 26.914317478618088*2, Math.toRadians(114.10780678008499), Math.toRadians(118.62129230769227), 12.75)
+                .setConstraints(45, 45, 3.9, 3.9, 12.75)
                 .setDimensions(16.5, 17)
                 .followTrajectorySequence(drivetrain -> {
                     drivetrain.setPoseEstimate(startPos);

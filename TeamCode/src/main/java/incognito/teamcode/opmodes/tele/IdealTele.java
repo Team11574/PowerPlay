@@ -46,12 +46,12 @@ public class IdealTele extends RobotOpMode {
                 .until(() -> robot.verticalArm.atPosition() && robot.horizontalArm.atPosition())
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
                 .until(robot.horizontalArm::atPosition)
-                .delay(100)
+                .delay(250)
                 .then(robot.horizontalArm::openClaw);
         claw_out_of_way = new Action(
                 () -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
                 .until(robot.verticalArm.claw::isOpened)
-                .delay(100)
+                .delay(250)
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
     }
 
@@ -59,7 +59,7 @@ public class IdealTele extends RobotOpMode {
         pad2.y.onRise(intake);
         pad2.x.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT));
         pad2.b.onRise(robot.verticalArm::toggleClaw);
-        pad2.a.onRise(() -> robot.horizontalArm.toggleClaw());
+        pad2.a.onRise(robot.horizontalArm::toggleClaw);
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
         pad2.right_trigger.onFall(robot.verticalArm::hingeUp);
         pad2.dpad_down.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND));
@@ -94,6 +94,7 @@ public class IdealTele extends RobotOpMode {
     }
 
     public void fullTelemetry() {
+        multiTelemetry.addData("Action manager length", ActionManager.actions.size());
         multiTelemetry.addData("Gamepad a", pad2.gamepad.a);
         multiTelemetry.addData("Button A", pad2.a);
         multiTelemetry.addData("Button A value", pad2.a.value);
