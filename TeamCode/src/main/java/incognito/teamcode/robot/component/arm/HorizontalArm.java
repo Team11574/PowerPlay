@@ -94,6 +94,7 @@ public class HorizontalArm extends Arm {
                 slide.goToSetPosition(HorizontalSlide.Position.IN);
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.OUT);
                 hinge.goToSetPosition(HorizontalHinge.Position.IN);
+                closeClaw();
                 break;
             case WAIT_OUT:
                 if (getPosition() == Position.OUT) {
@@ -174,10 +175,15 @@ public class HorizontalArm extends Arm {
         return lastPosition;
     }
 
+    public double getDistance() {
+        return distanceSensor.getDistance(DistanceUnit.CM);
+    }
+
     public void update() {
         if (getPosition() == OUT) {
-            if (distanceSensor.getDistance(DistanceUnit.CM) < HS_DS_CONE_DISTANCE_CM) {
+            if (getDistance() < HS_DS_CONE_DISTANCE_CM) {
                 slide.setTargetPosition(slide.getPosition());
+                closeClaw();
             }
         }
     }

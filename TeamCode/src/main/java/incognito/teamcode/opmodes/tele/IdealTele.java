@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import incognito.cog.actions.Action;
 import incognito.cog.actions.ActionManager;
 import incognito.cog.hardware.gamepad.Cogtroller;
@@ -46,18 +48,25 @@ public class IdealTele extends RobotOpMode {
                 .until(() -> robot.verticalArm.atPosition() && robot.horizontalArm.atPosition())
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
                 .until(robot.horizontalArm::atPosition)
-                .delay(250)
+                //.delay(100)
                 .then(robot.horizontalArm::openClaw);
         claw_out_of_way = new Action(
                 () -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
                 .until(robot.verticalArm.claw::isOpened)
-                .delay(250)
+                .delay(100)
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
     }
 
     public void initializeControls() {
         pad2.y.onRise(intake);
-        pad2.x.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT));
+        pad2.x.onRise(() -> {
+            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT)
+                robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
+            else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.OUT)
+                robot.horizontalArm.goToPosition(HorizontalArm.Position.MANUAL);
+            else
+                robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+        });
         pad2.b.onRise(robot.verticalArm::toggleClaw);
         pad2.a.onRise(robot.horizontalArm::toggleClaw);
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
@@ -94,20 +103,11 @@ public class IdealTele extends RobotOpMode {
     }
 
     public void fullTelemetry() {
-        multiTelemetry.addData("Action manager length", ActionManager.actions.size());
-        multiTelemetry.addData("Gamepad a", pad2.gamepad.a);
-        multiTelemetry.addData("Button A", pad2.a);
-        multiTelemetry.addData("Button A value", pad2.a.value);
-        multiTelemetry.addData("Button A lastValue", pad2.a.lastValue);
-        multiTelemetry.addData("Button A actions", pad2.a.actions);
-        multiTelemetry.addData("Button A onRise", pad2.a.onRise);
-        multiTelemetry.addData("Button A onRise value", pad2.a.onRise.value);
-        multiTelemetry.addData("Button A onRise lastValue", pad2.a.onRise.lastValue);
-        multiTelemetry.addData("Button A onRise actions", pad2.a.onRise.actions);
-        multiTelemetry.addData("Button A onFall", pad2.a.onFall);
-        multiTelemetry.addData("Button A onFall value", pad2.a.onFall.value);
-        multiTelemetry.addData("Button A onFall lastValue", pad2.a.onFall.lastValue);
-        multiTelemetry.addData("Button A onFall actions", pad2.a.onFall.actions);
+        multiTelemetry.addData("Vertical claw isOpened", robot.verticalArm.claw.isOpened());
+        multiTelemetry.addData("claw_out is active", claw_out_of_way.isActive());
+        multiTelemetry.addData("claw_out index", claw_out_of_way.index);
+        multiTelemetry.addData("intake is active", intake.isActive());
+        multiTelemetry.addData("intake index", intake.index);
         multiTelemetry.addLine();
         multiTelemetry.addData("Vertical slide motor encoder", robot.verticalArm.slide.getPosition());
         multiTelemetry.addData("Vertical slide target position", robot.verticalArm.slide.getTargetPosition());
@@ -125,6 +125,7 @@ public class IdealTele extends RobotOpMode {
         multiTelemetry.addLine();
         multiTelemetry.addData("Vertical arm atPosition", robot.verticalArm.atPosition());
         multiTelemetry.addData("Horizontal arm atPosition", robot.horizontalArm.atPosition());
+        multiTelemetry.addData("Horizontal distance", robot.horizontalArm.getDistance());
         multiTelemetry.update();
     }
 

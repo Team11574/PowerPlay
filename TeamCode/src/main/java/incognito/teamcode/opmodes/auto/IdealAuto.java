@@ -68,9 +68,11 @@ public class IdealAuto extends RobotLinearOpMode {
         Action toHigh = new Action(() -> {
             robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
             robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT);})
-                .until(() -> robot.verticalArm.atPosition())
+                .delay(900)
+                //.delay(400)
+                .then(robot.verticalArm::openClaw)
                 .delay(100)
-                .then(robot.verticalArm::openClaw);
+                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
 
         /*
                 // 1

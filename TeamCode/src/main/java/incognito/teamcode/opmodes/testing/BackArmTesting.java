@@ -7,6 +7,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import incognito.cog.actions.Scheduler;
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
@@ -95,21 +97,22 @@ public class BackArmTesting extends RobotOpMode {
     }
 
     public void fullTelemetry() {
-        multiTelemetry.addData("Vertical slide motor encoder", robot.horizontalArm.slide.getPosition());
-        multiTelemetry.addData("Vertical slide target position", robot.horizontalArm.slide.getTargetPosition());
-        multiTelemetry.addData("Vertical slide motor power", robot.horizontalArm.slide.getPower());
-        multiTelemetry.addData("Vertical slide limit switch:", robot.horizontalArm.slide.getDangerState());
+        multiTelemetry.addData("Horizontal slide motor encoder", robot.horizontalArm.slide.getPosition());
+        multiTelemetry.addData("Horizontal slide target position", robot.horizontalArm.slide.getTargetPosition());
+        multiTelemetry.addData("Horizontal slide motor power", robot.horizontalArm.slide.getPower());
+        multiTelemetry.addData("Horizontal slide limit switch:", robot.horizontalArm.slide.getDangerState());
         multiTelemetry.addLine();
-        multiTelemetry.addData("Vertical slide atTop", robot.horizontalArm.slide.atTop);
-        multiTelemetry.addData("Vertical slide atBottom", robot.horizontalArm.slide.atBottom);
-        multiTelemetry.addData("Vertical slide goingDown", robot.horizontalArm.slide.goingDown());
-        multiTelemetry.addData("Vertical slide goingUp", robot.horizontalArm.slide.goingUp());
+        multiTelemetry.addData("Horizontal slide atTop", robot.horizontalArm.slide.atTop);
+        multiTelemetry.addData("Horizontal slide atBottom", robot.horizontalArm.slide.atBottom);
+        multiTelemetry.addData("Horizontal slide goingDown", robot.horizontalArm.slide.goingDown());
+        multiTelemetry.addData("Horizontal slide goingUp", robot.horizontalArm.slide.goingUp());
         multiTelemetry.addLine();
-        multiTelemetry.addData("Vertical lever pos", robot.horizontalArm.lever.getPosition());
-        multiTelemetry.addData("Vertical hinge pos", robot.horizontalArm.hinge.getPosition());
-        multiTelemetry.addData("Vertical claw pos", robot.horizontalArm.claw.getPosition());
-        multiTelemetry.addData("Vertical arm pos", robot.horizontalArm.getPosition());
+        multiTelemetry.addData("Horizontal lever pos", robot.horizontalArm.lever.getPosition());
+        multiTelemetry.addData("Horizontal hinge pos", robot.horizontalArm.hinge.getPosition());
+        multiTelemetry.addData("Horizontal claw pos", robot.horizontalArm.claw.getPosition());
+        multiTelemetry.addData("Horizontal arm pos", robot.horizontalArm.getPosition());
         multiTelemetry.addLine();
+        multiTelemetry.addData("Horizontal distance", robot.horizontalArm.getDistance());
         multiTelemetry.update();
     }
 }

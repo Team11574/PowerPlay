@@ -104,7 +104,7 @@ public class WorldSlideConstants {
     public static double HS_MIN_ENCODER = 0;
     public static double HS_MAX_ENCODER = 2100;
 
-    public static double HS_LEVER_WAIT_TIME = 750; // ms
+    public static double HS_LEVER_WAIT_TIME = 650; // ms
     public static double HS_HINGE_WAIT_TIME = 150; // ms
     public static double HS_CLAW_WAIT_TIME = 250; // ms
 
@@ -135,7 +135,7 @@ public class WorldSlideConstants {
     public static double HS_LEVER_SPEED = 0.05;
 
     /* == Horizontal Slide Cone Distance == */
-    public static double HS_DS_CONE_DISTANCE_CM = 4;
+    public static double HS_DS_CONE_DISTANCE_CM = 6;
 
 
     /* == Slides General == */
