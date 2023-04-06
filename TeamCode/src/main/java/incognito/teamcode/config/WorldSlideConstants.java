@@ -91,6 +91,8 @@ public class WorldSlideConstants {
     public static double VS_CLAW_OPEN = 0.3;
     public static double VS_CLAW_CLOSED = 0.35;
 
+    public static double VS_CLAW_HANDOFF_SPEED = 250;
+
 
 
 
@@ -102,7 +104,7 @@ public class WorldSlideConstants {
     public static final double HS_TICKS_PER_IN = HS_TICKS_PER_REV * HS_GEAR_RATIO / HS_PULLEY_CIRCUMFERENCE;
 
     public static double HS_MIN_ENCODER = 0;
-    public static double HS_MAX_ENCODER = 2100;
+    public static double HS_MAX_ENCODER = 1900;
 
     public static double HS_LEVER_WAIT_TIME = 650; // ms
     public static double HS_HINGE_WAIT_TIME = 150; // ms

@@ -1,5 +1,7 @@
 package incognito.teamcode.opmodes.tele;
 
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -51,7 +53,7 @@ public class IdealTele extends RobotOpMode {
                 //.delay(100)
                 .then(robot.horizontalArm::openClaw);
         claw_out_of_way = new Action(
-                () -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
+                () -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
                 .until(robot.verticalArm.claw::isOpened)
                 .delay(100)
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
@@ -72,12 +74,39 @@ public class IdealTele extends RobotOpMode {
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
         pad2.right_trigger.onFall(robot.verticalArm::hingeUp);
         pad2.dpad_down.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND));
-        pad2.dpad_left.onRise(() -> robot.verticalArm.goToPosition(VerticalArm.Position.LOW))
-                        .onRise(claw_out_of_way);
-        pad2.dpad_up.onRise(() -> robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM))
-                        .onRise(claw_out_of_way);
-        pad2.dpad_right.onRise(() -> robot.verticalArm.goToPosition(VerticalArm.Position.HIGH))
-                .onRise(claw_out_of_way);
+        pad2.dpad_left.onRise(new Action(() -> {
+                    if (pad2.left_trigger_active()) {
+                        intake.run();
+                    }
+                })
+                .waitFor(intake)
+                .delay(VS_CLAW_HANDOFF_SPEED)
+                .then(() -> {
+                    robot.verticalArm.goToPosition(VerticalArm.Position.LOW);
+                    claw_out_of_way.run();
+                }));
+        pad2.dpad_left.onRise(new Action(() -> {
+                    if (pad2.left_trigger_active()) {
+                        intake.run();
+                    }
+                })
+                .waitFor(intake)
+                .delay(VS_CLAW_HANDOFF_SPEED)
+                .then(() -> {
+                    robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM);
+                    claw_out_of_way.run();
+                }));
+        pad2.dpad_left.onRise(new Action(() -> {
+                    if (pad2.left_trigger_active()) {
+                        intake.run();
+                    }
+                })
+                .waitFor(intake)
+                .delay(VS_CLAW_HANDOFF_SPEED)
+                .then(() -> {
+                    robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
+                    claw_out_of_way.run();
+                }));
         pad2.right_bumper.onRise(robot.horizontalArm::incrementLeverHeight);
         pad2.left_bumper.onRise(robot.horizontalArm::decrementLeverHeight);
     }
