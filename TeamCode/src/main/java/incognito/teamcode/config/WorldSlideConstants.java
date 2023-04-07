@@ -88,10 +88,12 @@ public class WorldSlideConstants {
     public static double VS_DEFAULT_TIME = 250; // ms
 
     // TODO: Find correct vertical claw open/closed positions
-    public static double VS_CLAW_OPEN = 0.3;
+    public static double VS_CLAW_WIDE = 0.2;
+    public static double VS_CLAW_OPEN = 0.29;
     public static double VS_CLAW_CLOSED = 0.35;
 
     public static double VS_CLAW_HANDOFF_SPEED = 250;
+    public static double VS_DROP_SPEED = 250;
 
 
 
@@ -104,7 +106,7 @@ public class WorldSlideConstants {
     public static final double HS_TICKS_PER_IN = HS_TICKS_PER_REV * HS_GEAR_RATIO / HS_PULLEY_CIRCUMFERENCE;
 
     public static double HS_MIN_ENCODER = 0;
-    public static double HS_MAX_ENCODER = 1900;
+    public static double HS_MAX_ENCODER = 2000;
 
     public static double HS_LEVER_WAIT_TIME = 650; // ms
     public static double HS_HINGE_WAIT_TIME = 150; // ms
@@ -119,14 +121,14 @@ public class WorldSlideConstants {
 
     // TODO: Find correct values
     public static double HS_CLAW_OPEN = 0.3;
-    public static double HS_CLAW_CLOSED = 0.5;
+    public static double HS_CLAW_CLOSED = 0.45;
 
-    public static double HS_HINGE_START = .6;
+    public static double HS_HINGE_START = .605;
     public static double HS_HINGE_MID = .3;
     public static double HS_HINGE_END = 0;
     public static double HS_HINGE_SPEED = 0.01;
 
-    public static double HS_LEVER_START = 0.92;
+    public static double HS_LEVER_START = 0.94;
     public static double HS_LEVER_MID = 0.7;
     public static double HS_LEVER_FIFTH = 0.315;
     public static double HS_LEVER_FOURTH = 0.28;
@@ -137,15 +139,16 @@ public class WorldSlideConstants {
     public static double HS_LEVER_SPEED = 0.05;
 
     /* == Horizontal Slide Cone Distance == */
-    public static double HS_DS_CONE_DISTANCE_CM = 6;
+    public static double HS_DS_CONE_DISTANCE_CM = 6; // cm
+    public static int HS_CONE_JUMP_DISTANCE = 5; // ticks
 
 
     /* == Slides General == */
     public static double S_SET_POSITION_THRESHOLD = 20;
-    public static double S_RUN_TO_POSITION_POWER = 0.75;
-    public static double S_AUTO_EXTEND_POWER = 0.75;
+    public static double S_RUN_TO_POSITION_POWER = 1;
     // TODO: UPDATE
     public static double S_ENCODER_CENTER_ISH = 300;
+    public static double S_JOYSTICK_THRESHOLD = 0.1;
 
 
     // REMOVE ONCE CURRENT ALERT TESTING IS FINISHED

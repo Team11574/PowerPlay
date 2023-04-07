@@ -17,4 +17,6 @@ public class GenericConstants {
     public static double FRONT_DS_THETA_THRESHOLD = 0.05;
     public static double FRONT_DS_DISTANCE_FACTOR = 20;
     public static double FRONT_DS_DISTANCE_THRESHOLD = 1;
+
+    public static double DRIVETRAIN_RAMP_SPEED = 0.1;
 }

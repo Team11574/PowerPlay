@@ -16,6 +16,7 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
 import static incognito.teamcode.config.WorldSlideConstants.HS_MIN_ENCODER;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_CLOSED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_OPEN;
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_WIDE;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_END;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_HIGH_DOWN;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_HIGH_UP;
@@ -152,7 +153,7 @@ public class WorldRobot extends RobotCog {
         );
 
         Servo VS_claw_S = hardwareMap.get(Servo.class, "VS_claw_S");
-        verticalClaw = new Claw(hardwareMap, telemetry, VS_claw_S, VS_CLAW_OPEN, VS_CLAW_CLOSED);
+        verticalClaw = new Claw(hardwareMap, telemetry, VS_claw_S, VS_CLAW_OPEN, VS_CLAW_CLOSED, VS_CLAW_WIDE);
 
         verticalArm = new VerticalArm(verticalSlide, verticalLever, verticalHinge, verticalClaw);
     }

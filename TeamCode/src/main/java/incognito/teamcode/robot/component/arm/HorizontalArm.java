@@ -1,12 +1,16 @@
 package incognito.teamcode.robot.component.arm;
 
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.HS_CONE_JUMP_DISTANCE;
 import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_CM;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_END;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_MID;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
+import static incognito.teamcode.config.WorldSlideConstants.S_RUN_TO_POSITION_POWER;
+import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.CLAW_OUT;
+import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.GROUND;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.MANUAL;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.OUT;
 
@@ -59,13 +63,16 @@ public class HorizontalArm extends Arm {
      */
 
     public void goToPosition(Position position) {
-        if (position == lastPosition) return;
+        if (position == currentPosition) return;
+        lastPosition = currentPosition;
+        currentPosition = position;
         if (position == MANUAL) {
             slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             slide.setPower(0);
             return;
         } else if (slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setPower(S_RUN_TO_POSITION_POWER);
         }
         switch (position) {
             case IN:
@@ -75,7 +82,7 @@ public class HorizontalArm extends Arm {
                 closeClaw();
                 break;
             case WAIT_IN:
-                if (getPosition() == Position.IN) {
+                if (lastPosition == Position.IN) {
                     // ignore
                     return;
                 }
@@ -97,7 +104,7 @@ public class HorizontalArm extends Arm {
                 closeClaw();
                 break;
             case WAIT_OUT:
-                if (getPosition() == Position.OUT) {
+                if (lastPosition == Position.OUT) {
                     // ignore
                     return;
                 }
@@ -113,8 +120,6 @@ public class HorizontalArm extends Arm {
                 openClaw();
                 break;
         }
-        lastPosition = currentPosition;
-        currentPosition = position;
     }
 
     public void extendSlide() {
@@ -140,15 +145,24 @@ public class HorizontalArm extends Arm {
 
         leverLow = 0
         leverHigh = 0.8
+
+        lever @ 0 => hinge @ 0.6
+        lever @ 0.8 => hinge @ 0
+
          */
-        hinge.setPosition((1 - lever.getPosition()) / HS_LEVER_MID * HS_HINGE_START);
+        hinge.setPosition((0.8 - lever.getPosition() + 0.05)/0.8 * 0.6);
+    }
+
+    public void setPower(double power) {
+        goToPosition(MANUAL);
+        slide.setPower(power);
     }
 
     public void storeLeverHeight(Lever.HorizontalLeverPosition position) {
         leverOutPositionStorage = position;
-        lever.goToSetPosition(leverOutPositionStorage);
-        if (getPosition() == OUT || getPosition() == MANUAL) {
-            // i dont know what i wanted to do here...
+        if (getPosition() == OUT || getPosition() == CLAW_OUT || getPosition() == GROUND) {
+            lever.goToSetPosition(leverOutPositionStorage);
+            levelHinge();
         }
     }
 
@@ -182,7 +196,7 @@ public class HorizontalArm extends Arm {
     public void update() {
         if (getPosition() == OUT) {
             if (getDistance() < HS_DS_CONE_DISTANCE_CM) {
-                slide.setTargetPosition(slide.getPosition());
+                slide.setTargetPosition(slide.getPosition() + HS_CONE_JUMP_DISTANCE);
                 closeClaw();
             }
         }

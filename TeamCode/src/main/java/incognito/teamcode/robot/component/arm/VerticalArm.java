@@ -1,10 +1,7 @@
 package incognito.teamcode.robot.component.arm;
 
-import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_TO_INTAKE_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_TO_INTAKE_TIME_LOW;
-import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_WAIT_TIME;
-import static incognito.teamcode.config.WorldSlideConstants.VS_LEVER_WAIT_TIME;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -106,6 +103,10 @@ public class VerticalArm extends Arm {
 
     public void toggleClaw() {
         claw.toggle();
+    }
+
+    public void toggleClawWide() {
+        claw.toggleWide();
     }
 
     public void hingeUp() {
