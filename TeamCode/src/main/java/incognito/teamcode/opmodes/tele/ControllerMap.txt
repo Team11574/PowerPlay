@@ -1,36 +1,48 @@
-                                _=====_      SECONDARY CONTROLLER:      _=====_
-                   LT = NONE   / _____ \                               / _____ \    RT = Front Hinge Down
+.                               _=====_      SECONDARY CONTROLLER:      _=====_
+                   LT = SUPER  / _____ \                               / _____ \    RT = Front Hinge Down (HOLD) / Up (RELEASE)
   LB = Back Lever Step Down   +.-'_____'-.---------------------------.-'_____'-.+   RB = Back Lever Step Up
                              /   |     |  '.                       .'  |     |   \
                             / ___| /|\ |___ \                     / ___| (Y) |___ \
-    ↑ = Vert Slide MED     / |      |      | ;  ___         ___  ; |             | ;   Y = Back claw extend until cone
-    ← = Vert Slide LOW     | | <---   ---> | | |_M_|   L   |_S_| | |(X)       (B)| |   X = Back claw retract and transfer
-    → = Vert Slide HIGH    | |___   |   ___| ;                   ; |___       ___| ;   A = Back Claw grab
-    ↓ = Hori Slide GROUND  |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = Front Claw let go
+    ↑ = *Vert Slide MED    / |      |      | ;  ___         ___  ; |             | ;   Y = Back claw retract and transfer cone
+    ← = *Vert Slide LOW    | | <---   ---> | | |_M_|   L   |_S_| | |(X)       (B)| |   X = Back Claw grab/release
+    → = *Vert Slide HIGH   | |___   |   ___| ;                   ; |___       ___| ;   A = *Back claw extend until cone + grab
+    ↓ = Hori Slide GROUND  |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = Front Claw grab/release
                            | \   |_____|  .','" "', |_B_|  ,'" "', '.  |_____|  .' |
                            |  '-.______.-' /  @"@ \       /  @"@  \  '-._____.-'   |
                            |               | (   ) |------| (   ) |                |
                            |              /\  @~@  /      \  @"@  /\               |
                            |             /  '.___.'        '.___.'  \              |
-                           |            / ⊙ = Override     ⊙ = Clear \             |
-                            \          /  ↕ = Vert Slide   ↕ = Lever  \           /
+                           |            / ⊙ = NONE         ⊙ = NONE  \             |
+                            \          /  ↕ = NONE         ↕ = NONE   \           /
                              \________/  ←→ = Hori Slide  ←→ = NONE    \_________/
 
-    Override = Disable all horizontal components and set horizontal power to 0.
-    Clear = Clear schedulers.
-    Needed controls: Anything to do with the front arm.
+Notes:
+    RB and LB actually queue a lever step position, so you can preemptively click them while the claw is in and it will remember the new position (up or down
+    from where you last were by however many times you click the buttons) and then move to that position when the claw next extends.
+
+    Y should generally not be used when cycling, ←/↑/→/↓ will automatically intake the cone when the claw is extended. It is just a backup to be used if you want
+    to intake and store the cone without scoring it at a height immediately.
+
+    A is a toggle between three modes, OUT, EXTEND, and MANUAL. When you press A while the claw is in, the lever will go to the floor but the slide will
+    not extend (OUT mode). Clicking A again will extend the slide until it hits a cone, and then it will grab it (EXTEND mode). Clicking A during this extension
+    will stop the slide at the current position (MANUAL mode) and let you direct it with the left joystick (moving the left joystick by default enables MANUAL
+    mode, but this is an intermediary to stop the auto-extend just in case). Clicking A in MANUAL mode will return the slide to EXTEND mode.
+
+    SUPER = Alternate action. A * indicates that there is an alternate command available for a button, accessed by holding LT while pressing that button.
+    ←/↑/→ + SUPER = Move to indicated height (LOW/MED/HIGH) but do not change horizontal slide position (by default, ←/↑/→ also makes the horizontal slide intake)
+    A + SUPER = Back claw extend until cone but without grabbing it (useful for moving out while the vertical slide still has a cone)
 
 
 
 
 
                                _=====_        PRIMARY CONTROLLER:      _=====_
-                LT = NONE     / _____ \                               / _____ \    RT = Tile lock (^)
+                LT = NONE     / _____ \                               / _____ \    RT = //Tile lock (^)
                 LB = NONE    +.-'_____'-.---------------------------.-'_____'-.+   RB = NONE
                             /   |     |  '.                       .'  |     |   \
                            / ___| /|\ |___ \                     / ___| (Y) |___ \
         ↑ = NONE          / |      |      | ;  __           __  ; |             | ;   Y = NONE
-        ← = NONE          | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = Assert Centered
+        ← = NONE          | | <---   ---> | | |__|         |__| | |(X)       (B)| |   X = //Assert Centered
         → = NONE          | |___   |   ___| ;                   ; |___       ___| ;   A = TARGET LOCK
         ↓ = NONE          |\    | \|/ |    /  _     ___      _   \    | (A) |    /|   B = NONE
                           | \   |_____|  .','" "', |___|  ,'" "', '.  |_____|  .' |

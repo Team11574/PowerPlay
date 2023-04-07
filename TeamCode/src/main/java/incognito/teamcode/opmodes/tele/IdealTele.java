@@ -82,7 +82,7 @@ public class IdealTele extends RobotOpMode {
 
     public void initializeControls() {
         pad2.y.onRise(intake);
-        pad2.x.onRise(() -> {
+        pad2.a.onRise(() -> {
             if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT
                     || robot.horizontalArm.getPosition() == HorizontalArm.Position.MANUAL) {
                 if (pad2.left_trigger_active()) {
@@ -104,7 +104,7 @@ public class IdealTele extends RobotOpMode {
                 robot.verticalArm.toggleClawWide();
             }
         });
-        pad2.a.onRise(robot.horizontalArm::toggleClaw);
+        pad2.x.onRise(robot.horizontalArm::toggleClaw);
         //pad2.a.onRise(() -> robot.horizontalArm.hinge.setPosition(robot.horizontalArm.hinge.getPosition() + 0.01));
         //pad2.b.onRise(() -> robot.horizontalArm.hinge.setPosition(robot.horizontalArm.hinge.getPosition() - 0.01));
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
