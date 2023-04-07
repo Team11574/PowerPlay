@@ -15,6 +15,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import incognito.cog.actions.Action;
 import incognito.cog.actions.ActionManager;
 import incognito.cog.hardware.gamepad.Cogtroller;
@@ -36,11 +38,12 @@ public class IdealTele extends RobotOpMode {
     Action conditional_intake;
 
     boolean targetLocking = false;
+    boolean fieldOriented = false;
 
-    double velX, velY, theta = 0;
+    double velX, velY, theta, rotX, rotY, botHeading = 0;
     double normalFactor;
     double junctionWidth, junctionHorizontalDistance, junctionYPower;
-    double frontRight_Power, backRight_Power, frontLeft_Power, backLeft_Power;
+    double frontRightPower, backRightPower, frontLeftPower, backLeftPower;
     double inputVelY, inputVelX, inputTheta;
 
     @Override
@@ -81,7 +84,7 @@ public class IdealTele extends RobotOpMode {
     }
 
     public void initializeControls() {
-        pad2.y.onRise(intake);
+        pad2.b.onRise(intake);
         pad2.a.onRise(() -> {
             if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT
                     || robot.horizontalArm.getPosition() == HorizontalArm.Position.MANUAL) {
@@ -97,7 +100,7 @@ public class IdealTele extends RobotOpMode {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
             }
         });
-        pad2.b.onRise(() -> {
+        pad2.y.onRise(() -> {
             if (robot.verticalArm.getPosition() == VerticalArm.Position.INTAKE) {
                 robot.verticalArm.toggleClaw();
             } else {
@@ -126,6 +129,7 @@ public class IdealTele extends RobotOpMode {
         pad2.left_bumper.onRise(robot.horizontalArm::decrementLeverHeight);
 
 
+
         pad1.a.onRise(() -> {
             targetLocking = !targetLocking;
             if (targetLocking) {
@@ -134,6 +138,7 @@ public class IdealTele extends RobotOpMode {
                 robot.autoCamera.stopCamera();
             }
         });
+        pad1.y.onRise(new Action().doIf(() -> {fieldOriented = !fieldOriented;}, () -> !targetLocking));
     }
 
     @Override
@@ -147,7 +152,7 @@ public class IdealTele extends RobotOpMode {
     public void loop() {
         // Adjust drivetrain
         if (!targetLocking) {
-            adjustDrivetrain();
+            adjustVelocities();
         } else {
             targetLock();
         }
@@ -156,23 +161,48 @@ public class IdealTele extends RobotOpMode {
             robot.horizontalArm.setPower(pad2.gamepad.left_stick_x);
         }
 
-        normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
-        frontRight_Power = (velY - velX - theta) / normalFactor;
-        backRight_Power = (velY + velX - theta) / normalFactor;
-        frontLeft_Power = (velY + velX + theta) / normalFactor;
-        backLeft_Power = (velY - velX + theta) / normalFactor;
-
-        drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+        updatePower();
 
         update();
-        multiTelemetry.addData("Hinge position", robot.horizontalArm.hinge.getPosition());
-        multiTelemetry.addData("Lever position", robot.horizontalArm.lever.getPosition());
+        multiTelemetry.addData("Target Locking", targetLocking);
+        multiTelemetry.addData("Field Oriented Movement", fieldOriented);
+        multiTelemetry.addLine();
         multiTelemetry.addData("Horizontal distance", robot.horizontalArm.getDistance());
         multiTelemetry.update();
         //fullTelemetry();
     }
 
-    public void adjustDrivetrain() {
+    public void swapFieldOriented() {
+        fieldOriented = !fieldOriented;
+    }
+
+    public void updatePower() {
+        if (fieldOriented && !targetLocking) {
+            botHeading = drivetrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+            // Rotate the movement direction counter to the bot's rotation
+            rotX = velX * Math.cos(-botHeading) - velY * Math.sin(-botHeading);
+            rotY = velX * Math.sin(-botHeading) + velY * Math.cos(-botHeading);
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio, but only when
+            // at least one is out of the range [-1, 1]
+            normalFactor = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(theta), 1);
+            frontLeftPower = (rotY + rotX + theta) / normalFactor;
+            backLeftPower = (rotY - rotX + theta) / normalFactor;
+            frontRightPower = (rotY - rotX - theta) / normalFactor;
+            backRightPower = (rotY + rotX - theta) / normalFactor;
+        } else {
+            normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
+            frontRightPower = (velY - velX - theta) / normalFactor;
+            backRightPower = (velY + velX - theta) / normalFactor;
+            frontLeftPower = (velY + velX + theta) / normalFactor;
+            backLeftPower = (velY - velX + theta) / normalFactor;
+        }
+        drivetrain.setMotorPowers(frontLeftPower, backLeftPower, backRightPower, frontRightPower);
+    }
+
+    public void adjustVelocities() {
         inputVelY = -pad1.gamepad.left_stick_y;
         inputVelX = pad1.gamepad.left_stick_x;
         inputTheta = pad1.gamepad.right_stick_x;
@@ -217,11 +247,12 @@ public class IdealTele extends RobotOpMode {
         } else {
             theta = junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
         }
-
+        /*
         multiTelemetry.addData("Junction distance", junctionHorizontalDistance);
         multiTelemetry.addData("Junction width", junctionWidth);
         multiTelemetry.addData("Junction Y power", velY);
         multiTelemetry.addData("Junction theta power", theta);
+        */
     }
 
     private double ramp(double input, double currentValue, double speed) {
