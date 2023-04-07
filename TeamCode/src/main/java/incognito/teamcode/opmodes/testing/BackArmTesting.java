@@ -1,7 +1,7 @@
 package incognito.teamcode.opmodes.testing;
 
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_END;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_OUT;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_IN;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -66,10 +66,10 @@ public class BackArmTesting extends RobotOpMode {
         }
 
         if (pad2.dpad_right_pressed) {
-            robot.horizontalArm.hinge.setPosition(HS_HINGE_START);
+            robot.horizontalArm.hinge.setPosition(HS_HINGE_IN);
         }
         if (pad2.dpad_left_pressed) {
-            robot.horizontalArm.hinge.setPosition(HS_HINGE_END);
+            robot.horizontalArm.hinge.setPosition(HS_HINGE_OUT);
         }
 
 

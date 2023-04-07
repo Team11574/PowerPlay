@@ -46,13 +46,12 @@ public class IdealTele extends RobotOpMode {
     @Override
     public void init() {
         this.multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        this.robot = new WorldRobot(hardwareMap, multiTelemetry, false);
+        this.robot = new WorldRobot(hardwareMap, multiTelemetry, true);
+        robot.autoCamera.swapDoingJunctions();
         this.drivetrain = robot.drivetrain;
         pad1 = new Cogtroller(gamepad1);
         pad2 = new Cogtroller(gamepad2);
 
-        multiTelemetry.addLine("Initialized!");
-        multiTelemetry.update();
         ActionManager.clear();
 
         initializeActions();
@@ -62,7 +61,8 @@ public class IdealTele extends RobotOpMode {
     public void initializeActions() {
         intake = new Action(() -> {
                     robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
-                    robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_IN);
+                    if (robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
+                        robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_IN);
                 })
                 .until(() -> robot.verticalArm.atPosition() && robot.horizontalArm.atPosition())
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
@@ -83,46 +83,43 @@ public class IdealTele extends RobotOpMode {
     public void initializeControls() {
         pad2.y.onRise(intake);
         pad2.x.onRise(() -> {
-            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT)
-                robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
-            else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.OUT)
+            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT
+                    || robot.horizontalArm.getPosition() == HorizontalArm.Position.MANUAL) {
+                if (pad2.left_trigger_active()) {
+                    robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
+                } else {
+                    robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
+                    robot.verticalArm.openClaw();
+                }
+            } else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.OUT) {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.MANUAL);
-            else
+            } else {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+            }
         });
         pad2.b.onRise(() -> {
-            telemetry.addLine("HERE 1");
             if (robot.verticalArm.getPosition() == VerticalArm.Position.INTAKE) {
-                telemetry.addLine("HERE 2");
                 robot.verticalArm.toggleClaw();
             } else {
-                telemetry.addLine("HERE 3");
                 robot.verticalArm.toggleClawWide();
             }
         });
         pad2.a.onRise(robot.horizontalArm::toggleClaw);
+        //pad2.a.onRise(() -> robot.horizontalArm.hinge.setPosition(robot.horizontalArm.hinge.getPosition() + 0.01));
+        //pad2.b.onRise(() -> robot.horizontalArm.hinge.setPosition(robot.horizontalArm.hinge.getPosition() - 0.01));
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
         pad2.right_trigger.onFall(robot.verticalArm::hingeUp);
         pad2.dpad_down.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND));
         pad2.dpad_left.onRise(conditional_intake
-                .then(() -> {
-                    telemetry.addLine("LOWING");
-                    robot.verticalArm.goToPosition(VerticalArm.Position.LOW);
-                })
+                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.LOW))
                 .then(claw_out_of_way)
         );
         pad2.dpad_up.onRise(conditional_intake
-                .then(() -> {
-                    telemetry.addLine("MEDIUMING");
-                    robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM);
-                })
+                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM))
                 .then(claw_out_of_way)
         );
         pad2.dpad_right.onRise(conditional_intake
-                .then(() -> {
-                    telemetry.addLine("HIGHING");
-                    robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
-                })
+                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.HIGH))
                 .then(claw_out_of_way)
         );
         pad2.right_bumper.onRise(robot.horizontalArm::incrementLeverHeight);
@@ -158,8 +155,19 @@ public class IdealTele extends RobotOpMode {
         if (pad2.gamepad.left_stick_x > S_JOYSTICK_THRESHOLD || robot.horizontalArm.slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             robot.horizontalArm.setPower(pad2.gamepad.left_stick_x);
         }
+
+        normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
+        frontRight_Power = (velY - velX - theta) / normalFactor;
+        backRight_Power = (velY + velX - theta) / normalFactor;
+        frontLeft_Power = (velY + velX + theta) / normalFactor;
+        backLeft_Power = (velY - velX + theta) / normalFactor;
+
+        drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
+
         update();
-        multiTelemetry.addData("Action count", ActionManager.actions.size());
+        multiTelemetry.addData("Hinge position", robot.horizontalArm.hinge.getPosition());
+        multiTelemetry.addData("Lever position", robot.horizontalArm.lever.getPosition());
+        multiTelemetry.addData("Horizontal distance", robot.horizontalArm.getDistance());
         multiTelemetry.update();
         //fullTelemetry();
     }
@@ -172,14 +180,6 @@ public class IdealTele extends RobotOpMode {
         velY = ramp(inputVelY, velY, DRIVETRAIN_RAMP_SPEED, DRIVETRAIN_RAMP_SPEED * 3);
         velX = ramp(inputVelX, velX, DRIVETRAIN_RAMP_SPEED * 2, DRIVETRAIN_RAMP_SPEED * 3);
         theta = ramp(inputTheta, theta, 0.8);
-
-        normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
-        frontRight_Power = (velY - velX - theta) / normalFactor;
-        backRight_Power = (velY + velX - theta) / normalFactor;
-        frontLeft_Power = (velY + velX + theta) / normalFactor;
-        backLeft_Power = (velY - velX + theta) / normalFactor;
-
-        drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
     }
 
     public void targetLock() {
@@ -222,15 +222,6 @@ public class IdealTele extends RobotOpMode {
         multiTelemetry.addData("Junction width", junctionWidth);
         multiTelemetry.addData("Junction Y power", velY);
         multiTelemetry.addData("Junction theta power", theta);
-
-
-        normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
-        frontRight_Power = (velY - velX - theta) / normalFactor;
-        backRight_Power = (velY + velX - theta) / normalFactor;
-        frontLeft_Power = (velY + velX + theta) / normalFactor;
-        backLeft_Power = (velY - velX + theta) / normalFactor;
-
-        drivetrain.setMotorPowers(frontLeft_Power, backLeft_Power, backRight_Power, frontRight_Power);
     }
 
     private double ramp(double input, double currentValue, double speed) {

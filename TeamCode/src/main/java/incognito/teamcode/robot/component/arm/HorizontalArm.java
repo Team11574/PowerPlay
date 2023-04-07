@@ -1,18 +1,16 @@
 package incognito.teamcode.robot.component.arm;
 
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_WAIT_TIME;
-import static incognito.teamcode.config.WorldSlideConstants.HS_CONE_JUMP_DISTANCE;
 import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_CM;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_END;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
+import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_SUPER_DISTANCE_CM;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_WAIT_TIME;
-import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_MID;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_WAIT_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.S_RUN_TO_POSITION_POWER;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.CLAW_OUT;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.GROUND;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.MANUAL;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.OUT;
+import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.SUPER_OUT;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -28,7 +26,7 @@ import incognito.teamcode.robot.component.slide.HorizontalSlide;
 public class HorizontalArm extends Arm {
 
     public enum Position {
-        IN, WAIT_IN, WAIT_OUT, OUT, MANUAL, CLAW_OUT, GROUND
+        IN, WAIT_IN, WAIT_OUT, OUT, MANUAL, CLAW_OUT, GROUND, SUPER_OUT
     }
 
     public HorizontalSlide slide;
@@ -70,7 +68,7 @@ public class HorizontalArm extends Arm {
             slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             slide.setPower(0);
             return;
-        } else if (slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+        } else if (slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER || Math.abs(slide.getPower()) < 0.1) {
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(S_RUN_TO_POSITION_POWER);
         }
@@ -119,6 +117,12 @@ public class HorizontalArm extends Arm {
                 levelHinge();
                 openClaw();
                 break;
+            case SUPER_OUT:
+                extendSlide();
+                lever.goToSetPosition(Lever.HorizontalLeverPosition.OUT);
+                levelHinge();
+                openClaw();
+                break;
         }
     }
 
@@ -140,17 +144,25 @@ public class HorizontalArm extends Arm {
 
     public void levelHinge() {
         /*
-        hingeLow = 0
+        hingeLow = 0.46
+        hinge2 = 0.35
+        hinge3 = 0.29
+        hinge4 = 0.15
+        hinge5 = 0.08
         hingeHigh = 0.6
-
-        leverLow = 0
+        leverLow = 0.04
+        lever2 = 0.15
+        lever3 = 0.26
+        lever4 = 0.38
+        lever5 = 0.46
         leverHigh = 0.8
 
         lever @ 0 => hinge @ 0.6
         lever @ 0.8 => hinge @ 0
 
          */
-        hinge.setPosition((0.8 - lever.getPosition() + 0.05)/0.8 * 0.6);
+        //hinge.setPosition((0.8 - lever.getPosition() + 0.05)/0.8 * 0.6);
+        hinge.goToSetPosition(HorizontalHinge.Position.valueOf(leverOutPositionStorage.name()));
     }
 
     public void setPower(double power) {
@@ -159,6 +171,9 @@ public class HorizontalArm extends Arm {
     }
 
     public void storeLeverHeight(Lever.HorizontalLeverPosition position) {
+        if (position == Lever.HorizontalLeverPosition.IN) {
+            position = Lever.HorizontalLeverPosition.OUT;
+        }
         leverOutPositionStorage = position;
         if (getPosition() == OUT || getPosition() == CLAW_OUT || getPosition() == GROUND) {
             lever.goToSetPosition(leverOutPositionStorage);
@@ -196,8 +211,13 @@ public class HorizontalArm extends Arm {
     public void update() {
         if (getPosition() == OUT) {
             if (getDistance() < HS_DS_CONE_DISTANCE_CM) {
-                slide.setTargetPosition(slide.getPosition() + HS_CONE_JUMP_DISTANCE);
+                slide.setPower(0);
+                //slide.setTargetPosition(slide.getPosition() + HS_CONE_JUMP_DISTANCE);
                 closeClaw();
+            }
+        } else if (getPosition() == SUPER_OUT) {
+            if (getDistance() < HS_DS_CONE_SUPER_DISTANCE_CM) {
+                slide.setPower(0);
             }
         }
     }

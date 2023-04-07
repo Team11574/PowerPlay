@@ -2,9 +2,13 @@ package incognito.teamcode.robot;
 
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_CLOSED;
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_OPEN;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_END;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_FIFTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_FOURTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_IN;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_MID;
-import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_START;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_OUT;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_SECOND;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_THIRD;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_END;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FIFTH;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FOURTH;
@@ -162,11 +166,14 @@ public class WorldRobot extends RobotCog {
         Servo HS_hinge_S = hardwareMap.get(Servo.class, "HS_hinge_S");
         horizontalHinge = new HorizontalHinge(hardwareMap, telemetry, HS_hinge_S,
                 new double[] {
-                        HS_HINGE_START,
+                        HS_HINGE_IN,
                         HS_HINGE_MID,
-                        HS_HINGE_END
-                }, HS_HINGE_END, HS_HINGE_START);
-        //horizontalHinge.setOffsetFactor(HS_HINGE_SPEED);
+                        HS_HINGE_FIFTH,
+                        HS_HINGE_FOURTH,
+                        HS_HINGE_THIRD,
+                        HS_HINGE_SECOND,
+                        HS_HINGE_OUT
+                }, HS_HINGE_MID, HS_HINGE_IN);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
         horizontalLever = new Lever(hardwareMap, telemetry, HS_lever_S,
@@ -178,7 +185,6 @@ public class WorldRobot extends RobotCog {
                         HS_LEVER_SECOND,
                         HS_LEVER_END},
                 HS_LEVER_END, HS_LEVER_START);
-        //horizontalLever.setOffsetFactor(HS_LEVER_SPEED);
 
         Servo HS_claw_S = hardwareMap.get(Servo.class, "HS_claw_S");
         horizontalClaw = new Claw(hardwareMap, telemetry, HS_claw_S, HS_CLAW_OPEN, HS_CLAW_CLOSED);

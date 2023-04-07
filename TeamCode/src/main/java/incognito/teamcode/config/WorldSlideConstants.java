@@ -50,8 +50,8 @@ public class WorldSlideConstants {
     public static double VS_HINGE_LOW_DOWN = 0.7;
     public static double VS_HINGE_MEDIUM_UP = 0.4;
     public static double VS_HINGE_MEDIUM_DOWN = 0.25;
-    public static double VS_HINGE_HIGH_UP = 0.3;
-    public static double VS_HINGE_HIGH_DOWN = 0.15;
+    public static double VS_HINGE_HIGH_UP = 0.35;
+    public static double VS_HINGE_HIGH_DOWN = 0.2;
 
     public static double VS_HINGE_PAUSE_TIME = 250; // ms
     public static double VS_HINGE_TO_INTAKE_TIME = 400; // ms
@@ -92,7 +92,7 @@ public class WorldSlideConstants {
     public static double VS_CLAW_OPEN = 0.29;
     public static double VS_CLAW_CLOSED = 0.35;
 
-    public static double VS_CLAW_HANDOFF_SPEED = 250;
+    public static double VS_CLAW_HANDOFF_SPEED = 350;
     public static double VS_DROP_SPEED = 250;
 
 
@@ -105,7 +105,7 @@ public class WorldSlideConstants {
 
     public static final double HS_TICKS_PER_IN = HS_TICKS_PER_REV * HS_GEAR_RATIO / HS_PULLEY_CIRCUMFERENCE;
 
-    public static double HS_MIN_ENCODER = 0;
+    public static double HS_MIN_ENCODER = 30;
     public static double HS_MAX_ENCODER = 2000;
 
     public static double HS_LEVER_WAIT_TIME = 650; // ms
@@ -123,23 +123,25 @@ public class WorldSlideConstants {
     public static double HS_CLAW_OPEN = 0.3;
     public static double HS_CLAW_CLOSED = 0.45;
 
-    public static double HS_HINGE_START = .605;
-    public static double HS_HINGE_MID = .3;
-    public static double HS_HINGE_END = 0;
-    public static double HS_HINGE_SPEED = 0.01;
+    public static double HS_HINGE_IN = .605;
+    public static double HS_HINGE_OUT = 0.46;
+    public static double HS_HINGE_SECOND = 0.35;
+    public static double HS_HINGE_THIRD = 0.29;
+    public static double HS_HINGE_FOURTH = 0.15;
+    public static double HS_HINGE_FIFTH = 0.08;
+    public static double HS_HINGE_MID = 0;
 
     public static double HS_LEVER_START = 0.94;
     public static double HS_LEVER_MID = 0.7;
-    public static double HS_LEVER_FIFTH = 0.315;
-    public static double HS_LEVER_FOURTH = 0.28;
-    public static double HS_LEVER_THIRD = 0.235;
-    public static double HS_LEVER_SECOND = 0.19;
-    public static double HS_LEVER_END = 0;
-
-    public static double HS_LEVER_SPEED = 0.05;
+    public static double HS_LEVER_FIFTH = 0.46;
+    public static double HS_LEVER_FOURTH = 0.38;
+    public static double HS_LEVER_THIRD = 0.26;
+    public static double HS_LEVER_SECOND = 0.17;
+    public static double HS_LEVER_END = 0.04;
 
     /* == Horizontal Slide Cone Distance == */
     public static double HS_DS_CONE_DISTANCE_CM = 6; // cm
+    public static double HS_DS_CONE_SUPER_DISTANCE_CM = 8; // cm
     public static int HS_CONE_JUMP_DISTANCE = 5; // ticks
 
 

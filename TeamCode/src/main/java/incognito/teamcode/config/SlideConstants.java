@@ -63,7 +63,7 @@ public class SlideConstants {
     public static double HS_TURRET_MAX = 1;
     public static double HS_TURRET_SPEED = 0.02;
 
-    public static double HS_HINGE_START = 0.56; // 0.505;
+    public static double HS_HINGE_IN = 0.56; // 0.505;
     public static double HS_HINGE_SPEED = 0.01;
 
     public static double HS_LEVER_IN = 0.7;

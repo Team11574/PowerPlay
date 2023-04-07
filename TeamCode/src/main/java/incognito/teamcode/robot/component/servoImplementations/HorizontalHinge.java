@@ -14,7 +14,11 @@ public class HorizontalHinge extends ContinuousServo {
     public enum Position {
         IN,
         MID,
-        OUT,
+        FIFTH,
+        FOURTH,
+        THIRD,
+        SECOND,
+        OUT
     }
 
     public HorizontalHinge(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo, double startPos) {

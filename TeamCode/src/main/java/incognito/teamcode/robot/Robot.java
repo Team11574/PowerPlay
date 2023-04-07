@@ -4,7 +4,7 @@ import static incognito.teamcode.config.SlideConstants.HS_CLAW_CLOSED;
 import static incognito.teamcode.config.SlideConstants.HS_CLAW_OPEN;
 import static incognito.teamcode.config.SlideConstants.HS_HINGE_FLAT;
 import static incognito.teamcode.config.SlideConstants.HS_HINGE_SPEED;
-import static incognito.teamcode.config.SlideConstants.HS_HINGE_START;
+import static incognito.teamcode.config.SlideConstants.HS_HINGE_IN;
 import static incognito.teamcode.config.SlideConstants.HS_LEVER_FIFTH;
 import static incognito.teamcode.config.SlideConstants.HS_LEVER_FLAT;
 import static incognito.teamcode.config.SlideConstants.HS_LEVER_FOURTH;
@@ -153,7 +153,7 @@ public class Robot extends RobotCog {
         turret.setOffsetFactor(HS_TURRET_SPEED);
 
         Servo HS_hinge_S = hardwareMap.get(Servo.class, "HS_hinge_S");
-        hinge = new ContinuousServo(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_START);
+        hinge = new ContinuousServo(hardwareMap, telemetry, HS_hinge_S, HS_HINGE_IN);
         hinge.setOffsetFactor(HS_HINGE_SPEED);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
