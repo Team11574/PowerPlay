@@ -152,6 +152,9 @@ public class VerticalArm extends Arm {
     }
 
     public boolean atPosition() {
+        if (lastPosition == getPosition()) {
+            return true;
+        }
         if (lastPosition == null || getPosition() == null) {
             return true;
         }

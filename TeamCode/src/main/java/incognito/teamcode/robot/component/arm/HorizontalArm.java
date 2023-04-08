@@ -111,15 +111,10 @@ public class HorizontalArm extends Arm {
                 hinge.goToSetPosition(HorizontalHinge.Position.MID);
                 openClaw();
                 break;
+            case SUPER_OUT:
             case OUT:
                 extendSlide();
                 lever.goToSetPosition(leverOutPositionStorage);
-                levelHinge();
-                openClaw();
-                break;
-            case SUPER_OUT:
-                extendSlide();
-                lever.goToSetPosition(Lever.HorizontalLeverPosition.OUT);
                 levelHinge();
                 openClaw();
                 break;
@@ -175,18 +170,26 @@ public class HorizontalArm extends Arm {
             position = Lever.HorizontalLeverPosition.OUT;
         }
         leverOutPositionStorage = position;
-        if (getPosition() == OUT || getPosition() == CLAW_OUT || getPosition() == GROUND) {
+        if (getPosition() == OUT || getPosition() == CLAW_OUT || getPosition() == GROUND || getPosition() == MANUAL || getPosition() == SUPER_OUT) {
             lever.goToSetPosition(leverOutPositionStorage);
             levelHinge();
         }
     }
 
     public void incrementLeverHeight() {
-        storeLeverHeight(leverOutPositionStorage.increment());
+        Lever.HorizontalLeverPosition pos = leverOutPositionStorage.increment();
+        if (pos == Lever.HorizontalLeverPosition.IN) {
+            pos = Lever.HorizontalLeverPosition.MID;
+        }
+        storeLeverHeight(pos);
     }
 
     public void decrementLeverHeight() {
-        storeLeverHeight(leverOutPositionStorage.decrement());
+        Lever.HorizontalLeverPosition pos = leverOutPositionStorage.decrement();
+        if (pos == Lever.HorizontalLeverPosition.IN) {
+            pos = Lever.HorizontalLeverPosition.OUT;
+        }
+        storeLeverHeight(pos);
     }
 
     public boolean atPosition() {

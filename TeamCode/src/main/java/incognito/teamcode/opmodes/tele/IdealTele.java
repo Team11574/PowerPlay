@@ -1,14 +1,23 @@
 package incognito.teamcode.opmodes.tele;
 
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
+import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_HORIZONTAL_DISTANCE;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
 import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_RAMP_SPEED;
+import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_RIGHT_POWER_MULTIPLIER;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_AVERAGE;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_CONE_OFFSET;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_DISTANCE_FACTOR;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_DISTANCE_THRESHOLD;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_HIGH;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_LOW;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_MAX;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_MEDIUM;
+import static incognito.teamcode.config.GenericConstants.FRONT_DS_THETA_THRESHOLD;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_DISTANCE_PID;
 import static incognito.teamcode.config.WorldSlideConstants.S_JOYSTICK_THRESHOLD;
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_GRAB_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
-import static incognito.teamcode.config.WorldSlideConstants.VS_DROP_SPEED;
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_DROP_SPEED;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -16,11 +25,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import incognito.cog.actions.Action;
 import incognito.cog.actions.ActionManager;
 import incognito.cog.hardware.gamepad.Cogtroller;
 import incognito.cog.opmodes.RobotOpMode;
+import incognito.cog.util.PIDController;
 import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.HorizontalArm;
@@ -35,14 +46,16 @@ public class IdealTele extends RobotOpMode {
     Cogtroller pad2;
     Action intake;
     Action claw_out_of_way;
+    Action intake_delay;
     Action conditional_intake;
 
     boolean targetLocking = false;
     boolean fieldOriented = false;
+    PIDController junctionDistancePID = new PIDController(JUNCTION_DISTANCE_PID);
 
     double velX, velY, theta, rotX, rotY, botHeading = 0;
     double normalFactor;
-    double junctionWidth, junctionHorizontalDistance, junctionYPower;
+    double junctionMinDistance, junctionHorizontalDistance;
     double frontRightPower, backRightPower, frontLeftPower, backLeftPower;
     double inputVelY, inputVelX, inputTheta;
 
@@ -50,6 +63,7 @@ public class IdealTele extends RobotOpMode {
     public void init() {
         this.multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         this.robot = new WorldRobot(hardwareMap, multiTelemetry, true);
+        TelemetryBigError.initialize(multiTelemetry);
         robot.autoCamera.swapDoingJunctions();
         this.drivetrain = robot.drivetrain;
         pad1 = new Cogtroller(gamepad1);
@@ -72,15 +86,20 @@ public class IdealTele extends RobotOpMode {
                 .until(robot.horizontalArm::atPosition)
                 //.delay(100)
                 .then(robot.horizontalArm::openClaw);
-        claw_out_of_way = new Action(
-                () -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
+        claw_out_of_way = new Action()
+                //.until(robot.horizontalArm::atPosition)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
                 .until(robot.verticalArm.claw::isOpened)
-                .delay(VS_DROP_SPEED)
+                .delay(VS_CLAW_DROP_SPEED)
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
+        intake_delay = intake
+                .delay(VS_CLAW_HANDOFF_SPEED);
         conditional_intake = new Action()
-                .doIf(new Action(() -> intake.run())
-                                .delay(VS_CLAW_HANDOFF_SPEED),
-                    () -> !pad2.left_trigger_active() && robot.horizontalArm.getPosition() != HorizontalArm.Position.IN);
+                .doIf(intake_delay,
+                    () -> !pad2.left_trigger_active() && robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
+                .then(robot.verticalArm::closeClaw)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
+                .delay(VS_CLAW_GRAB_SPEED);
     }
 
     public void initializeControls() {
@@ -108,8 +127,6 @@ public class IdealTele extends RobotOpMode {
             }
         });
         pad2.x.onRise(robot.horizontalArm::toggleClaw);
-        //pad2.a.onRise(() -> robot.horizontalArm.hinge.setPosition(robot.horizontalArm.hinge.getPosition() + 0.01));
-        //pad2.b.onRise(() -> robot.horizontalArm.hinge.setPosition(robot.horizontalArm.hinge.getPosition() - 0.01));
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
         pad2.right_trigger.onFall(robot.verticalArm::hingeUp);
         pad2.dpad_down.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND));
@@ -138,13 +155,14 @@ public class IdealTele extends RobotOpMode {
                 robot.autoCamera.stopCamera();
             }
         });
-        pad1.y.onRise(new Action().doIf(() -> {fieldOriented = !fieldOriented;}, () -> !targetLocking));
+        Action oriented = new Action().doIf(this::swapFieldOriented, () -> !targetLocking);
+        pad1.y.onRise(oriented);
     }
 
     @Override
     public void init_loop() {
         super.init_loop();
-        fullTelemetry();
+        //fullTelemetry();
         update();
     }
 
@@ -152,6 +170,7 @@ public class IdealTele extends RobotOpMode {
     public void loop() {
         // Adjust drivetrain
         if (!targetLocking) {
+            fieldOriented = false;
             adjustVelocities();
         } else {
             targetLock();
@@ -164,11 +183,14 @@ public class IdealTele extends RobotOpMode {
         updatePower();
 
         update();
-        multiTelemetry.addData("Target Locking", targetLocking);
+        /*multiTelemetry.addData("Target Locking", targetLocking);
         multiTelemetry.addData("Field Oriented Movement", fieldOriented);
         multiTelemetry.addLine();
+        multiTelemetry.addData("Front distance", getFrontDistance());
         multiTelemetry.addData("Horizontal distance", robot.horizontalArm.getDistance());
-        multiTelemetry.update();
+        multiTelemetry.addData("Vertical hinge pos", robot.verticalArm.hinge.getPosition());
+        multiTelemetry.addData("Vertical claw pos", robot.verticalArm.claw.getPosition());
+        multiTelemetry.update();*/
         //fullTelemetry();
     }
 
@@ -181,21 +203,21 @@ public class IdealTele extends RobotOpMode {
             botHeading = drivetrain.getImu().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             // Rotate the movement direction counter to the bot's rotation
-            rotX = velX * Math.cos(-botHeading) - velY * Math.sin(-botHeading);
-            rotY = velX * Math.sin(-botHeading) + velY * Math.cos(-botHeading);
+            rotX = inputVelX * Math.cos(-botHeading) - inputVelY * Math.sin(-botHeading);
+            rotY = inputVelX * Math.sin(-botHeading) + inputVelY * Math.cos(-botHeading);
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio, but only when
             // at least one is out of the range [-1, 1]
             normalFactor = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(theta), 1);
-            frontLeftPower = (rotY + rotX + theta) / normalFactor;
-            backLeftPower = (rotY - rotX + theta) / normalFactor;
-            frontRightPower = (rotY - rotX - theta) / normalFactor;
-            backRightPower = (rotY + rotX - theta) / normalFactor;
+            frontLeftPower = (rotY + rotX + inputTheta) / normalFactor;
+            backLeftPower = (rotY - rotX + inputTheta) / normalFactor;
+            frontRightPower = (rotY - rotX - inputTheta) / normalFactor;
+            backRightPower = (rotY + rotX - inputTheta) / normalFactor;
         } else {
             normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
-            frontRightPower = (velY - velX - theta) / normalFactor;
-            backRightPower = (velY + velX - theta) / normalFactor;
+            frontRightPower = (velY - velX - theta) / normalFactor * DRIVETRAIN_RIGHT_POWER_MULTIPLIER;
+            backRightPower = (velY + velX - theta) / normalFactor * DRIVETRAIN_RIGHT_POWER_MULTIPLIER;
             frontLeftPower = (velY + velX + theta) / normalFactor;
             backLeftPower = (velY - velX + theta) / normalFactor;
         }
@@ -209,50 +231,59 @@ public class IdealTele extends RobotOpMode {
 
         velY = ramp(inputVelY, velY, DRIVETRAIN_RAMP_SPEED, DRIVETRAIN_RAMP_SPEED * 3);
         velX = ramp(inputVelX, velX, DRIVETRAIN_RAMP_SPEED * 2, DRIVETRAIN_RAMP_SPEED * 3);
-        theta = ramp(inputTheta, theta, 0.8);
+        theta = ramp(inputTheta, theta, 0.6);
     }
 
     public void targetLock() {
-        junctionWidth = robot.autoCamera.getJunctionWidth();
         junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
-        // TODO: adjust JUNCTION_Y_POWER_FACTOR so the robot moves quickly when
-        //  far away from the junction but slowly when close.
-        if (junctionWidth == 0) {
-            TelemetryBigError.raise(2);
-            multiTelemetry.addLine("Junction locking failed");
-            targetLocking = false;
-            return;
-        } else {
-            junctionYPower = 1 / junctionWidth * JUNCTION_Y_POWER_FACTOR;
-        }
-
-        // TODO: Test, and consider removing. My thinking is that having the ability
-        //  to move the robot in and out along the the autolock for precise movements
-        //  could be good.
-        velY = -pad1.get_partitioned_left_stick_y();
-
-        // TODO: Test how close this is and adjust JUNCTION_WIDTH_THRESHOLD accordingly
-        // TODO: See if we need different JUNCTION_MAX_WIDTH values for different
-        //  junction heights, and if so create them.
-        if (junctionWidth > JUNCTION_MAX_WIDTH
-                || junctionWidth < JUNCTION_MIN_WIDTH) {
-            // TODO: Consider adding in negative velocity if too close to the pole
-            velY += 0;
-        } else {
-            velY += Math.max(0, junctionYPower);
-        }
-        velX = pad1.get_partitioned_left_stick_x();
-        if (Math.abs(junctionHorizontalDistance) < JUNCTION_MIN_HORIZONTAL_DISTANCE) {
+        velX = pad1.gamepad.left_stick_x;
+        velY = -pad1.gamepad.left_stick_y;
+        junctionDistancePID.setDesiredValue(0);
+        if (Math.abs(junctionHorizontalDistance) < JUNCTION_MIN_HORIZONTAL_DISTANCE
+                || Math.abs(junctionHorizontalDistance) > JUNCTION_MAX_HORIZONTAL_DISTANCE) {
             theta = 0;
         } else {
-            theta = junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
+            theta = junctionDistancePID.update(junctionHorizontalDistance); // junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
+            // Only move forward once we are locked on horizontally to the junction if using REV sensor
+            junctionMinDistance = getPreferredJunctionDistance();
+            if (theta < FRONT_DS_THETA_THRESHOLD) {
+                if (Math.abs(getFrontDistance() - junctionMinDistance) < FRONT_DS_DISTANCE_THRESHOLD
+                        || getFrontDistance() > FRONT_DS_MAX) {
+                    velY += 0;
+                } else {
+                    // Add an amount of power proportional to the distance from the junction
+                    //  to the robot
+                    velY += (getFrontDistance() - junctionMinDistance) / (FRONT_DS_DISTANCE_FACTOR);
+                }
+            }
         }
-        /*
-        multiTelemetry.addData("Junction distance", junctionHorizontalDistance);
-        multiTelemetry.addData("Junction width", junctionWidth);
+
+        multiTelemetry.addData("Junction horizontal distance", junctionHorizontalDistance);
+        multiTelemetry.addData("Junction forward pref distance", junctionMinDistance);
+        multiTelemetry.addData("Junction forward actual distance", getFrontDistance());
         multiTelemetry.addData("Junction Y power", velY);
         multiTelemetry.addData("Junction theta power", theta);
-        */
+        multiTelemetry.addLine();
+    }
+
+    public double  getFrontDistance() {
+        // In CM
+        return robot.frontDistanceSensor.getDistance(DistanceUnit.CM);
+    }
+
+    public double getPreferredJunctionDistance() {
+        double distance;
+        switch (robot.verticalArm.getPosition()) {
+            case LOW: distance = FRONT_DS_LOW; break;
+            case MEDIUM: distance = FRONT_DS_MEDIUM; break;
+            case HIGH: distance = FRONT_DS_HIGH; break;
+            default: distance = FRONT_DS_AVERAGE; break;
+        }
+
+        if (!robot.autoCamera.coneOnJunction()) {
+            distance += FRONT_DS_CONE_OFFSET;
+        }
+        return distance;
     }
 
     private double ramp(double input, double currentValue, double speed) {

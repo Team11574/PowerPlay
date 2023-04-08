@@ -43,15 +43,15 @@ public class WorldSlideConstants {
 
 
     // TODO: Set correct positions for vertical hinge
-    public static double VS_HINGE_START = 0.1; // Start = min
-    public static double VS_HINGE_END = 0.8; // End = max
-    public static double VS_HINGE_INTAKE = 0.2;
+    public static double VS_HINGE_START = 0.08;//0.1; // Start = min
+    public static double VS_HINGE_END = 0.86;//0.8; // End = max
+    public static double VS_HINGE_INTAKE = 0.22;
     public static double VS_HINGE_LOW_UP = VS_HINGE_END;
-    public static double VS_HINGE_LOW_DOWN = 0.7;
-    public static double VS_HINGE_MEDIUM_UP = 0.4;
-    public static double VS_HINGE_MEDIUM_DOWN = 0.25;
-    public static double VS_HINGE_HIGH_UP = 0.35;
-    public static double VS_HINGE_HIGH_DOWN = 0.2;
+    public static double VS_HINGE_LOW_DOWN = 0.8;
+    public static double VS_HINGE_MEDIUM_UP = 0.42;
+    public static double VS_HINGE_MEDIUM_DOWN = 0.31;
+    public static double VS_HINGE_HIGH_UP = 0.39;
+    public static double VS_HINGE_HIGH_DOWN = 0.24;
 
     public static double VS_HINGE_PAUSE_TIME = 250; // ms
     public static double VS_HINGE_TO_INTAKE_TIME = 400; // ms
@@ -82,18 +82,19 @@ public class WorldSlideConstants {
         }
     }
 
-    public static double VS_INTAKE_TO_LOW_TIME = 950; // ms
+    public static double VS_INTAKE_TO_LOW_TIME = 750; // ms
     public static double VS_INTAKE_TO_MEDIUM_TIME = 400; // ms
     public static double VS_INTAKE_TO_HIGH_TIME = 400; // ms
     public static double VS_DEFAULT_TIME = 250; // ms
 
     // TODO: Find correct vertical claw open/closed positions
-    public static double VS_CLAW_WIDE = 0.2;
-    public static double VS_CLAW_OPEN = 0.29;
-    public static double VS_CLAW_CLOSED = 0.35;
+    public static double VS_CLAW_WIDE = 0.2;//0.2;
+    public static double VS_CLAW_OPEN = 0.11;//0.29;
+    public static double VS_CLAW_CLOSED = 0;//0.35;
 
-    public static double VS_CLAW_HANDOFF_SPEED = 350;
-    public static double VS_DROP_SPEED = 250;
+    public static double VS_CLAW_HANDOFF_SPEED = 250;
+    public static double VS_CLAW_DROP_SPEED = 350;
+    public static double VS_CLAW_GRAB_SPEED = 100;
 
 
 
@@ -105,12 +106,12 @@ public class WorldSlideConstants {
 
     public static final double HS_TICKS_PER_IN = HS_TICKS_PER_REV * HS_GEAR_RATIO / HS_PULLEY_CIRCUMFERENCE;
 
-    public static double HS_MIN_ENCODER = 30;
+    public static double HS_MIN_ENCODER = 0;
     public static double HS_MAX_ENCODER = 2000;
 
-    public static double HS_LEVER_WAIT_TIME = 650; // ms
-    public static double HS_HINGE_WAIT_TIME = 150; // ms
-    public static double HS_CLAW_WAIT_TIME = 250; // ms
+    public static double HS_LEVER_WAIT_TIME = 100; //500; // ms
+    public static double HS_HINGE_WAIT_TIME = 100; //150; // ms
+    public static double HS_CLAW_WAIT_TIME = 100; //250; // ms
 
     public static double HS_BRAKE_THRESHOLD = 75;
 
@@ -120,8 +121,8 @@ public class WorldSlideConstants {
     // TODO: Insert correct set positions for horizontal slide
 
     // TODO: Find correct values
-    public static double HS_CLAW_OPEN = 0.3;
-    public static double HS_CLAW_CLOSED = 0.45;
+    public static double HS_CLAW_OPEN = 0.4;
+    public static double HS_CLAW_CLOSED = 0.20;
 
     public static double HS_HINGE_IN = .605;
     public static double HS_HINGE_OUT = 0.46;
@@ -131,7 +132,7 @@ public class WorldSlideConstants {
     public static double HS_HINGE_FIFTH = 0.08;
     public static double HS_HINGE_MID = 0;
 
-    public static double HS_LEVER_START = 0.94;
+    public static double HS_LEVER_START = 0.90;
     public static double HS_LEVER_MID = 0.7;
     public static double HS_LEVER_FIFTH = 0.46;
     public static double HS_LEVER_FOURTH = 0.38;

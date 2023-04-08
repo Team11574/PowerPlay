@@ -20,7 +20,7 @@ Notes:
     RB and LB actually queue a lever step position, so you can preemptively click them while the claw is in and it will remember the new position (up or down
     from where you last were by however many times you click the buttons) and then move to that position when the claw next extends.
 
-    Y should generally not be used when cycling, ←/↑/→/↓ will automatically intake the cone when the claw is extended. It is just a backup to be used if you want
+    B should generally not be used when cycling, ←/↑/→/↓ will automatically intake the cone when the claw is extended. It is just a backup to be used if you want
     to intake and store the cone without scoring it at a height immediately.
 
     A is a toggle between three modes, OUT, EXTEND, and MANUAL. When you press A while the claw is in, the lever will go to the floor but the slide will
