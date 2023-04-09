@@ -1,5 +1,7 @@
 package incognito.teamcode.opmodes.auto;
 
+import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_DROP_SPEED;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -35,6 +37,7 @@ public class IdealAuto extends RobotLinearOpMode {
         drivetrain = robot.drivetrain;
 
         multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        robot.verticalArm.closeClaw();
 
         ActionManager.clear();
 
@@ -65,14 +68,17 @@ public class IdealAuto extends RobotLinearOpMode {
                         Math.toRadians(180)
                 )
                 .build();
-        Action toHigh = new Action(() -> {
-            robot.verticalArm.goToPosition(VerticalArm.Position.HIGH);
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT);})
-                .delay(900)
-                //.delay(400)
+        Action toHigh = new Action(robot.verticalArm::closeClaw)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
+                //.delay(0)
+                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.HIGH))
+                .until(robot.verticalArm::atPosition)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
+                .delay(50)
                 .then(robot.verticalArm::openClaw)
                 .delay(100)
-                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
+                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE))
+                .globalize();
 
         /*
                 // 1

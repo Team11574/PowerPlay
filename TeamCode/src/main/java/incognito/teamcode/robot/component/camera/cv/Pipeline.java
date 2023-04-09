@@ -104,6 +104,7 @@ public class Pipeline extends OpenCvPipeline {
     public double junctionWidth = 0;
     public double junctionHorizontalDistanceInternal = Double.POSITIVE_INFINITY;
     public boolean doingJunctions = false;
+    public boolean useConeWidth = false;
     boolean coneOnJunction = false;
     double x;
     double y;
@@ -424,7 +425,7 @@ public class Pipeline extends OpenCvPipeline {
                 // telemetry.addData("Red width", redWidth);
                 // telemetry.addData("Red x", redX);
             } else {
-                yellowWidth = -1;
+                redWidth = -1;
             }
             redContour.release();
         }
@@ -445,15 +446,24 @@ public class Pipeline extends OpenCvPipeline {
         if (x == -1) {
             if (redWidth > blueWidth) {
                 // telemetry.addData("Color used", "RED");
+                junctionWidth = redWidth;
+                useConeWidth = true;
                 x = redX;
                 y = redY;
             } else if (blueWidth > redWidth) {
                 // telemetry.addData("Color used", "BLUE");
+                junctionWidth = blueWidth;
+                useConeWidth = true;
                 x = blueX;
                 y = blueY;
             } else {
+                junctionWidth = -1;
+                useConeWidth = false;
                 // telemetry.addData("Color used", "NONE");
             }
+        } else {
+            useConeWidth = false;
+            junctionWidth = yellowWidth;
         }
 
         for (m = 0; m < junctionWidestContours.size(); m++) {
@@ -463,7 +473,6 @@ public class Pipeline extends OpenCvPipeline {
         if (maxJunctionContour != null)
             maxJunctionContour.release();
         junctionWidestContours.clear();
-
         coneOnJunction = redWidth > RED_WIDTH_THRESHOLD || blueWidth > BLUE_WIDTH_THRESHOLD;
         // telemetry.addData("Cone on junction", coneOnJunction);
 

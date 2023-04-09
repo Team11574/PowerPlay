@@ -54,13 +54,14 @@ public class WorldSlideConstants {
     public static double VS_HINGE_HIGH_DOWN = 0.24;
 
     public static double VS_HINGE_PAUSE_TIME = 250; // ms
-    public static double VS_HINGE_TO_INTAKE_TIME = 400; // ms
-    public static double VS_HINGE_TO_INTAKE_TIME_LOW = 900; // ms
+    public static double VS_HINGE_TO_INTAKE_TIME = 300; // ms
+    public static double VS_HINGE_TO_INTAKE_TIME_LOW = 750; // ms
 
     public enum VS_TIME_TO {
         INTAKE_TO_LOW(VS_INTAKE_TO_LOW_TIME),
         INTAKE_TO_MEDIUM(VS_INTAKE_TO_MEDIUM_TIME),
         INTAKE_TO_HIGH(VS_INTAKE_TO_HIGH_TIME),
+        HIGH_TO_INTAKE(VS_HIGH_TO_INTAKE_TIME),
         DEFAULT(VS_DEFAULT_TIME)
         ;
         private final double time;
@@ -84,16 +85,17 @@ public class WorldSlideConstants {
 
     public static double VS_INTAKE_TO_LOW_TIME = 750; // ms
     public static double VS_INTAKE_TO_MEDIUM_TIME = 400; // ms
-    public static double VS_INTAKE_TO_HIGH_TIME = 400; // ms
+    public static double VS_INTAKE_TO_HIGH_TIME = 350; // ms
+    public static double VS_HIGH_TO_INTAKE_TIME = 400; // ms
     public static double VS_DEFAULT_TIME = 250; // ms
 
     // TODO: Find correct vertical claw open/closed positions
     public static double VS_CLAW_WIDE = 0.2;//0.2;
     public static double VS_CLAW_OPEN = 0.11;//0.29;
-    public static double VS_CLAW_CLOSED = 0;//0.35;
+    public static double VS_CLAW_CLOSED = 0.03;//0.35;
 
     public static double VS_CLAW_HANDOFF_SPEED = 250;
-    public static double VS_CLAW_DROP_SPEED = 350;
+    public static double VS_CLAW_DROP_SPEED = 150;
     public static double VS_CLAW_GRAB_SPEED = 100;
 
 
@@ -122,7 +124,7 @@ public class WorldSlideConstants {
 
     // TODO: Find correct values
     public static double HS_CLAW_OPEN = 0.4;
-    public static double HS_CLAW_CLOSED = 0.20;
+    public static double HS_CLAW_CLOSED = 0.18;
 
     public static double HS_HINGE_IN = .605;
     public static double HS_HINGE_OUT = 0.46;

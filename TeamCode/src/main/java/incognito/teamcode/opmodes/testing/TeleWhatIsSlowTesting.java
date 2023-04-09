@@ -1,14 +1,13 @@
 package incognito.teamcode.opmodes.testing;
 
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
 import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import incognito.cog.hardware.component.drive.PoseStorage;

@@ -158,7 +158,7 @@ public class VerticalArm extends Arm {
         if (lastPosition == null || getPosition() == null) {
             return true;
         }
-        return timer.time() > getPosition().getWaitTime(lastPosition);
+        return timer.time() > lastPosition.getWaitTime(getPosition());
         /*
         return slide.atSetPosition()
                 && lever.atSetPosition(VS_LEVER_WAIT_TIME)

@@ -1,7 +1,7 @@
 package incognito.teamcode.opmodes.tele;
 
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_HORIZONTAL_DISTANCE;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_MAX_HORIZONTAL_DISTANCE;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
 import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_RAMP_SPEED;
 import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_RIGHT_POWER_MULTIPLIER;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_AVERAGE;
@@ -77,7 +77,7 @@ public class IdealTele extends RobotOpMode {
 
     public void initializeActions() {
         intake = new Action(() -> {
-                    robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+                    robot.verticalArm.openClaw();
                     if (robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
                         robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_IN);
                 })
@@ -110,8 +110,8 @@ public class IdealTele extends RobotOpMode {
                 if (pad2.left_trigger_active()) {
                     robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
                 } else {
-                    robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
                     robot.verticalArm.openClaw();
+                    robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
                 }
             } else if (robot.horizontalArm.getPosition() == HorizontalArm.Position.OUT) {
                 robot.horizontalArm.goToPosition(HorizontalArm.Position.MANUAL);

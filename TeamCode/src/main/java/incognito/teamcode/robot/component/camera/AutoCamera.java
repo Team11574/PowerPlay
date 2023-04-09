@@ -1,5 +1,7 @@
 package incognito.teamcode.robot.component.camera;
 
+import static incognito.teamcode.config.GenericConstants.JUNCTION_CONE_WIDTH_FACTOR;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -74,8 +76,12 @@ public class AutoCamera extends CameraSuper {
         return pipeline.coneOnJunction();
     }
 
+
     // In pixels
     public double getJunctionWidth() {
+        if (pipeline.useConeWidth) {
+            return pipeline.junctionWidth/JUNCTION_CONE_WIDTH_FACTOR;
+        }
         return pipeline.junctionWidth;
     }
 }

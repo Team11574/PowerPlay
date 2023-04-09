@@ -1,14 +1,10 @@
 package incognito.teamcode.opmodes.tele;
 
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_HORIZONTAL_DISTANCE;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MAX_WIDTH;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_MIN_WIDTH;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_THETA_POWER_FACTOR;
-import static incognito.teamcode.config.CameraConstants.JUNCTION_Y_POWER_FACTOR;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_MAX_HORIZONTAL_DISTANCE;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
+import static incognito.teamcode.config.GenericConstants.FORWARD_DISTANCE_PID;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_AVERAGE;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_CONE_OFFSET;
-import static incognito.teamcode.config.GenericConstants.FRONT_DS_DISTANCE_FACTOR;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_DISTANCE_THRESHOLD;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_HIGH;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_LOW;
@@ -16,21 +12,21 @@ import static incognito.teamcode.config.GenericConstants.FRONT_DS_MAX;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_MEDIUM;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_THETA_THRESHOLD;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_DISTANCE_PID;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_PREFERRED_PIXEL_DISTANCE_CLOSE;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_PREFERRED_PIXEL_DISTANCE_FAR;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_THETA_DISTANCE_FACTOR;
+import static incognito.teamcode.config.GenericConstants.JUNCTION_WIDTH_TO_DISTANCE_FACTOR;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import incognito.cog.hardware.gamepad.GamepadPlus;
 import incognito.cog.opmodes.RobotOpMode;
-import incognito.cog.util.Generic;
 import incognito.cog.util.PIDController;
 import incognito.cog.util.TelemetryBigError;
-import incognito.teamcode.robot.Robot;
-import incognito.teamcode.robot.TileMovementPretty;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
@@ -59,6 +55,7 @@ public class TeleJunction extends RobotOpMode {
     boolean targetLocking = false;
 
     PIDController junctionDistancePID = new PIDController(JUNCTION_DISTANCE_PID);
+    PIDController forwardDistancePID = new PIDController(FORWARD_DISTANCE_PID);
 
     @Override
     public void init() {
@@ -86,6 +83,8 @@ public class TeleJunction extends RobotOpMode {
             // TOGGLE TARGET LOCKING
             targetLocking = !targetLocking;
             if (targetLocking) {
+                junctionDistancePID.reset();
+                forwardDistancePID.reset();
                 robot.autoCamera.startCamera();
             } else {
                 robot.autoCamera.stopCamera();
@@ -142,36 +141,49 @@ public class TeleJunction extends RobotOpMode {
             default: distance = FRONT_DS_AVERAGE; break;
         }
 
-        if (!robot.autoCamera.coneOnJunction()) {
+        if (robot.autoCamera.coneOnJunction()) {
             distance += FRONT_DS_CONE_OFFSET;
         }
         return distance;
     }
 
+    public double getPreferredJunctionPixelDistance() {
+        if (getFrontDistance() > FRONT_DS_MAX) {
+            return JUNCTION_PREFERRED_PIXEL_DISTANCE_FAR;
+        } else {
+            return JUNCTION_PREFERRED_PIXEL_DISTANCE_CLOSE;
+        }
+    }
+
     public void targetLock() {
         junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
-
-        junctionDistancePID.setDesiredValue(0);
-        if (Math.abs(junctionHorizontalDistance) < JUNCTION_MIN_HORIZONTAL_DISTANCE
-        || Math.abs(junctionHorizontalDistance) > JUNCTION_MAX_HORIZONTAL_DISTANCE) {
-            theta = 0;
-        } else {
-            theta = junctionDistancePID.update(junctionHorizontalDistance); // junctionHorizontalDistance * JUNCTION_THETA_POWER_FACTOR;
-        }
         velX = pad1.gamepad.left_stick_x;
         velY = -pad1.gamepad.left_stick_y;
-        // Only move forward once we are locked on horizontally to the junction if using REV sensor
-        double junctionMinDistance = getPreferredJunctionDistance();
-        if (theta < FRONT_DS_THETA_THRESHOLD) {
-            if (Math.abs(getFrontDistance() - junctionMinDistance) < FRONT_DS_DISTANCE_THRESHOLD
-                    || getFrontDistance() > FRONT_DS_MAX) {
-                velY += 0;
-            } else {
-                // Add an amount of power proportional to the distance from the junction
-                //  to the robot
-                velY += (getFrontDistance() - junctionMinDistance) / (FRONT_DS_DISTANCE_FACTOR);
-            }
+        double junctionPreferredPixelDistance = getPreferredJunctionPixelDistance();
+        junctionDistancePID.setDesiredValue(junctionPreferredPixelDistance);
+
+        // Set preferred front distance
+        double junctionPreferredFrontDistance = getPreferredJunctionDistance();
+        double junctionWidthDistance = JUNCTION_WIDTH_TO_DISTANCE_FACTOR / robot.autoCamera.getJunctionWidth();
+        forwardDistancePID.setDesiredValue(junctionPreferredFrontDistance);
+        double distanceUsed = getFrontDistance();
+        if (getFrontDistance() > FRONT_DS_MAX) {
+            distanceUsed = junctionWidthDistance;
         }
+
+        if (Math.abs(junctionHorizontalDistance - junctionPreferredPixelDistance) < JUNCTION_MIN_HORIZONTAL_DISTANCE
+        || Math.abs(junctionHorizontalDistance - junctionPreferredPixelDistance) > JUNCTION_MAX_HORIZONTAL_DISTANCE) {
+            theta = 0;
+        } else {
+            theta = junctionDistancePID.update(junctionHorizontalDistance) / (distanceUsed * JUNCTION_THETA_DISTANCE_FACTOR);
+        }
+        if (distanceUsed < 0) {
+            velY += 0;
+        }else if (Math.abs(distanceUsed - junctionPreferredFrontDistance) > FRONT_DS_DISTANCE_THRESHOLD) {
+            velY += forwardDistancePID.update(distanceUsed);
+        }
+
+        // Only move forward once we are locked on horizontally to the junction if using REV sensor
         //}
 
         /*
@@ -205,8 +217,10 @@ public class TeleJunction extends RobotOpMode {
         */
 
         multiTelemetry.addData("Junction horizontal distance", junctionHorizontalDistance);
-        multiTelemetry.addData("Junction forward pref distance", junctionMinDistance);
-        multiTelemetry.addData("Junction forward actual distance", getFrontDistance());
+        multiTelemetry.addData("Junction forward pref distance", junctionPreferredFrontDistance);
+        multiTelemetry.addData("Junction forward distance sensor", getFrontDistance());
+        multiTelemetry.addData("Junction width camera", robot.autoCamera.getJunctionWidth());
+        multiTelemetry.addData("Junction forward distance camera", junctionWidthDistance);
         multiTelemetry.addData("Junction Y power", velY);
         multiTelemetry.addData("Junction theta power", theta);
     }
