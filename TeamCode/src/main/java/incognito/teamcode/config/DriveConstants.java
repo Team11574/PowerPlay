@@ -46,7 +46,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // in
     public static double GEAR_RATIO = 1.9; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 7.2; // in, ESTIMATE: 12.75, working well with 13, but that yield an angle of 182
+    public static double TRACK_WIDTH = 14.48; // in, ESTIMATE: 12.75, working well with 13, but that yielded an angle of 182
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -67,8 +67,8 @@ public class DriveConstants {
      */
     public static double MAX_VEL = 42.13720320937437;
     public static double MAX_ACCEL = 42.13720320937437;
-    public static double MAX_ANG_VEL = 3.9; // Math.toRadians(229.79967999999997);
-    public static double MAX_ANG_ACCEL = 3.9; //Math.toRadians(229.79967999999997);
+    public static double MAX_ANG_VEL = 3.8; // Math.toRadians(229.79967999999997);
+    public static double MAX_ANG_ACCEL = 3.8; //Math.toRadians(229.79967999999997);
 
     /* Results from MaxAngularVeloTuner:
     Max Angular Velocity (deg): 142.63475847510625
