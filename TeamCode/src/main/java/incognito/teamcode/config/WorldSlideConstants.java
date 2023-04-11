@@ -37,7 +37,7 @@ public class WorldSlideConstants {
     public static double VS_LEVER_START = 0.03; // Start = lever in
     public static double VS_LEVER_END = 1; // End = lever out
     public static double VS_LEVER_INTAKE = VS_LEVER_START;
-    public static double VS_LEVER_LOW = VS_LEVER_END;
+    public static double VS_LEVER_LOW = .98;
     public static double VS_LEVER_MEDIUM = 0.6;
     public static double VS_LEVER_HIGH = 0.55;
 
@@ -47,7 +47,7 @@ public class WorldSlideConstants {
     public static double VS_HINGE_END = 0.86;//0.8; // End = max
     public static double VS_HINGE_INTAKE = 0.22;
     public static double VS_HINGE_LOW_UP = VS_HINGE_END;
-    public static double VS_HINGE_LOW_DOWN = 0.8;
+    public static double VS_HINGE_LOW_DOWN = 0.75;
     public static double VS_HINGE_MEDIUM_UP = 0.42;
     public static double VS_HINGE_MEDIUM_DOWN = 0.31;
     public static double VS_HINGE_HIGH_UP = 0.39;
@@ -98,6 +98,8 @@ public class WorldSlideConstants {
     public static double VS_CLAW_DROP_SPEED = 150;
     public static double VS_CLAW_GRAB_SPEED = 100;
 
+    public static double HS_WAIT_OUT_SPEED = 100;
+
 
 
 
@@ -127,6 +129,7 @@ public class WorldSlideConstants {
     public static double HS_CLAW_CLOSED = 0.18;
 
     public static double HS_HINGE_IN = .605;
+    public static double HS_HINGE_GROUND = 0.5;
     public static double HS_HINGE_OUT = 0.46;
     public static double HS_HINGE_SECOND = 0.35;
     public static double HS_HINGE_THIRD = 0.29;

@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import incognito.cog.actions.Scheduler;
 import incognito.cog.opmodes.RobotLinearOpMode;
@@ -11,6 +12,7 @@ import incognito.cog.trajectory.TrajectorySequence;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
+@Disabled
 @Autonomous(name = "AUTO Right 1 Cone", group = "auto", preselectTeleOp = "Tele")
 public class AutoRight1Cone extends RobotLinearOpMode {
     // Instance variables

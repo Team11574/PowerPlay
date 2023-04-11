@@ -18,7 +18,8 @@ public class HorizontalHinge extends ContinuousServo {
         FOURTH,
         THIRD,
         SECOND,
-        OUT
+        OUT,
+        GROUND
     }
 
     public HorizontalHinge(HardwareMap hardwareMap, Telemetry telemetry, Servo crServo, double startPos) {

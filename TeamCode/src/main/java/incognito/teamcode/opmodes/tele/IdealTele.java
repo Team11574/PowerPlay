@@ -14,6 +14,7 @@ import static incognito.teamcode.config.GenericConstants.FRONT_DS_MAX;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_MEDIUM;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_THETA_THRESHOLD;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_DISTANCE_PID;
+import static incognito.teamcode.config.WorldSlideConstants.HS_WAIT_OUT_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.S_JOYSTICK_THRESHOLD;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_GRAB_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
@@ -48,6 +49,7 @@ public class IdealTele extends RobotOpMode {
     Action claw_out_of_way;
     Action intake_delay;
     Action conditional_intake;
+    Action super_intake;
 
     boolean targetLocking = false;
     boolean fieldOriented = false;
@@ -78,22 +80,33 @@ public class IdealTele extends RobotOpMode {
     public void initializeActions() {
         intake = new Action(() -> {
                     robot.verticalArm.openClaw();
+                    robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
                     if (robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
                         robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_IN);
                 })
                 .until(() -> robot.verticalArm.atPosition() && robot.horizontalArm.atPosition())
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
                 .until(robot.horizontalArm::atPosition)
-                //.delay(100)
-                .then(robot.horizontalArm::openClaw);
+                .then(robot.horizontalArm::openClaw)
+                .globalize();
         claw_out_of_way = new Action()
                 //.until(robot.horizontalArm::atPosition)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
+                .delay(HS_WAIT_OUT_SPEED)
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
                 .until(robot.verticalArm.claw::isOpened)
                 .delay(VS_CLAW_DROP_SPEED)
-                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE));
+                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE))
+                .globalize();
         intake_delay = intake
-                .delay(VS_CLAW_HANDOFF_SPEED);
+                .delay(VS_CLAW_HANDOFF_SPEED)
+                .globalize();
+        super_intake = new Action()
+                .doIf(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN),
+                        () -> pad2.left_trigger_active())
+                .doIf(intake,
+                    () -> !pad2.left_trigger_active())
+                .globalize();
         conditional_intake = new Action()
                 .doIf(intake_delay,
                     () -> !pad2.left_trigger_active() && robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
@@ -103,7 +116,7 @@ public class IdealTele extends RobotOpMode {
     }
 
     public void initializeControls() {
-        pad2.b.onRise(intake);
+        pad2.b.onRise(super_intake);
         pad2.a.onRise(() -> {
             if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT
                     || robot.horizontalArm.getPosition() == HorizontalArm.Position.MANUAL) {
@@ -144,6 +157,12 @@ public class IdealTele extends RobotOpMode {
         );
         pad2.right_bumper.onRise(robot.horizontalArm::incrementLeverHeight);
         pad2.left_bumper.onRise(robot.horizontalArm::decrementLeverHeight);
+        pad2.right_stick_button.onRise(() -> {
+            intake.cancel();
+            claw_out_of_way.cancel();
+            conditional_intake.cancel();
+            intake_delay.cancel();
+        });
 
 
 

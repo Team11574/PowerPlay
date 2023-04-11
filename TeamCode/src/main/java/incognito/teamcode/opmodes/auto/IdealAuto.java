@@ -41,6 +41,8 @@ public class IdealAuto extends RobotLinearOpMode {
 
         ActionManager.clear();
 
+        double MOVEMENT_DELAY = 250;
+
         Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
         drivetrain.setPoseEstimate(startPos);
 
@@ -77,7 +79,27 @@ public class IdealAuto extends RobotLinearOpMode {
                 .delay(50)
                 .then(robot.verticalArm::openClaw)
                 .delay(100)
-                .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE))
+                //.then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE))
+                .globalize();
+        Action outtake = new Action(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE))
+                .delay(MOVEMENT_DELAY)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT))
+                // Wait until arm stops going out
+                .until(robot.horizontalArm::atPosition)
+                .globalize();
+        Action intake = new Action(() -> {
+            robot.verticalArm.openClaw();
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_IN);
+        })
+                .until(() -> robot.verticalArm.atPosition() && robot.horizontalArm.atPosition())
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
+                .until(robot.horizontalArm::atPosition)
+                .then(robot.horizontalArm::openClaw)
+                .globalize();
+
+        Action wait_face_junction = new Action()
+                .delay(MOVEMENT_DELAY)
+                .then(() -> drivetrain.followTrajectorySequenceAsync(faceFirstJunction))
                 .globalize();
 
         /*
@@ -175,10 +197,33 @@ public class IdealAuto extends RobotLinearOpMode {
         while (drivetrain.isBusy()) {
             update();
         }
+        robot.horizontalArm.storeLeverHeight(Lever.HorizontalLeverPosition.FIFTH);
         toHigh.run();
         while (toHigh.isActive()) {
             update();
+            if (!opModeIsActive()) break;
         }
+        drivetrain.followTrajectorySequenceAsync(faceFirstStack);
+        outtake.run();
+        while (outtake.isActive() || drivetrain.isBusy()) {
+            update();
+            if (!opModeIsActive()) break;
+        }
+        wait_face_junction.run();
+        intake.run();
+        while (intake.isActive() || wait_face_junction.isActive() || drivetrain.isBusy()) {
+            update();
+            if (!opModeIsActive()) break;
+        }
+        toHigh.run();
+        while (toHigh.isActive()) {
+            update();
+            if (!opModeIsActive()) break;
+        }
+        robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+        nap(1000);
+
+
         /*
         robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
         drivetrain.followTrajectorySequence(faceFirstStack);
@@ -199,7 +244,7 @@ public class IdealAuto extends RobotLinearOpMode {
     void nap(double milliseconds) {
         timer.reset();
         while (timer.time(TimeUnit.MILLISECONDS) <= milliseconds) {
-            robot.update();
+            update();
         }
     }
 }

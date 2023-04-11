@@ -72,8 +72,42 @@ public class MeepMeepTesting {
                     double x = startPos.getX();
                     double y = startPos.getY();
 
+                    double angle = 22;
+
                     return drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
+                            .setTangent(Math.toRadians(180))
                             .splineToConstantHeading(
+                                    new Vector2d(12, -48),
+                                    Math.toRadians(90)
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(14, -24, Math.toRadians(180 + angle)),
+                                    Math.toRadians(90)
+                            )
+                            .splineToConstantHeading(
+                                    new Vector2d(20, -16),
+                                    Math.toRadians(angle)
+                            )
+                            .setTangent(Math.toRadians(90))
+                            .splineToSplineHeading(
+                                    new Pose2d(26, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(40, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            .waitSeconds(.25)
+                            .splineToSplineHeading(
+                                    new Pose2d(26, -12, Math.toRadians(180)),
+                                    Math.toRadians(180)
+                            )
+                            .splineToSplineHeading(
+                                    new Pose2d(20, -16, Math.toRadians(180+angle)),
+                                    Math.toRadians(270)
+                            )
+
+                            /*.splineToConstantHeading(
                                     new Vector2d(36, -24),
                                     directionalHeading
                             )
@@ -165,7 +199,7 @@ public class MeepMeepTesting {
                             .splineToSplineHeading(
                                     new Pose2d(-12, -12, Math.toRadians(90)),
                                     Math.toRadians(0)
-                            )
+                            )*/
                             /* 8 CONE RIGHT SIDE TESTING
                             .splineToSplineHeading(
                                     new Pose2d(33.5, -3.5, Math.toRadians(170.8)),

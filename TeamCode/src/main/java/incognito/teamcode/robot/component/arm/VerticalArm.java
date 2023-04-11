@@ -152,9 +152,10 @@ public class VerticalArm extends Arm {
     }
 
     public boolean atPosition() {
+        /* I don't think this is doing what I think it's supposed to be doing...
         if (lastPosition == getPosition()) {
             return true;
-        }
+        }*/
         if (lastPosition == null || getPosition() == null) {
             return true;
         }

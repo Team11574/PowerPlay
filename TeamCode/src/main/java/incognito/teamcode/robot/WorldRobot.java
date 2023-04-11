@@ -4,6 +4,7 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_CLOSED;
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_OPEN;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_FIFTH;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_FOURTH;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_GROUND;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_IN;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_MID;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_OUT;
@@ -172,7 +173,8 @@ public class WorldRobot extends RobotCog {
                         HS_HINGE_FOURTH,
                         HS_HINGE_THIRD,
                         HS_HINGE_SECOND,
-                        HS_HINGE_OUT
+                        HS_HINGE_OUT,
+                        HS_HINGE_GROUND
                 }, HS_HINGE_MID, HS_HINGE_IN);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");

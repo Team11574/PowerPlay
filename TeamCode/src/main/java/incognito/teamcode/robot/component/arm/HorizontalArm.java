@@ -98,7 +98,7 @@ public class HorizontalArm extends Arm {
             case GROUND:
                 slide.goToSetPosition(HorizontalSlide.Position.IN);
                 lever.goToSetPosition(Lever.HorizontalLeverPosition.OUT);
-                hinge.goToSetPosition(HorizontalHinge.Position.IN);
+                hinge.goToSetPosition(HorizontalHinge.Position.GROUND);
                 closeClaw();
                 break;
             case WAIT_OUT:
