@@ -65,7 +65,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         Math.toRadians(0)
                 )
                 .waitSeconds(.25)
-                .setTangent(180)
+                .setTangent(Math.toRadians(180))
                 .splineToSplineHeading(
                         new Pose2d(24, -12, Math.toRadians(180)),
                         Math.toRadians(180)
