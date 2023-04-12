@@ -16,6 +16,8 @@ import static incognito.teamcode.config.GenericConstants.JUNCTION_PREFERRED_PIXE
 import static incognito.teamcode.config.GenericConstants.JUNCTION_PREFERRED_PIXEL_DISTANCE_FAR;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_THETA_DISTANCE_FACTOR;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_WIDTH_TO_DISTANCE_FACTOR;
+import static incognito.teamcode.config.GenericConstants.MAX_THETA_POWER;
+import static incognito.teamcode.config.GenericConstants.MAX_Y_POWER;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -79,19 +81,26 @@ public class TeleJunction extends RobotOpMode {
     @Override
     public void loop() {
 
-        if (pad1.a_pressed) {
+        if (pad1.right_trigger_pressed) {
             // TOGGLE TARGET LOCKING
-            targetLocking = !targetLocking;
-            if (targetLocking) {
-                junctionDistancePID.reset();
-                forwardDistancePID.reset();
-                robot.autoCamera.startCamera();
-            } else {
-                robot.autoCamera.stopCamera();
-                velX = 0;
-                velY = 0;
-                theta = 0;
-            }
+            targetLocking = true;
+            junctionDistancePID.reset();
+            forwardDistancePID.reset();
+            robot.autoCamera.startCamera();
+        }
+        if (pad1.right_trigger_depressed) {
+            targetLocking = false;
+            robot.autoCamera.stopCamera();
+            velX = 0;
+            velY = 0;
+            theta = 0;
+        }
+
+        if (pad1.left_trigger_pressed) {
+            robot.verticalArm.hingeDown();
+        }
+        if (pad1.left_trigger_depressed) {
+            robot.verticalArm.hingeUp();
         }
 
         if (pad1.dpad_down_pressed) {
@@ -155,58 +164,33 @@ public class TeleJunction extends RobotOpMode {
         }
     }
 
-    public double getJunctionDistance() {
-        double junctionDistanceByWidth = JUNCTION_WIDTH_TO_DISTANCE_FACTOR / robot.autoCamera.getJunctionWidth();
-        double adjustedJunctionDistanceByWidth = JUNCTION_WIDTH_TO_DISTANCE_FACTOR / junctionDistanceByWidth;
-        double junctionDistanceByDS = getFrontDistance();
-
-        if (junctionDistanceByDS < FRONT_DS_MAX ||  adjustedJunctionDistanceByWidth < FRONT_DS_MAX) {
-            return junctionDistanceByDS;
-        } else {
-            return junctionDistanceByWidth;
-        }
-    }
-
-    public double getJunctionTheta() {
-        double junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
-        double junctionVerticalDistance = getJunctionDistance();
-        return Math.atan2(junctionHorizontalDistance, junctionVerticalDistance);
-    }
-
-    public double getJunctionForwardSpeed() {
-        double junctionDistance = getJunctionDistance();
-        double junctionPreferredDistance = getPreferredJunctionDistance();
-        forwardDistancePID.setDesiredValue(junctionPreferredDistance);
-        double junctionDistanceError = junctionDistance - junctionPreferredDistance;
-        double junctionDistanceSpeed = junctionDistancePID.update(junctionDistanceError);
-        return 1/(junctionDistanceSpeed + 1);
-    }
-
-    public double getJunctionRotateSpeed() {
-        double junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
-        double junctionPreferredPixelDistance = getPreferredJunctionPixelDistance();
-        junctionDistancePID.setDesiredValue(junctionPreferredPixelDistance);
-        double junctionHorizontalDistanceError = junctionHorizontalDistance - junctionPreferredPixelDistance;
-        double junctionHorizontalDistanceSpeed = junctionDistancePID.update(junctionHorizontalDistanceError);
-        return Math.log10(junctionHorizontalDistanceSpeed + 1) * JUNCTION_THETA_DISTANCE_FACTOR;
-    }
-
     public void targetLock() {
+        junctionHorizontalDistance = robot.autoCamera.getJunctionDistance();
         velX = pad1.gamepad.left_stick_x;
         velY = -pad1.gamepad.left_stick_y;
+        theta = pad1.gamepad.right_stick_x;
         double junctionPreferredPixelDistance = getPreferredJunctionPixelDistance();
-        double junctionPreferredFrontDistance = getPreferredJunctionDistance();
+        junctionDistancePID.setDesiredValue(junctionPreferredPixelDistance);
 
-        if (Math.abs(getJunctionDistance() - junctionPreferredPixelDistance) < JUNCTION_MIN_HORIZONTAL_DISTANCE
-        || Math.abs(getJunctionTheta() - junctionPreferredPixelDistance) > JUNCTION_MAX_HORIZONTAL_DISTANCE) {
-            theta = 0;
-        } else {
-            theta = getJunctionRotateSpeed();
+        // Set preferred front distance
+        double junctionPreferredFrontDistance = getPreferredJunctionDistance();
+        double junctionWidthDistance = JUNCTION_WIDTH_TO_DISTANCE_FACTOR / robot.autoCamera.getJunctionWidth();
+        forwardDistancePID.setDesiredValue(junctionPreferredFrontDistance);
+        double distanceUsed = getFrontDistance();
+        if (getFrontDistance() > FRONT_DS_MAX) {
+            distanceUsed = junctionWidthDistance;
         }
-        if (getJunctionDistance() < 0) {
+
+        if (Math.abs(junctionHorizontalDistance - junctionPreferredPixelDistance) < JUNCTION_MIN_HORIZONTAL_DISTANCE
+                || Math.abs(junctionHorizontalDistance - junctionPreferredPixelDistance) > JUNCTION_MAX_HORIZONTAL_DISTANCE) {
+            theta += 0;
+        } else {
+            theta += Math.min(MAX_THETA_POWER, junctionDistancePID.update(junctionHorizontalDistance) / (distanceUsed * JUNCTION_THETA_DISTANCE_FACTOR));
+        }
+        if (distanceUsed < 0) {
             velY += 0;
-        }else if (Math.abs(getJunctionDistance() - junctionPreferredFrontDistance) > FRONT_DS_DISTANCE_THRESHOLD) {
-            velY += getJunctionForwardSpeed();
+        }else if (Math.abs(distanceUsed - junctionPreferredFrontDistance) > FRONT_DS_DISTANCE_THRESHOLD) {
+            velY += Math.min(MAX_Y_POWER, forwardDistancePID.update(distanceUsed));
         }
 
         // Only move forward once we are locked on horizontally to the junction if using REV sensor
@@ -242,14 +226,12 @@ public class TeleJunction extends RobotOpMode {
         }
         */
 
-        double junctionDistanceByWidth = JUNCTION_WIDTH_TO_DISTANCE_FACTOR / robot.autoCamera.getJunctionWidth();
-        double adjustedJunctionDistanceByWidth = JUNCTION_WIDTH_TO_DISTANCE_FACTOR / junctionDistanceByWidth;
-
         multiTelemetry.addData("Junction horizontal distance", junctionHorizontalDistance);
         multiTelemetry.addData("Junction forward pref distance", junctionPreferredFrontDistance);
         multiTelemetry.addData("Junction forward distance sensor", getFrontDistance());
         multiTelemetry.addData("Junction width camera", robot.autoCamera.getJunctionWidth());
-        multiTelemetry.addData("Junction forward distance camera", adjustedJunctionDistanceByWidth);
+        multiTelemetry.addData("Junction forward distance camera", junctionWidthDistance);
+        multiTelemetry.addData("Forward Distance used", distanceUsed);
         multiTelemetry.addData("Junction Y power", velY);
         multiTelemetry.addData("Junction theta power", theta);
     }

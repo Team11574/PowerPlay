@@ -28,8 +28,8 @@ public class WorldSlideConstants {
     // TODO: Set correct slide positions (UPDATE after new slide is added)
     public static int VS_SLIDE_INTAKE = -10;
     public static int VS_SLIDE_LOW = 400;
-    public static int VS_SLIDE_MEDIUM = VS_SLIDE_INTAKE;
-    public static int VS_SLIDE_HIGH = 750;
+    public static int VS_SLIDE_MEDIUM = 50;
+    public static int VS_SLIDE_HIGH = 800;
 
 
 
@@ -62,6 +62,7 @@ public class WorldSlideConstants {
         INTAKE_TO_MEDIUM(VS_INTAKE_TO_MEDIUM_TIME),
         INTAKE_TO_HIGH(VS_INTAKE_TO_HIGH_TIME),
         HIGH_TO_INTAKE(VS_HIGH_TO_INTAKE_TIME),
+        MEDIUM_TO_INTAKE(VS_MEDIUM_TO_INTAKE_TIME),
         DEFAULT(VS_DEFAULT_TIME)
         ;
         private final double time;
@@ -85,6 +86,7 @@ public class WorldSlideConstants {
 
     public static double VS_INTAKE_TO_LOW_TIME = 750; // ms
     public static double VS_INTAKE_TO_MEDIUM_TIME = 400; // ms
+    public static double VS_MEDIUM_TO_INTAKE_TIME = 450; // ms
     public static double VS_INTAKE_TO_HIGH_TIME = 350; // ms
     public static double VS_HIGH_TO_INTAKE_TIME = 400; // ms
     public static double VS_DEFAULT_TIME = 250; // ms
