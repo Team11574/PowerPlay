@@ -26,7 +26,7 @@ import incognito.teamcode.robot.component.slide.HorizontalSlide;
 public class HorizontalArm extends Arm {
 
     public enum Position {
-        IN, WAIT_IN, WAIT_OUT, OUT, MANUAL, CLAW_OUT, GROUND, SUPER_OUT
+        IN, WAIT_IN, WAIT_OUT, OUT, MANUAL, CLAW_OUT, GROUND, SUPER_OUT, UP
     }
 
     public HorizontalSlide slide;
@@ -116,6 +116,12 @@ public class HorizontalArm extends Arm {
                 extendSlide();
                 lever.goToSetPosition(leverOutPositionStorage);
                 levelHinge();
+                openClaw();
+                break;
+            case UP:
+                slide.goToSetPosition(HorizontalSlide.Position.IN);
+                lever.goToSetPosition(Lever.HorizontalLeverPosition.IN);
+                hinge.goToSetPosition(HorizontalHinge.Position.MID);
                 openClaw();
                 break;
         }

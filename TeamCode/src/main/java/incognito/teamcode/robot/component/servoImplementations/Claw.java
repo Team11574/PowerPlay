@@ -33,11 +33,6 @@ public class Claw extends SetServo {
     }
 
     public void toggle() {
-        telemetry.addLine();
-        telemetry.addData("TOGGLING NORMAL; IS CLOSED", isClosed());
-        telemetry.addLine();
-        telemetry.addData("TOGGLING NORMAL;  POSITION", getPosition());
-        telemetry.addLine();
         if (isClosed()) {
             open();
         } else {
@@ -46,8 +41,6 @@ public class Claw extends SetServo {
     }
 
     public void toggleWide() {
-        telemetry.addData("TOGGLING WIDE; IS CLOSED", isClosed());
-        telemetry.addData("TOGGLING WIDE;  POSITION", getPosition());
         if (isClosed()) {
             wide();
         } else {

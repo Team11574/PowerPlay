@@ -31,6 +31,7 @@ public class WorldSlideConstants {
     public static int VS_SLIDE_MEDIUM = 50;
     public static int VS_SLIDE_HIGH = 800;
 
+    public static double VS_OFFSET_FACTOR = 20;
 
 
     // TODO: Set correct positions for vertical lever
@@ -38,7 +39,7 @@ public class WorldSlideConstants {
     public static double VS_LEVER_END = 1; // End = lever out
     public static double VS_LEVER_INTAKE = VS_LEVER_START;
     public static double VS_LEVER_LOW = .98;
-    public static double VS_LEVER_MEDIUM = 0.6;
+    public static double VS_LEVER_MEDIUM = 0.55; //0.6;
     public static double VS_LEVER_HIGH = 0.55;
 
 
@@ -48,8 +49,8 @@ public class WorldSlideConstants {
     public static double VS_HINGE_INTAKE = 0.22;
     public static double VS_HINGE_LOW_UP = VS_HINGE_END;
     public static double VS_HINGE_LOW_DOWN = 0.75;
-    public static double VS_HINGE_MEDIUM_UP = 0.42;
-    public static double VS_HINGE_MEDIUM_DOWN = 0.31;
+    public static double VS_HINGE_MEDIUM_UP = 0.39;//0.42;
+    public static double VS_HINGE_MEDIUM_DOWN = 0.24; //0.31;
     public static double VS_HINGE_HIGH_UP = 0.39;
     public static double VS_HINGE_HIGH_DOWN = 0.24;
 
@@ -89,7 +90,7 @@ public class WorldSlideConstants {
     public static double VS_MEDIUM_TO_INTAKE_TIME = 450; // ms
     public static double VS_INTAKE_TO_HIGH_TIME = 350; // ms
     public static double VS_HIGH_TO_INTAKE_TIME = 400; // ms
-    public static double VS_DEFAULT_TIME = 250; // ms
+    public static double VS_DEFAULT_TIME = 450; // ms
 
     // TODO: Find correct vertical claw open/closed positions
     public static double VS_CLAW_WIDE = 0.2;//0.2;
@@ -139,7 +140,7 @@ public class WorldSlideConstants {
     public static double HS_HINGE_FIFTH = 0.08;
     public static double HS_HINGE_MID = 0;
 
-    public static double HS_LEVER_START = 0.90;
+    public static double HS_LEVER_START = 0.88;
     public static double HS_LEVER_MID = 0.7;
     public static double HS_LEVER_FIFTH = 0.46;
     public static double HS_LEVER_FOURTH = 0.38;

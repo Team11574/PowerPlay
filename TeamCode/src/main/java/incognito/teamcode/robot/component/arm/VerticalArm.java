@@ -3,6 +3,7 @@ package incognito.teamcode.robot.component.arm;
 import static incognito.teamcode.config.WorldSlideConstants.S_RUN_TO_POSITION_POWER;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_TO_INTAKE_TIME;
 import static incognito.teamcode.config.WorldSlideConstants.VS_HINGE_TO_INTAKE_TIME_LOW;
+import static incognito.teamcode.config.WorldSlideConstants.VS_OFFSET_FACTOR;
 import static incognito.teamcode.robot.component.arm.HorizontalArm.Position.MANUAL;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,7 +19,7 @@ import incognito.teamcode.robot.component.slide.VerticalSlide;
 public class VerticalArm extends Arm {
 
     public enum Position {
-        INTAKE, LOW, MEDIUM, HIGH, INTAKE_LIMIT, MANUAL;
+        INTAKE, LOW, MEDIUM, HIGH, INTAKE_LIMIT;
 
         public double getWaitTime(Position currentPosition) {
             return WorldSlideConstants.VS_TIME_TO.getTime(this.name(), currentPosition.name());
@@ -35,6 +36,7 @@ public class VerticalArm extends Arm {
 
     public VerticalArm(VerticalSlide slide, Lever lever, VerticalHinge hinge, Claw claw) {
         this.slide = slide;
+        slide.setOffsetFactor(VS_OFFSET_FACTOR);
         this.lever = lever;
         this.hinge = hinge;
         this.claw = claw;
@@ -49,14 +51,6 @@ public class VerticalArm extends Arm {
         timer.reset();
         lastPosition = getPosition();
         currentPosition = position;
-        if (position == Position.MANUAL) {
-            slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            slide.setPower(0);
-            return;
-        } else if (slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER || Math.abs(slide.getPower()) < 0.1) {
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setPower(S_RUN_TO_POSITION_POWER);
-        }
         switch (position) {
             case INTAKE_LIMIT:
                 slide.setPower(-1);
@@ -105,9 +99,8 @@ public class VerticalArm extends Arm {
         }
     }
 
-    public void setPower(double power) {
-        goToPosition(Position.MANUAL);
-        slide.setPower(power);
+    public void setPower(double quote_un_quote_power) {
+        slide.offsetPosition(quote_un_quote_power);
     }
 
     public void openClaw() {

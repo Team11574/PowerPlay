@@ -7,13 +7,11 @@ import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_RAMP_SPEED;
 import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_RIGHT_POWER_MULTIPLIER;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_AVERAGE;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_CONE_OFFSET;
-import static incognito.teamcode.config.GenericConstants.FRONT_DS_DISTANCE_FACTOR;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_DISTANCE_THRESHOLD;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_HIGH;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_LOW;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_MAX;
 import static incognito.teamcode.config.GenericConstants.FRONT_DS_MEDIUM;
-import static incognito.teamcode.config.GenericConstants.FRONT_DS_THETA_THRESHOLD;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_DISTANCE_PID;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_PREFERRED_PIXEL_DISTANCE_CLOSE;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_PREFERRED_PIXEL_DISTANCE_FAR;
@@ -21,19 +19,16 @@ import static incognito.teamcode.config.GenericConstants.JUNCTION_THETA_DISTANCE
 import static incognito.teamcode.config.GenericConstants.JUNCTION_WIDTH_TO_DISTANCE_FACTOR;
 import static incognito.teamcode.config.GenericConstants.MAX_THETA_POWER;
 import static incognito.teamcode.config.GenericConstants.MAX_Y_POWER;
-import static incognito.teamcode.config.WorldSlideConstants.HS_WAIT_OUT_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.S_JOYSTICK_THRESHOLD;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_GRAB_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_DROP_SPEED;
-import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_WAIT_TIME;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import incognito.cog.actions.Action;
@@ -54,8 +49,8 @@ public class IdealTele extends RobotOpMode {
     Cogtroller pad1;
     Cogtroller pad2;
     Action intake;
-    Action claw_out_of_way;
-    Action intake_delay;
+    Action vertical_arm_to_intake;
+    Action intake_for_cycle;
     Action conditional_intake;
     Action super_intake;
 
@@ -86,6 +81,13 @@ public class IdealTele extends RobotOpMode {
     }
 
     public void initializeActions() {
+        /*
+        press B to intake will end with back claw UP
+        if then press Junction height and you know you have intaken already, go to the height without adjusting back claw at all
+        if height is pressed to intake, then have back claw go back out normally
+        super B can still do super intake
+
+         */
         intake = new Action(() -> {
                     robot.verticalArm.openClaw();
                     robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
@@ -96,20 +98,20 @@ public class IdealTele extends RobotOpMode {
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
                 .until(robot.horizontalArm::atPosition)
                 .then(robot.horizontalArm::openClaw)
+                .delay(VS_CLAW_GRAB_SPEED)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.UP))
                 .globalize();
-        claw_out_of_way = new Action()
-                //.until(robot.horizontalArm::atPosition)
-                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
-                .delay(HS_WAIT_OUT_SPEED)
-                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
+        vertical_arm_to_intake = new Action()
                 .until(robot.verticalArm.claw::isOpened)
                 .delay(VS_CLAW_DROP_SPEED)
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE))
+                .doIf(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.UP),
+                        () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.IN)
                 .globalize();
-        intake_delay = intake
+        intake_for_cycle = intake
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
                 .delay(VS_CLAW_HANDOFF_SPEED)
                 .then(robot.verticalArm::closeClaw)
-                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
                 .delay(VS_CLAW_GRAB_SPEED)
                 .globalize();
         super_intake = new Action()
@@ -119,8 +121,8 @@ public class IdealTele extends RobotOpMode {
                     () -> !pad2.left_trigger_active())
                 .globalize();
         conditional_intake = new Action()
-                .doIf(intake_delay,
-                    () -> !pad2.left_trigger_active() && robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
+                .doIf(intake_for_cycle,
+                    () -> robot.horizontalArm.getPosition() != HorizontalArm.Position.UP)
                 .then(robot.verticalArm::closeClaw)
                 .globalize();
     }
@@ -155,24 +157,26 @@ public class IdealTele extends RobotOpMode {
         pad2.dpad_down.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND));
         pad2.dpad_left.onRise(conditional_intake
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.LOW))
-                .then(claw_out_of_way)
+                .then(vertical_arm_to_intake)
         );
         pad2.dpad_up.onRise(conditional_intake
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.MEDIUM))
-                .then(claw_out_of_way)
+                .then(vertical_arm_to_intake)
         );
         pad2.dpad_right.onRise(conditional_intake
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.HIGH))
-                .then(claw_out_of_way)
+                .then(vertical_arm_to_intake)
         );
         pad2.right_bumper.onRise(robot.horizontalArm::incrementLeverHeight);
         pad2.left_bumper.onRise(robot.horizontalArm::decrementLeverHeight);
-        pad2.right_stick_button.onRise(() -> {
+        pad2.guide.onRise(() -> {
             intake.cancel();
-            claw_out_of_way.cancel();
+            vertical_arm_to_intake.cancel();
             conditional_intake.cancel();
-            intake_delay.cancel();
+            intake_for_cycle.cancel();
             targetLocking = false;
+            robot.horizontalArm.slide.enable();
+            robot.verticalArm.slide.enable();
         });
 
 
@@ -213,7 +217,7 @@ public class IdealTele extends RobotOpMode {
         if (pad2.gamepad.left_stick_x > S_JOYSTICK_THRESHOLD || robot.horizontalArm.slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             robot.horizontalArm.setPower(pad2.gamepad.left_stick_x);
         }
-        if (pad2.gamepad.right_stick_y > S_JOYSTICK_THRESHOLD  || robot.verticalArm.slide.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
+        if (Math.abs(pad2.gamepad.right_stick_y) > S_JOYSTICK_THRESHOLD && robot.verticalArm.getPosition() != VerticalArm.Position.INTAKE) {
             robot.verticalArm.setPower(pad2.gamepad.right_stick_y);
         }
 
@@ -375,8 +379,8 @@ public class IdealTele extends RobotOpMode {
 
     public void fullTelemetry() {
         multiTelemetry.addData("Vertical claw isOpened", robot.verticalArm.claw.isOpened());
-        multiTelemetry.addData("claw_out is active", claw_out_of_way.isActive());
-        multiTelemetry.addData("claw_out index", claw_out_of_way.index);
+        multiTelemetry.addData("claw_out is active", vertical_arm_to_intake.isActive());
+        multiTelemetry.addData("claw_out index", vertical_arm_to_intake.index);
         multiTelemetry.addData("intake is active", intake.isActive());
         multiTelemetry.addData("intake index", intake.index);
         multiTelemetry.addLine();
