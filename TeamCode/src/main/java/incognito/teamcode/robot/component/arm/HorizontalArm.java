@@ -120,7 +120,7 @@ public class HorizontalArm extends Arm {
                 break;
             case UP:
                 slide.goToSetPosition(HorizontalSlide.Position.IN);
-                lever.goToSetPosition(Lever.HorizontalLeverPosition.IN);
+                lever.goToSetPosition(Lever.HorizontalLeverPosition.MID);
                 hinge.goToSetPosition(HorizontalHinge.Position.MID);
                 openClaw();
                 break;

@@ -1,5 +1,7 @@
 package incognito.teamcode.opmodes.tele;
 
+import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_LEFT_POWER_MULTIPLIER;
+import static incognito.teamcode.config.GenericConstants.DRIVETRAIN_SLOW_MODE_POWER;
 import static incognito.teamcode.config.GenericConstants.FORWARD_DISTANCE_PID;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_MAX_HORIZONTAL_DISTANCE;
 import static incognito.teamcode.config.GenericConstants.JUNCTION_MIN_HORIZONTAL_DISTANCE;
@@ -19,6 +21,7 @@ import static incognito.teamcode.config.GenericConstants.JUNCTION_THETA_DISTANCE
 import static incognito.teamcode.config.GenericConstants.JUNCTION_WIDTH_TO_DISTANCE_FACTOR;
 import static incognito.teamcode.config.GenericConstants.MAX_THETA_POWER;
 import static incognito.teamcode.config.GenericConstants.MAX_Y_POWER;
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_DROP_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.S_JOYSTICK_THRESHOLD;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_GRAB_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
@@ -64,6 +67,8 @@ public class IdealTele extends RobotOpMode {
     double frontRightPower, backRightPower, frontLeftPower, backLeftPower;
     double inputVelY, inputVelX, inputTheta;
 
+    double drivetrainPowerFactor = 1;
+
     @Override
     public void init() {
         this.multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -98,8 +103,10 @@ public class IdealTele extends RobotOpMode {
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
                 .until(robot.horizontalArm::atPosition)
                 .then(robot.horizontalArm::openClaw)
-                .delay(VS_CLAW_GRAB_SPEED)
+                .delay(HS_CLAW_DROP_SPEED)
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.UP))
+                .delay(VS_CLAW_HANDOFF_SPEED)
+                .then(robot.verticalArm::closeClaw)
                 .globalize();
         vertical_arm_to_intake = new Action()
                 .until(robot.verticalArm.claw::isOpened)
@@ -110,15 +117,18 @@ public class IdealTele extends RobotOpMode {
                 .globalize();
         intake_for_cycle = intake
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT))
-                .delay(VS_CLAW_HANDOFF_SPEED)
-                .then(robot.verticalArm::closeClaw)
                 .delay(VS_CLAW_GRAB_SPEED)
                 .globalize();
         super_intake = new Action()
-                .doIf(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN),
+                .doIf(() -> {
+                    robot.horizontalArm.goToPosition(HorizontalArm.Position.IN);
+                    robot.horizontalArm.openClaw();
+                    },
                         () -> pad2.left_trigger_active())
+                .doIf(robot.verticalArm::openClaw,
+                        () -> !pad2.left_trigger_active() && robot.horizontalArm.getPosition() == HorizontalArm.Position.UP)
                 .doIf(intake,
-                    () -> !pad2.left_trigger_active())
+                    () -> !pad2.left_trigger_active() && robot.horizontalArm.getPosition() != HorizontalArm.Position.UP)
                 .globalize();
         conditional_intake = new Action()
                 .doIf(intake_for_cycle,
@@ -167,8 +177,8 @@ public class IdealTele extends RobotOpMode {
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.HIGH))
                 .then(vertical_arm_to_intake)
         );
-        pad2.right_bumper.onRise(robot.horizontalArm::incrementLeverHeight);
-        pad2.left_bumper.onRise(robot.horizontalArm::decrementLeverHeight);
+        pad2.left_bumper.onRise(robot.horizontalArm::incrementLeverHeight);
+        pad2.right_bumper.onRise(robot.horizontalArm::decrementLeverHeight);
         pad2.guide.onRise(() -> {
             intake.cancel();
             vertical_arm_to_intake.cancel();
@@ -194,6 +204,8 @@ public class IdealTele extends RobotOpMode {
             velY = 0;
             theta = 0;
         });
+        pad1.left_trigger.onRise(() -> drivetrainPowerFactor = DRIVETRAIN_SLOW_MODE_POWER);
+        pad1.left_trigger.onFall(() -> drivetrainPowerFactor = 1);
         /*Action oriented = new Action().doIf(this::swapFieldOriented, () -> !targetLocking);
         pad1.y.onRise(oriented);*/
     }
@@ -218,7 +230,7 @@ public class IdealTele extends RobotOpMode {
             robot.horizontalArm.setPower(pad2.gamepad.left_stick_x);
         }
         if (Math.abs(pad2.gamepad.right_stick_y) > S_JOYSTICK_THRESHOLD && robot.verticalArm.getPosition() != VerticalArm.Position.INTAKE) {
-            robot.verticalArm.setPower(pad2.gamepad.right_stick_y);
+            robot.verticalArm.setPower(-pad2.gamepad.right_stick_y);
         }
 
         updatePower();
@@ -237,10 +249,10 @@ public class IdealTele extends RobotOpMode {
 
     public void updatePower() {
         normalFactor = Math.max(Math.abs(velY) + Math.abs(velX) + Math.abs(theta), 1);
-        frontRightPower = (velY - velX - theta) / normalFactor * DRIVETRAIN_RIGHT_POWER_MULTIPLIER;
-        backRightPower = (velY + velX - theta) / normalFactor * DRIVETRAIN_RIGHT_POWER_MULTIPLIER;
-        frontLeftPower = (velY + velX + theta) / normalFactor;
-        backLeftPower = (velY - velX + theta) / normalFactor;
+        frontRightPower = (velY - velX - theta) / normalFactor * DRIVETRAIN_RIGHT_POWER_MULTIPLIER * drivetrainPowerFactor;
+        backRightPower = (velY + velX - theta) / normalFactor * DRIVETRAIN_RIGHT_POWER_MULTIPLIER * drivetrainPowerFactor;
+        frontLeftPower = (velY + velX + theta) / normalFactor * DRIVETRAIN_LEFT_POWER_MULTIPLIER * drivetrainPowerFactor;
+        backLeftPower = (velY - velX + theta) / normalFactor * DRIVETRAIN_LEFT_POWER_MULTIPLIER * drivetrainPowerFactor;
         drivetrain.setMotorPowers(frontLeftPower, backLeftPower, backRightPower, frontRightPower);
     }
 

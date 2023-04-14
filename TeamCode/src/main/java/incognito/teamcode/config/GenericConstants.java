@@ -33,5 +33,7 @@ public class GenericConstants {
     public static double FRONT_DS_DISTANCE_THRESHOLD = 1;
 
     public static double DRIVETRAIN_RAMP_SPEED = 0.1;
-    public static double DRIVETRAIN_RIGHT_POWER_MULTIPLIER = 0.96;
+    public static double DRIVETRAIN_RIGHT_POWER_MULTIPLIER = 1;
+    public static double DRIVETRAIN_LEFT_POWER_MULTIPLIER = 0.96;
+    public static double DRIVETRAIN_SLOW_MODE_POWER = 0.5;
 }

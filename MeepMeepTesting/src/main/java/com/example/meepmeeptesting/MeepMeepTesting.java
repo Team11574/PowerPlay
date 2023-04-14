@@ -55,7 +55,7 @@ public class MeepMeepTesting {
         )
          */
 
-        Pose2d startPos = new Pose2d(36, -62.5, Math.toRadians(90));
+        Pose2d startPos = new Pose2d(35.5, -63.5, Math.toRadians(90));
         //Pose2d startPos = new Pose2d(invertX(36), -62.5, Math.toRadians(90));
         //Pose2d startPos = new Pose2d(36, -60, Math.toRadians(330));
         //Pose2d startPos = new Pose2d(12, 12, Math.toRadians(270));
@@ -72,19 +72,36 @@ public class MeepMeepTesting {
                     double x = startPos.getX();
                     double y = startPos.getY();
 
-                    double angle = 22;
+                    double angle = 35;
 
                     return drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
                             .setTangent(Math.toRadians(180))
                             .splineToConstantHeading(
-                                    new Vector2d(12, -48),
+                                    new Vector2d(20, -63.5),
+                                    Math.toRadians(180)
+                            )
+                            .splineToConstantHeading(
+                                    new Vector2d(10, -48),
                                     Math.toRadians(90)
                             )
+                            .addDisplacementMarker(() -> {
+                                //robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
+                            })
                             .splineToSplineHeading(
-                                    new Pose2d(14, -24, Math.toRadians(180 + angle)),
+                                    new Pose2d(10, -12, Math.toRadians(180 + angle)),
                                     Math.toRadians(90)
                             )
                             .splineToConstantHeading(
+                                    new Vector2d(11, -10),
+                                    Math.toRadians(angle)
+                            )
+                            .waitSeconds(1)
+                            .setTangent(0)
+                            .splineToSplineHeading(
+                                    new Pose2d(40, -12, Math.toRadians(180)),
+                                    Math.toRadians(0)
+                            )
+                            /*.splineToConstantHeading(
                                     new Vector2d(20, -16),
                                     Math.toRadians(angle)
                             )
@@ -105,7 +122,7 @@ public class MeepMeepTesting {
                             .splineToSplineHeading(
                                     new Pose2d(20, -16, Math.toRadians(180+angle)),
                                     Math.toRadians(270)
-                            )
+                            )*/
 
                             /*.splineToConstantHeading(
                                     new Vector2d(36, -24),
