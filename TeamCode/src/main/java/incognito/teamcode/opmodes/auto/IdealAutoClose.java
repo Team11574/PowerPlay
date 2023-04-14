@@ -2,6 +2,9 @@ package incognito.teamcode.opmodes.auto;
 
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_DROP_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_GRAB_SPEED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_CM;
+import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_SUPER_DISTANCE_CM;
+import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -181,9 +184,20 @@ public class IdealAutoClose extends RobotLinearOpMode {
     public void update() {
         ActionManager.update();
         robot.update();
+        checkCancel();
         if (drivetrain.isBusy()) {
             drivetrain.update();
         }
+    }
+
+    public void checkCancel() {
+        if (robot.horizontalArm.slide.getPosition() <= HS_MAX_ENCODER - 20) {
+            return;
+        }
+        if (robot.horizontalArm.getDistance() > HS_DS_CONE_SUPER_DISTANCE_CM + 1) {
+            stop();
+        }
+
     }
 
     void nap(double milliseconds) {
