@@ -175,7 +175,7 @@ public class WorldRobot extends RobotCog {
                         HS_HINGE_SECOND,
                         HS_HINGE_OUT,
                         HS_HINGE_GROUND
-                }, HS_HINGE_MID, HS_HINGE_IN);
+                }, 0, HS_HINGE_IN);
 
         Servo HS_lever_S = hardwareMap.get(Servo.class, "HS_lever_S");
         horizontalLever = new Lever(hardwareMap, telemetry, HS_lever_S,

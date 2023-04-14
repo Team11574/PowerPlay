@@ -22,6 +22,7 @@ import static incognito.teamcode.config.GenericConstants.JUNCTION_WIDTH_TO_DISTA
 import static incognito.teamcode.config.GenericConstants.MAX_THETA_POWER;
 import static incognito.teamcode.config.GenericConstants.MAX_Y_POWER;
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_DROP_SPEED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_GRAB_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.S_JOYSTICK_THRESHOLD;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_GRAB_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
@@ -93,7 +94,9 @@ public class IdealTele extends RobotOpMode {
         super B can still do super intake
 
          */
-        intake = new Action(() -> {
+        intake = new Action(robot.horizontalArm::closeClaw)
+                .delay(HS_CLAW_GRAB_SPEED)
+                .then(() -> {
                     robot.verticalArm.openClaw();
                     robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
                     if (robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
