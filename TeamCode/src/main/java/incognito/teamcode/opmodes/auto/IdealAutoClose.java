@@ -81,6 +81,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
         drivetrain.followTrajectorySequenceAsync(firstGoToFirstJunction);
         while (drivetrain.isBusy()) {
             update();
+            if (isStopRequested()) break;
         }
     }
 
