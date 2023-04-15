@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 import incognito.teamcode.robot.Robot;
 
-@Autonomous(name = "AUTO Camera Testing", group = "auto")
+@Autonomous(name = "AUTO Camera Testing", group = "testing")
 public class AutoCameraTesting extends LinearOpMode {
 
     double junctionDistance;

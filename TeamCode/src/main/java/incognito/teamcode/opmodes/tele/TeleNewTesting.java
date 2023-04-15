@@ -25,7 +25,7 @@ import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
-@TeleOp(name = "Tele New Testing", group = "tele")
+@TeleOp(name = "Tele New Testing", group = "old")
 public class TeleNewTesting extends RobotOpMode {
     // Instance Variables
     protected Robot robot;

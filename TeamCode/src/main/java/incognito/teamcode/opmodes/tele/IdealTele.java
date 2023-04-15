@@ -46,7 +46,7 @@ import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.servoImplementations.HorizontalHinge;
 
-@TeleOp(name = "Ideal Tele", group = "tele")
+@TeleOp(name = "Ideal Tele", group = "0tele")
 public class IdealTele extends RobotOpMode {
     // Instance variables
     WorldRobot robot;

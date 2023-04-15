@@ -23,7 +23,7 @@ import incognito.teamcode.robot.TileMovementPretty;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 
-@TeleOp(name = "Tele WORLD", group = "tele")
+@TeleOp(name = "Tele WORLD", group = "old")
 public class TeleWorld extends RobotOpMode {
     // Instance Variables
     protected WorldRobot robot;

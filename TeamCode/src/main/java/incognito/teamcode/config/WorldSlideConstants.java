@@ -29,7 +29,7 @@ public class WorldSlideConstants {
     public static int VS_SLIDE_INTAKE = 0;
     public static int VS_SLIDE_LOW = 450;
     public static int VS_SLIDE_MEDIUM = 50;
-    public static int VS_SLIDE_HIGH = 850;
+    public static int VS_SLIDE_HIGH = 875;
 
     public static double VS_OFFSET_FACTOR = 100;
 
@@ -39,7 +39,7 @@ public class WorldSlideConstants {
     public static double VS_LEVER_END = 1; // End = lever out
     public static double VS_LEVER_INTAKE = VS_LEVER_START;
     public static double VS_LEVER_LOW = .93;
-    public static double VS_LEVER_MEDIUM = 0.55; //0.6;
+    public static double VS_LEVER_MEDIUM = 0.6; //0.6;
     public static double VS_LEVER_HIGH = 0.55;
 
 
@@ -49,9 +49,9 @@ public class WorldSlideConstants {
     public static double VS_HINGE_INTAKE = 0.22;
     public static double VS_HINGE_LOW_UP = 0.77;
     public static double VS_HINGE_LOW_DOWN = 0.7;
-    public static double VS_HINGE_MEDIUM_UP = 0.39;//0.42;
-    public static double VS_HINGE_MEDIUM_DOWN = 0.24; //0.31;
-    public static double VS_HINGE_HIGH_UP = 0.39;
+    public static double VS_HINGE_MEDIUM_UP = 0.42;
+    public static double VS_HINGE_MEDIUM_DOWN = 0.25; //0.31;
+    public static double VS_HINGE_HIGH_UP = 0.35;
     public static double VS_HINGE_HIGH_DOWN = 0.24;
 
     public static double VS_HINGE_PAUSE_TIME = 250; // ms
@@ -147,7 +147,7 @@ public class WorldSlideConstants {
     public static double HS_LEVER_FIFTH = 0.47;
     public static double HS_LEVER_FOURTH = 0.34;
     public static double HS_LEVER_THIRD = 0.26;
-    public static double HS_LEVER_SECOND = 0.16;
+    public static double HS_LEVER_SECOND = 0.18;
     public static double HS_LEVER_END = 0.04;
 
     /* == Horizontal Slide Cone Distance == */

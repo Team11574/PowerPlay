@@ -23,7 +23,7 @@ import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
-@Autonomous(name = "Ideal Auto", group = "auto")
+@Autonomous(name = "Ideal Auto FAKE", group = "old")
 public class IdealAuto extends RobotLinearOpMode {
     WorldRobot robot;
     MultipleTelemetry multiTelemetry;

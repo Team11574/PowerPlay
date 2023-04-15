@@ -18,7 +18,7 @@ import incognito.teamcode.robot.component.servoImplementations.Lever;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
 @Disabled
-@Autonomous(name = "AUTO Right 3 Cone", group = "auto", preselectTeleOp = "Tele")
+@Autonomous(name = "AUTO Right 3 Cone", group = "old", preselectTeleOp = "Tele")
 public class AutoRight3Cone extends RobotLinearOpMode {
     // Instance variables
     MultipleTelemetry multiTelemetry;

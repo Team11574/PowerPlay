@@ -7,7 +7,7 @@ import incognito.cog.opmodes.RobotLinearOpMode;
 import incognito.cog.trajectory.TrajectorySequence;
 import incognito.teamcode.robot.Robot;
 
-@Autonomous(name = "AUTO Park", group = "auto", preselectTeleOp = "Tele")
+@Autonomous(name = "AUTO Park", group = "old", preselectTeleOp = "Tele")
 public class AutoPark extends RobotLinearOpMode {
     // Instance variables
     TrajectorySequence spot1;

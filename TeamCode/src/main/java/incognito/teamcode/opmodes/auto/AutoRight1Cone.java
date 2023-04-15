@@ -13,7 +13,7 @@ import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
 @Disabled
-@Autonomous(name = "AUTO Right 1 Cone", group = "auto", preselectTeleOp = "Tele")
+@Autonomous(name = "AUTO Right 1 Cone", group = "old", preselectTeleOp = "Tele")
 public class AutoRight1Cone extends RobotLinearOpMode {
     // Instance variables
     TrajectorySequence spot1;

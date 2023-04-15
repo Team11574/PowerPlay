@@ -14,7 +14,7 @@ import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
 @Disabled
-@TeleOp(name = "TeleTesting", group = "tele")
+@TeleOp(name = "TeleTesting", group = "old")
 public class TeleTesting extends RobotOpMode {
     // Instance Variables
     protected Robot robot;

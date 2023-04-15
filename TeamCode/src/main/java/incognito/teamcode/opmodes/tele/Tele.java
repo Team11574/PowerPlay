@@ -14,7 +14,7 @@ import incognito.cog.trajectory.TrajectorySequence;
 import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.component.slide.VerticalSlide;
 
-@TeleOp(name = "Tele", group = "tele")
+@TeleOp(name = "Tele", group = "old")
 public class Tele extends RobotOpMode {
     // Instance Variables
     protected Robot robot;

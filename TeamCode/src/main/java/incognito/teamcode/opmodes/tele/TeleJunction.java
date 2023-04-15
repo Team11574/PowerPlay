@@ -33,7 +33,7 @@ import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
-@TeleOp(name = "Junction Test", group = "tele")
+@TeleOp(name = "Junction Test", group = "testing")
 public class TeleJunction extends RobotOpMode {
     double junctionDistance;
     double junctionArea;

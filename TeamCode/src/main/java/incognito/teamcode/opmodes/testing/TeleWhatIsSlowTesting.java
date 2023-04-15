@@ -18,7 +18,7 @@ import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
 
-@TeleOp(name = "AGH WHAT IS SLOW Test", group = "tele")
+@TeleOp(name = "AGH WHAT IS SLOW Test", group = "testing")
 public class TeleWhatIsSlowTesting extends RobotOpMode {
     double junctionDistance;
     double junctionArea;

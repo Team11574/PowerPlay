@@ -20,7 +20,7 @@ import incognito.teamcode.robot.Robot;
 import incognito.teamcode.robot.TileMovement;
 import incognito.teamcode.robot.WorldRobot;
 
-@TeleOp(name = "Tile Test", group = "tele")
+@TeleOp(name = "Tile Test", group = "testing")
 public class TeleTile extends RobotOpMode {
     MultipleTelemetry multiTelemetry;
     GamepadPlus pad1;

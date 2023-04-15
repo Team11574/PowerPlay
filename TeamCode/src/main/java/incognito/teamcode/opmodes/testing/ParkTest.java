@@ -9,7 +9,7 @@ import incognito.cog.hardware.component.drive.SampleMecanumDrive;
 import incognito.cog.trajectory.TrajectorySequence;
 
 @Disabled
-@Autonomous(name = "Parking Test", group = "Testing")
+@Autonomous(name = "Parking Test", group = "testing")
 public class ParkTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
