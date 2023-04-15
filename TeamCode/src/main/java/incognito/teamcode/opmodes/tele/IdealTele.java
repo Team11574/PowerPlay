@@ -44,8 +44,9 @@ import incognito.cog.util.TelemetryBigError;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
+import incognito.teamcode.robot.component.servoImplementations.HorizontalHinge;
 
-@TeleOp(name = "Ideal Tele", group = "testing")
+@TeleOp(name = "Ideal Tele", group = "tele")
 public class IdealTele extends RobotOpMode {
     // Instance variables
     WorldRobot robot;
@@ -57,6 +58,9 @@ public class IdealTele extends RobotOpMode {
     Action intake_for_cycle;
     Action conditional_intake;
     Action super_intake;
+    Action conditional_ground;
+    Action horizontal_hinge_down;
+    Action horizontal_hinge_up;
 
     boolean targetLocking = false;
     PIDController junctionDistancePID = new PIDController(JUNCTION_DISTANCE_PID);
@@ -98,9 +102,12 @@ public class IdealTele extends RobotOpMode {
                 .delay(HS_CLAW_GRAB_SPEED)
                 .then(() -> {
                     robot.verticalArm.openClaw();
-                    robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
-                    if (robot.horizontalArm.getPosition() != HorizontalArm.Position.IN)
+                    if (robot.verticalArm.getPosition() != VerticalArm.Position.INTAKE) {
+                        robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+                        robot.horizontalArm.goToPosition(HorizontalArm.Position.UP_CLOSED);
+                    } else if (robot.horizontalArm.getPosition() != HorizontalArm.Position.IN) {
                         robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_IN);
+                    }
                 })
                 .until(() -> robot.verticalArm.atPosition() && robot.horizontalArm.atPosition())
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
@@ -138,6 +145,22 @@ public class IdealTele extends RobotOpMode {
                     () -> robot.horizontalArm.getPosition() != HorizontalArm.Position.UP)
                 .then(robot.verticalArm::closeClaw)
                 .globalize();
+        conditional_ground = new Action()
+                .doIf(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.UP_CLOSED),
+                        () -> robot.horizontalArm.getPosition() != HorizontalArm.Position.UP_GROUND)
+                .doIf(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND),
+                        () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_GROUND)
+                .doIf(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.UP_GROUND),
+                        () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_CLOSED)
+                .globalize();
+        horizontal_hinge_down = new Action()
+                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.FIFTH),
+                    () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_GROUND)
+                .globalize();
+        horizontal_hinge_up = new Action()
+                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.MID),
+                        () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_GROUND)
+                .globalize();
     }
 
     public void initializeControls() {
@@ -166,8 +189,10 @@ public class IdealTele extends RobotOpMode {
         });
         pad2.x.onRise(robot.horizontalArm::toggleClaw);
         pad2.right_trigger.onRise(robot.verticalArm::hingeDown);
+        pad2.right_trigger.onRise(horizontal_hinge_down);
         pad2.right_trigger.onFall(robot.verticalArm::hingeUp);
-        pad2.dpad_down.onRise(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.GROUND));
+        pad2.right_trigger.onFall(horizontal_hinge_up);
+        pad2.dpad_down.onRise(conditional_ground);
         pad2.dpad_left.onRise(conditional_intake
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.LOW))
                 .then(vertical_arm_to_intake)
@@ -190,6 +215,8 @@ public class IdealTele extends RobotOpMode {
             targetLocking = false;
             robot.horizontalArm.slide.enable();
             robot.verticalArm.slide.enable();
+            /*robot.horizontalArm.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.horizontalArm.slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
         });
 
 
@@ -236,6 +263,7 @@ public class IdealTele extends RobotOpMode {
             robot.verticalArm.setPower(-pad2.gamepad.right_stick_y);
         }
 
+        multiTelemetry.update();
         updatePower();
 
         update();

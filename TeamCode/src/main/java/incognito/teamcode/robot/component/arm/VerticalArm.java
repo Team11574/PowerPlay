@@ -51,6 +51,8 @@ public class VerticalArm extends Arm {
         timer.reset();
         lastPosition = getPosition();
         currentPosition = position;
+        // THIS MIGHT BE SKETCHY BUT IT COULD WORK
+        slide.enable();
         switch (position) {
             case INTAKE_LIMIT:
                 slide.setPower(-1);

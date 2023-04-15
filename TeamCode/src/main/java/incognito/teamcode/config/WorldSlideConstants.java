@@ -31,14 +31,14 @@ public class WorldSlideConstants {
     public static int VS_SLIDE_MEDIUM = 50;
     public static int VS_SLIDE_HIGH = 850;
 
-    public static double VS_OFFSET_FACTOR = 50;
+    public static double VS_OFFSET_FACTOR = 100;
 
 
     // TODO: Set correct positions for vertical lever
     public static double VS_LEVER_START = 0.03; // Start = lever in
     public static double VS_LEVER_END = 1; // End = lever out
     public static double VS_LEVER_INTAKE = VS_LEVER_START;
-    public static double VS_LEVER_LOW = .98;
+    public static double VS_LEVER_LOW = .93;
     public static double VS_LEVER_MEDIUM = 0.55; //0.6;
     public static double VS_LEVER_HIGH = 0.55;
 
@@ -47,8 +47,8 @@ public class WorldSlideConstants {
     public static double VS_HINGE_START = 0.08;//0.1; // Start = min
     public static double VS_HINGE_END = 0.86;//0.8; // End = max
     public static double VS_HINGE_INTAKE = 0.22;
-    public static double VS_HINGE_LOW_UP = VS_HINGE_END;
-    public static double VS_HINGE_LOW_DOWN = 0.75;
+    public static double VS_HINGE_LOW_UP = 0.77;
+    public static double VS_HINGE_LOW_DOWN = 0.7;
     public static double VS_HINGE_MEDIUM_UP = 0.39;//0.42;
     public static double VS_HINGE_MEDIUM_DOWN = 0.24; //0.31;
     public static double VS_HINGE_HIGH_UP = 0.39;
@@ -154,6 +154,8 @@ public class WorldSlideConstants {
     public static double HS_DS_CONE_DISTANCE_CM = 6; // cm
     public static double HS_DS_CONE_SUPER_DISTANCE_CM = 9; // cm
     public static int HS_CONE_JUMP_DISTANCE = 5; // ticks
+
+    public static int HS_SLIDE_AUTO_OUT_POSITION = 750;
 
 
     /* == Slides General == */

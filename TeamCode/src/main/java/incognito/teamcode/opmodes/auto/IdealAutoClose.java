@@ -2,6 +2,7 @@ package incognito.teamcode.opmodes.auto;
 
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_DROP_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_GRAB_SPEED;
+import static incognito.teamcode.config.WorldSlideConstants.HS_SLIDE_AUTO_OUT_POSITION;
 import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_DISTANCE_CM;
 import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_SUPER_DISTANCE_CM;
 import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
@@ -49,6 +50,12 @@ public class IdealAutoClose extends RobotLinearOpMode {
 
         double angle = 35;
 
+        /*
+        From starting position
+        Positive X = to robot right
+        Positive Y = to robot front
+         */
+
         TrajectorySequence initialToJunction = drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
                 .setTangent(Math.toRadians(180))
                 .splineToConstantHeading(
@@ -56,7 +63,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         Math.toRadians(180)
                 )
                 .splineToConstantHeading(
-                        new Vector2d(8, -48),
+                        new Vector2d(10, -48),
                         Math.toRadians(90)
                 )
                 .addDisplacementMarker(() -> {
@@ -67,10 +74,13 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         Math.toRadians(90)
                 )
                 .splineToConstantHeading(
-                        new Vector2d(11, -10),
+                        new Vector2d(11, -12),
                         Math.toRadians(angle)
                 )
                 .build();
+
+        double firstYPref = -6;
+
         TrajectorySequence toStack = drivetrain.trajectorySequenceBuilder(initialToJunction.end())
                 .addDisplacementMarker(() -> {
                     robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
@@ -81,17 +91,15 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         Math.toRadians(0)
                 )
                 .addDisplacementMarker(() -> {
-                    robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
+                    robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+                    robot.horizontalArm.slide.setTargetPosition(HS_SLIDE_AUTO_OUT_POSITION);
                 })
                 .splineToConstantHeading(
-                        new Vector2d(30, -6),
+                        new Vector2d(30, firstYPref),
                         Math.toRadians(0)
                 )
-                .addDisplacementMarker(() -> {
-                    robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
-                })
                 .splineToConstantHeading(
-                        new Vector2d(40, -6),
+                        new Vector2d(40, firstYPref),
                         Math.toRadians(0)
                 )
                 /*.splineToConstantHeading(
@@ -119,24 +127,72 @@ public class IdealAutoClose extends RobotLinearOpMode {
                 )*/
                 .build();
 
+        double xPref = 15;
+        double deltaX = xPref - 11;
+        double yPref = -9;
+        double deltaY = yPref + 12;
+
         TrajectorySequence toJunction = drivetrain.trajectorySequenceBuilder(toStack.end())
                 .setTangent(Math.toRadians(180))
-                .splineToConstantHeading(
-                        new Vector2d(20, -6),
+                .splineToSplineHeading(
+                        new Pose2d(20 + deltaX, -9, Math.toRadians(180 + angle)),
                         Math.toRadians(180)
                 )
                 .splineToSplineHeading(
-                        new Pose2d(16, -11, Math.toRadians(180 + angle)),
+                        new Pose2d(16, -10, Math.toRadians(180 + angle)),
                         Math.toRadians(180 + angle)
                 )
                 .build();
+
+        TrajectorySequence toStack2 = drivetrain.trajectorySequenceBuilder(toJunction.end())
+                .addDisplacementMarker(() -> {
+                    robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+                })
+                .setTangent(Math.toRadians(angle))
+                .splineToSplineHeading(
+                        new Pose2d(20 + deltaX, firstYPref, Math.toRadians(180)),
+                        Math.toRadians(0)
+                )
+                .addDisplacementMarker(() -> {
+                    robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+                    robot.horizontalArm.slide.setTargetPosition(HS_SLIDE_AUTO_OUT_POSITION);
+                })
+                .splineToConstantHeading(
+                        new Vector2d(30 + deltaX, firstYPref),
+                        Math.toRadians(0)
+                )
+                .splineToConstantHeading(
+                        new Vector2d(40 + deltaX, firstYPref),
+                        Math.toRadians(0)
+                )
+                .build();
+
+        TrajectorySequence toJunction2 = drivetrain.trajectorySequenceBuilder(toStack.end())
+                .setTangent(Math.toRadians(180))
+                .splineToSplineHeading(
+                        new Pose2d(20 + deltaX, -8, Math.toRadians(180 + angle)),
+                        Math.toRadians(180)
+                )
+                .splineToSplineHeading(
+                        new Pose2d(15, -10, Math.toRadians(180 + angle)),
+                        Math.toRadians(180 + angle)
+                )
+                .build();
+
+        /*TrajectorySequence toJunction2 = drivetrain.trajectorySequenceBuilder(toStack.end())
+                .setTangent(Math.toRadians(180))
+                .splineToSplineHeading(
+                        new Pose2d(xPref, -10, Math.toRadians(180 + angle)),
+                        Math.toRadians(180 + angle)
+                )
+                .build();*/
 
         Action highCone = new Action(robot.verticalArm::closeClaw)
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.WAIT_OUT))
                 //.delay(0)
                 .then(() -> robot.verticalArm.goToPosition(VerticalArm.Position.HIGH))
-                .then(robot.verticalArm::hingeDown)
                 .until(robot.verticalArm::atPosition)
+                .then(robot.verticalArm::hingeDown)
                 .delay(250)
                 .then(robot.verticalArm::openClaw)
                 .delay(100)
@@ -162,6 +218,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                 .globalize();
 
         waitForStart();
+        robot.horizontalArm.slide.enable();
 
         robot.verticalArm.closeClaw();
         drivetrain.followTrajectorySequenceAsync(initialToJunction);
@@ -173,12 +230,39 @@ public class IdealAutoClose extends RobotLinearOpMode {
 
         robot.horizontalArm.storeLeverHeight(Lever.HorizontalLeverPosition.FIFTH);
         drivetrain.followTrajectorySequenceAsync(toStack);
-        nap(() -> drivetrain.isBusy() || !robot.horizontalArm.claw.isClosed()); //nap(() -> drivetrain.isBusy() || !robot.horizontalArm.claw.isClosed());
-        //nap(100);
+        nap(drivetrain::isBusy); //nap(() -> drivetrain.isBusy() || !robot.horizontalArm.claw.isClosed());
+
+        robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
+        nap(200);
+        nap(robot.horizontalArm.claw::isClosed);
+        nap(250);
         intake.run();
-        nap(1000);
+
+        //nap(1000);
         drivetrain.followTrajectorySequenceAsync(toJunction);
         nap(() -> intake.isActive() || drivetrain.isBusy());
+
+        highCone.run();
+        nap(highCone::isActive);
+
+        robot.horizontalArm.storeLeverHeight(Lever.HorizontalLeverPosition.FOURTH);
+        drivetrain.followTrajectorySequenceAsync(toStack2);
+        nap(drivetrain::isBusy);
+
+        robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
+        nap(200);
+        nap(robot.horizontalArm.claw::isClosed);
+        nap(100);
+        intake.run();
+
+        drivetrain.followTrajectorySequenceAsync(toJunction2);
+        nap(() -> intake.isActive() || drivetrain.isBusy());
+
+        highCone.run();
+        nap(highCone::isActive);
+
+        robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+        nap(1000);
     }
 
     public void update() {
