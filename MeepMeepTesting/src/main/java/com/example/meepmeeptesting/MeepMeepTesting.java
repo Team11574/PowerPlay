@@ -91,6 +91,32 @@ public class MeepMeepTesting {
                                 //robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
                             })
                             .splineToSplineHeading(
+                                    new Pose2d(10, -14, Math.toRadians(180 + angle)),
+                                    Math.toRadians(90)
+                            )
+                            .splineToConstantHeading(
+                                    new Vector2d(junctionPose.getX(), junctionPose.getY() + 2),
+                                    Math.toRadians(angle)
+                            )
+                            .splineToConstantHeading(
+                                    new Vector2d(junctionPose.getX(), junctionPose.getY() + 1),
+                                    Math.toRadians(angle)
+                            )
+
+
+                            /*.setTangent(Math.toRadians(180))
+                            .splineToConstantHeading(
+                                    new Vector2d(20, -63.5),
+                                    Math.toRadians(180)
+                            )
+                            .splineToConstantHeading(
+                                    new Vector2d(10, -48),
+                                    Math.toRadians(90)
+                            )
+                            .addDisplacementMarker(() -> {
+                                //robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
+                            })
+                            .splineToSplineHeading(
                                     new Pose2d(10, -13, Math.toRadians(180 + angle)),
                                     Math.toRadians(90)
                             )
@@ -113,7 +139,7 @@ public class MeepMeepTesting {
                             .splineToSplineHeading(
                                     new Pose2d(junctionPose.getX() + 6, -14, junctionPose.getHeading()),
                                     Math.toRadians(180 + angle)
-                            )
+                            )*/
 
 
                             /*.setTangent(Math.toRadians(180))

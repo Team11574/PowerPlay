@@ -72,18 +72,18 @@ public class IdealAutoClose extends RobotLinearOpMode {
                     robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
                 })
                 .splineToSplineHeading(
-                        new Pose2d(10, -14, Math.toRadians(180 + angle)),
+                        new Pose2d(9, -14, Math.toRadians(180 + angle)),
                         Math.toRadians(90)
                 )
                 .splineToConstantHeading(
-                        new Vector2d(junctionPose.getX(), junctionPose.getY() + 2),
+                        new Vector2d(junctionPose.getX() - 1, junctionPose.getY() + 4),
                         Math.toRadians(angle)
                 )
                 .build();
 
         double firstYPref = -6;
 
-        Pose2d stackPose = new Pose2d(40, -8, Math.toRadians(180+1));
+        Pose2d stackPose = new Pose2d(40, -7, Math.toRadians(180+0.5));
 
         TrajectorySequence toStack = drivetrain.trajectorySequenceBuilder(initialToJunction.end())
                 .addDisplacementMarker(() -> {
@@ -94,6 +94,10 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         stackPose, //new Pose2d(stackPose.getX(), -6, stackPose.getHeading()), //new Pose2d(40, -12, Math.toRadians(180)),
                         Math.toRadians(0)
                 )
+                .addTemporalMarker(1, () -> {
+                    robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
+                    robot.horizontalArm.slide.setTargetPosition(HS_SLIDE_AUTO_OUT_POSITION);
+                })
                /* .splineToConstantHeading(
                         new Vector2d(20, -10),
                         Math.toRadians(0)
@@ -102,10 +106,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         new Pose2d(30, -6, Math.toRadians(180)),
                         Math.toRadians(0)
                 )*/
-                .addTemporalMarker(1, () -> {
-                    robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
-                    robot.horizontalArm.slide.setTargetPosition(HS_SLIDE_AUTO_OUT_POSITION);
-                })/*
+                /*
                 .splineToConstantHeading(
                         new Vector2d(30, firstYPref),
                         Math.toRadians(0)
@@ -128,7 +129,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         Math.toRadians(180)
                 )
                 .splineToSplineHeading(
-                        new Pose2d(junctionPose.getX() + 3, -14, junctionPose.getHeading()),
+                        new Pose2d(junctionPose.getX() + 2, -14, junctionPose.getHeading()),
                         Math.toRadians(180 - angle)
                 )
                 /*.splineToSplineHeading(
@@ -145,38 +146,26 @@ public class IdealAutoClose extends RobotLinearOpMode {
                 .addDisplacementMarker(() -> {
                     robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
                 })
-                .setTangent(Math.toRadians(angle))
-                .splineToConstantHeading(
-                        new Vector2d(20, -10),
-                        Math.toRadians(0)
-                )
+                .setTangent(Math.toRadians(0))
                 .splineToSplineHeading(
-                        new Pose2d(30 + deltaX, firstYPref, Math.toRadians(180)),
+                        new Pose2d(45, -8.5, Math.toRadians(180 - 1)), //new Pose2d(stackPose.getX(), -6, stackPose.getHeading()), //new Pose2d(40, -12, Math.toRadians(180)),
                         Math.toRadians(0)
                 )
-                .addDisplacementMarker(() -> {
+                .addTemporalMarker(1, () -> {
                     robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
                     robot.horizontalArm.slide.setTargetPosition(HS_SLIDE_AUTO_OUT_POSITION);
-                })/*
-                .splineToConstantHeading(
-                        new Vector2d(30 + deltaX, firstYPref),
-                        Math.toRadians(0)
-                )*/
-                .splineToConstantHeading(
-                        new Vector2d(40 + deltaX, firstYPref),
-                        Math.toRadians(0)
-                )
+                })
                 .build();
 
         TrajectorySequence toJunction2 = drivetrain.trajectorySequenceBuilder(toStack.end())
                 .setTangent(Math.toRadians(180))
-                .splineToSplineHeading(
-                        new Pose2d(20 + deltaX, -8, Math.toRadians(180 + angle)),
+                .splineToConstantHeading(
+                        new Vector2d(22, junctionPose.getY()),
                         Math.toRadians(180)
                 )
                 .splineToSplineHeading(
-                        new Pose2d(15, -10, Math.toRadians(180 + angle)),
-                        Math.toRadians(180 + angle)
+                        new Pose2d(16, -14, junctionPose.getHeading()),
+                        Math.toRadians(180 - angle)
                 )
                 .build();
 
@@ -220,6 +209,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                 .globalize();
 
         waitForStart();
+        robot.autoCamera.stopCamera();
         robot.horizontalArm.slide.enable();
 
         robot.verticalArm.closeClaw();
@@ -231,26 +221,47 @@ public class IdealAutoClose extends RobotLinearOpMode {
 
         //nap(3000);
 
-
+        telemetry.addLine("1");
+        telemetry.update();
         robot.horizontalArm.storeLeverHeight(Lever.HorizontalLeverPosition.FIFTH);
+        telemetry.addLine("2");
+        telemetry.update();
         drivetrain.followTrajectorySequenceAsync(toStack);
+        telemetry.addLine("3");
+        telemetry.update();
         nap(drivetrain::isBusy); //nap(() -> drivetrain.isBusy() || !robot.horizontalArm.claw.isClosed());
-
+        telemetry.addLine("4");
+        telemetry.update();
         // ADD BACK
         robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
+        telemetry.addLine("5");
+        telemetry.update();
         nap(200);
+        telemetry.addLine("6");
+        telemetry.update();
         nap(robot.horizontalArm.claw::isClosed);
+        robot.horizontalArm.slide.enable();
+        telemetry.addLine("7");
+        telemetry.update();
         nap(100);
+        telemetry.addLine("8");
+        telemetry.update();
         intake.run();
+        telemetry.addLine("9");
+        telemetry.update();
 
         //nap(1000);
         drivetrain.followTrajectorySequenceAsync(toJunction);
+        telemetry.addLine("10");
+        telemetry.update();
         nap(() -> intake.isActive() || drivetrain.isBusy());
+        telemetry.addLine("11");
+        telemetry.update();
 
         highCone.run();
         nap(highCone::isActive);
         // ADD BACK
-        /*
+
         robot.horizontalArm.storeLeverHeight(Lever.HorizontalLeverPosition.FOURTH);
         drivetrain.followTrajectorySequenceAsync(toStack2);
         nap(drivetrain::isBusy);
@@ -261,11 +272,12 @@ public class IdealAutoClose extends RobotLinearOpMode {
         nap(100);
         intake.run();
 
+
         drivetrain.followTrajectorySequenceAsync(toJunction2);
         nap(() -> intake.isActive() || drivetrain.isBusy());
 
         highCone.run();
-        nap(highCone::isActive);*/
+        nap(highCone::isActive);
 
         robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
         nap(1000);

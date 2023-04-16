@@ -215,8 +215,8 @@ public class IdealTele extends RobotOpMode {
             targetLocking = false;
             robot.horizontalArm.slide.enable();
             robot.verticalArm.slide.enable();
-            /*robot.horizontalArm.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.horizontalArm.slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
+            robot.horizontalArm.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.horizontalArm.slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         });
 
 

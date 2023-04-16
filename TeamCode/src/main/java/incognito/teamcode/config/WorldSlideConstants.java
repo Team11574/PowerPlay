@@ -144,7 +144,7 @@ public class WorldSlideConstants {
 
     public static double HS_LEVER_START = 0.88;
     public static double HS_LEVER_MID = 0.8;
-    public static double HS_LEVER_FIFTH = 0.47;
+    public static double HS_LEVER_FIFTH = 0.49;
     public static double HS_LEVER_FOURTH = 0.34;
     public static double HS_LEVER_THIRD = 0.26;
     public static double HS_LEVER_SECOND = 0.18;
