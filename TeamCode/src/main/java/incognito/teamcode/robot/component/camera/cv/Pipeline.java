@@ -289,7 +289,7 @@ public class Pipeline extends OpenCvPipeline {
             colorParkingSublist = colorParkingList.subList(Math.max(colorParkingList.size() - (SAMPLES + 1), 0), colorParkingList.size());
         }
         if (aprilParkingList.size() > SAMPLES) {
-            aprilParkingSubList = aprilParkingList.subList(Math.max(colorParkingList.size() - (SAMPLES + 1), 0), colorParkingList.size());
+            aprilParkingSubList = aprilParkingList.subList(Math.max(aprilParkingList.size() - (SAMPLES + 1), 0), aprilParkingList.size());
         }
         int colorParkingValue = mode(colorParkingSublist);
         int aprilParkingValue = mode(aprilParkingSubList);

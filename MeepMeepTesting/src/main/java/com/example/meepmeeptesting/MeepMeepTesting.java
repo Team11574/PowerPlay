@@ -91,6 +91,52 @@ public class MeepMeepTesting {
                                 //robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
                             })
                             .splineToSplineHeading(
+                                    new Pose2d(9, -14, Math.toRadians(180 + angle)),
+                                    Math.toRadians(90)
+                            )
+                            .splineToConstantHeading(
+                                    new Vector2d(junctionPose.getX() - 1, junctionPose.getY() + 4),
+                                    Math.toRadians(angle)
+                            )
+                            .waitSeconds(1)
+                            .turn(Math.toRadians(-(angle + 90)))
+
+                            .setTangent(Math.toRadians(270))
+                            .splineToConstantHeading(
+                                    new Vector2d(12, -31),
+                                    Math.toRadians(270)
+                            )
+                            .turn(Math.toRadians(-90))
+                            .setTangent(0)
+                            .splineToConstantHeading(
+                                    new Vector2d(60, -31),
+                                    Math.toRadians(0)
+                            )
+
+
+                            /*
+                            .setTangent(Math.toRadians(270))
+                            .splineToConstantHeading(
+                                    new Vector2d(12, -36),
+                                    Math.toRadians(270)
+                            )*/
+
+
+
+
+                            /*.setTangent(Math.toRadians(180))
+                            .splineToConstantHeading(
+                                    new Vector2d(20, -63.5),
+                                    Math.toRadians(180)
+                            )
+                            .splineToConstantHeading(
+                                    new Vector2d(10, -48),
+                                    Math.toRadians(90)
+                            )
+                            .addDisplacementMarker(() -> {
+                                //robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
+                            })
+                            .splineToSplineHeading(
                                     new Pose2d(10, -14, Math.toRadians(180 + angle)),
                                     Math.toRadians(90)
                             )
@@ -101,7 +147,7 @@ public class MeepMeepTesting {
                             .splineToConstantHeading(
                                     new Vector2d(junctionPose.getX(), junctionPose.getY() + 1),
                                     Math.toRadians(angle)
-                            )
+                            )*/
 
 
                             /*.setTangent(Math.toRadians(180))

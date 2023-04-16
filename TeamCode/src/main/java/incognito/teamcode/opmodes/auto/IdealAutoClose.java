@@ -129,7 +129,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                         Math.toRadians(180)
                 )
                 .splineToSplineHeading(
-                        new Pose2d(junctionPose.getX() + 2, -14, junctionPose.getHeading()),
+                        new Pose2d(junctionPose.getX() + 1, -14, junctionPose.getHeading()),
                         Math.toRadians(180 - angle)
                 )
                 /*.splineToSplineHeading(
@@ -148,7 +148,7 @@ public class IdealAutoClose extends RobotLinearOpMode {
                 })
                 .setTangent(Math.toRadians(0))
                 .splineToSplineHeading(
-                        new Pose2d(45, -8.5, Math.toRadians(180 - 1)), //new Pose2d(stackPose.getX(), -6, stackPose.getHeading()), //new Pose2d(40, -12, Math.toRadians(180)),
+                        new Pose2d(45, -8, Math.toRadians(180 - 1)), //new Pose2d(stackPose.getX(), -6, stackPose.getHeading()), //new Pose2d(40, -12, Math.toRadians(180)),
                         Math.toRadians(0)
                 )
                 .addTemporalMarker(1, () -> {
@@ -166,6 +166,43 @@ public class IdealAutoClose extends RobotLinearOpMode {
                 .splineToSplineHeading(
                         new Pose2d(16, -14, junctionPose.getHeading()),
                         Math.toRadians(180 - angle)
+                )
+                .build();
+
+        TrajectorySequence spot1 = drivetrain.trajectorySequenceBuilder(toJunction2.end())
+                .turn(Math.toRadians(-(angle + 90)))
+                .setTangent(Math.toRadians(270))
+                .splineToConstantHeading(
+                        new Vector2d(toJunction2.end().getX(), toJunction2.end().getY()-22),
+                        Math.toRadians(270)
+                )
+                .build();
+
+        TrajectorySequence spot2 = drivetrain.trajectorySequenceBuilder(toJunction2.end())
+                .turn(Math.toRadians(-(angle + 90)))
+                .setTangent(Math.toRadians(270))
+                .splineToConstantHeading(
+                        new Vector2d(toJunction2.end().getX() + 1, toJunction2.end().getY() - 10),
+                        Math.toRadians(270)
+                )
+                .splineToConstantHeading(
+                        new Vector2d(toJunction2.end().getX() + 32.5, toJunction2.end().getY()-15),
+                        Math.toRadians(0)
+                )
+                .build();
+
+        TrajectorySequence spot3 = drivetrain.trajectorySequenceBuilder(toJunction2.end())
+                .turn(Math.toRadians(-(angle + 90)))
+                .setTangent(Math.toRadians(270))
+                .splineToConstantHeading(
+                        new Vector2d(toJunction2.end().getX() + 1, toJunction2.end().getY() -25),
+                        Math.toRadians(270)
+                )
+                .turn(Math.toRadians(-90))
+                .setTangent(0)
+                .splineToConstantHeading(
+                        new Vector2d(toJunction2.end().getX()+49, toJunction2.end().getY()-25),
+                        Math.toRadians(0)
                 )
                 .build();
 
@@ -208,7 +245,24 @@ public class IdealAutoClose extends RobotLinearOpMode {
                 .then(robot.verticalArm::closeClaw)
                 .globalize();
 
+
+        Action in = new Action(() -> {
+            robot.verticalArm.openClaw();
+            robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
+        })
+                .until(() -> robot.verticalArm.atPosition())
+                .delay(250)
+                .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.IN))
+                .until(robot.horizontalArm::atPosition)
+                .then(robot.horizontalArm::openClaw)
+                .globalize();
+
+
+
+
+
         waitForStart();
+        int parkingSpot = robot.getParkingSpot();
         robot.autoCamera.stopCamera();
         robot.horizontalArm.slide.enable();
 
@@ -233,17 +287,22 @@ public class IdealAutoClose extends RobotLinearOpMode {
         telemetry.addLine("4");
         telemetry.update();
         // ADD BACK
-        robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
+        robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
         telemetry.addLine("5");
         telemetry.update();
+
         nap(200);
         telemetry.addLine("6");
         telemetry.update();
+
         nap(robot.horizontalArm.claw::isClosed);
         robot.horizontalArm.slide.enable();
         telemetry.addLine("7");
         telemetry.update();
-        nap(100);
+
+        robot.horizontalArm.closeClaw();
+        nap(500);
+
         telemetry.addLine("8");
         telemetry.update();
         intake.run();
@@ -268,8 +327,10 @@ public class IdealAutoClose extends RobotLinearOpMode {
 
         robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
         nap(200);
+
         nap(robot.horizontalArm.claw::isClosed);
-        nap(100);
+        robot.horizontalArm.closeClaw();
+        nap(500);
         intake.run();
 
 
@@ -279,8 +340,22 @@ public class IdealAutoClose extends RobotLinearOpMode {
         highCone.run();
         nap(highCone::isActive);
 
-        robot.verticalArm.goToPosition(VerticalArm.Position.INTAKE);
-        nap(1000);
+        in.run();
+
+        switch (parkingSpot) {
+            case 1:
+                drivetrain.followTrajectorySequenceAsync(spot1);
+                break;
+            case 2:
+                drivetrain.followTrajectorySequenceAsync(spot2);
+                break;
+            case 3:
+                drivetrain.followTrajectorySequenceAsync(spot3);
+                break;
+        }
+
+        nap(drivetrain::isBusy);
+        nap(in::isActive);
     }
 
     public void update() {
@@ -293,11 +368,14 @@ public class IdealAutoClose extends RobotLinearOpMode {
     }
 
     public void checkCancel() {
-        if (robot.horizontalArm.slide.getPosition() <= HS_MAX_ENCODER - 20) {
+        if (isStopRequested() || !opModeIsActive()) {
+            terminateOpModeNow();
+        }
+        if (robot.horizontalArm.slide.getPosition() <= HS_MAX_ENCODER - 10) {
             return;
         }
         if (robot.horizontalArm.getDistance() > HS_DS_CONE_SUPER_DISTANCE_CM + 1) {
-            stop();
+            terminateOpModeNow();
         }
 
     }
@@ -313,7 +391,6 @@ public class IdealAutoClose extends RobotLinearOpMode {
         try {
             while (condition.call()) {
                 update();
-                if (isStopRequested()) return;
             }
         } catch (Exception ignored) {}
     }
