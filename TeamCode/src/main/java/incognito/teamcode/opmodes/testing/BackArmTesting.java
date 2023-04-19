@@ -48,21 +48,18 @@ public class BackArmTesting extends RobotOpMode {
 
     @Override
     public void loop() {
-        if (pad2.a_pressed) {
+        /*if (pad2.a_pressed) {
             robot.horizontalArm.openClaw();
         }
         if (pad2.b_pressed) {
             robot.horizontalArm.closeClaw();
-        }
+        }*/
 
         if (pad2.y_pressed) {
             robot.horizontalArm.goToPosition(HorizontalArm.Position.IN);
         }
         if (pad2.x_pressed) {
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.OUT);
-        }
-        if (pad2.right_bumper_pressed) {
-            robot.horizontalArm.goToPosition(HorizontalArm.Position.MANUAL);
+            robot.horizontalArm.goToPosition(HorizontalArm.Position.CLAW_OUT);
         }
 
         if (pad2.dpad_right_pressed) {
@@ -70,6 +67,21 @@ public class BackArmTesting extends RobotOpMode {
         }
         if (pad2.dpad_left_pressed) {
             robot.horizontalArm.hinge.setPosition(HS_HINGE_OUT);
+        }
+
+        if (pad2.a_pressed) {
+            if (pad2.left_trigger_active()) {
+                robot.horizontalArm.hinge.offsetPosition(0.02);
+            } else {
+                robot.horizontalArm.hinge.offsetPosition(0.005);
+            }
+        }
+        if (pad2.b_pressed) {
+            if (pad2.left_trigger_active()) {
+                robot.horizontalArm.hinge.offsetPosition(-0.02);
+            } else {
+                robot.horizontalArm.hinge.offsetPosition(-0.005);
+            }
         }
 
 
@@ -82,10 +94,6 @@ public class BackArmTesting extends RobotOpMode {
         if (pad2.dpad_down_pressed) {
             robot.horizontalArm.incrementLeverHeight();
             robot.horizontalArm.levelHinge();
-        }
-
-        if (pad2.left_bumper_pressed) {
-            robot.horizontalArm.lever.goToSetPosition(0);
         }
 
         multiTelemetry.addData("Lever stored", robot.horizontalArm.leverOutPositionStorage);

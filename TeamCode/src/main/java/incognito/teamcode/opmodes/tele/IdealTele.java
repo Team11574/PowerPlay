@@ -142,7 +142,9 @@ public class IdealTele extends RobotOpMode {
                 .globalize();
         conditional_intake = new Action()
                 .doIf(intake_for_cycle,
-                    () -> robot.horizontalArm.getPosition() != HorizontalArm.Position.UP)
+                    () -> robot.horizontalArm.getPosition() != HorizontalArm.Position.UP
+                            && robot.horizontalArm.getPosition() != HorizontalArm.Position.UP_GROUND
+                            && robot.horizontalArm.getPosition() != HorizontalArm.Position.GROUND)
                 .then(robot.verticalArm::closeClaw)
                 .globalize();
         conditional_ground = new Action()
@@ -154,7 +156,7 @@ public class IdealTele extends RobotOpMode {
                         () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_CLOSED)
                 .globalize();
         horizontal_hinge_down = new Action()
-                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.FIFTH),
+                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.MIN),
                     () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_GROUND)
                 .globalize();
         horizontal_hinge_up = new Action()

@@ -133,14 +133,16 @@ public class WorldSlideConstants {
     public static double HS_CLAW_OPEN = 0.4;
     public static double HS_CLAW_CLOSED = 0.15;
 
-    public static double HS_HINGE_IN = .86;
+    public static double HS_HINGE_IN = 0.73; // .86;
     public static double HS_HINGE_GROUND = 0.755;
-    public static double HS_HINGE_OUT = 0.715;
-    public static double HS_HINGE_SECOND = 0.605;
-    public static double HS_HINGE_THIRD = 0.53;
+    public static double HS_HINGE_OUT = 0.63; // 0.715;
+    public static double HS_HINGE_SECOND = 0.54; // 0.605;
+    public static double HS_HINGE_THIRD = 0.5; // 0.53;
     public static double HS_HINGE_FOURTH = 0.45;
-    public static double HS_HINGE_FIFTH = 0.28;
-    public static double HS_HINGE_MID = 0.455;
+    public static double HS_HINGE_FIFTH = 0.36; // 0.28;
+    public static double HS_HINGE_MID = 0.47; //0.455;
+    public static double HS_HINGE_MAX = 0.765;
+    public static double HS_HINGE_MIN = 0.125;
 
     public static double HS_LEVER_START = 0.88;
     public static double HS_LEVER_MID = 0.8;
