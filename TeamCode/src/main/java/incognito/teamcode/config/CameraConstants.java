@@ -14,8 +14,8 @@ public class CameraConstants {
     public static int VIEWPORT_HEIGHT = 240;
 
     // === Color Thresholds ===
-    public static Scalar greenLow = new Scalar(43, 14, 99);
-    public static Scalar greenHigh = new Scalar(94, 197, 204);
+    public static Scalar greenLow = new Scalar(43, 64, 99);
+    public static Scalar greenHigh = new Scalar(82, 197, 198);
     public static final List<Scalar> greenThreshold = Arrays.asList(greenLow, greenHigh);
 
     public static Scalar orangeLow = new Scalar(0, 50, 128); // Orange min HSV

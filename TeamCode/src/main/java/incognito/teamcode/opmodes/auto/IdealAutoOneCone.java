@@ -63,22 +63,22 @@ public class IdealAutoOneCone extends RobotLinearOpMode {
         TrajectorySequence initialToJunction = drivetrain.trajectorySequenceBuilder(startPos) //r.startPose)
                 .setTangent(Math.toRadians(180))
                 .splineToConstantHeading(
-                        new Vector2d(20, -63.5),
+                        new Vector2d(14, -63.5),
                         Math.toRadians(180)
                 )
                 .splineToConstantHeading(
-                        new Vector2d(10, -48),
+                        new Vector2d(17, -48),
                         Math.toRadians(90)
                 )
                 .addDisplacementMarker(() -> {
                     robot.horizontalArm.goToPosition(HorizontalArm.Position.UP);
                 })
                 .splineToSplineHeading(
-                        new Pose2d(9, -14, Math.toRadians(180 + angle)),
+                        new Pose2d(17, -14, Math.toRadians(180 + angle)),
                         Math.toRadians(90)
                 )
                 .splineToConstantHeading(
-                        new Vector2d(junctionPose.getX() - 1, junctionPose.getY() + 4),
+                        new Vector2d(20, junctionPose.getY() - 12),
                         Math.toRadians(angle)
                 )
                 .build();
@@ -87,7 +87,7 @@ public class IdealAutoOneCone extends RobotLinearOpMode {
                 .turn(Math.toRadians(-(angle + 90)))
                 .setTangent(Math.toRadians(270))
                 .splineToConstantHeading(
-                        new Vector2d(11, -31),
+                        new Vector2d(22, -31),
                         Math.toRadians(270)
                 )
                 .build();
@@ -96,7 +96,7 @@ public class IdealAutoOneCone extends RobotLinearOpMode {
                 .turn(Math.toRadians(-(angle + 90)))
                 .setTangent(Math.toRadians(270))
                 .splineToConstantHeading(
-                        new Vector2d(12, -19),
+                        new Vector2d(22, -19),
                         Math.toRadians(270)
                 )
                 .splineToConstantHeading(
@@ -109,7 +109,7 @@ public class IdealAutoOneCone extends RobotLinearOpMode {
                 .turn(Math.toRadians(-(angle + 90)))
                 .setTangent(Math.toRadians(270))
                 .splineToConstantHeading(
-                        new Vector2d(12, -34),
+                        new Vector2d(22, -34),
                         Math.toRadians(270)
                 )
                 .turn(Math.toRadians(-90))

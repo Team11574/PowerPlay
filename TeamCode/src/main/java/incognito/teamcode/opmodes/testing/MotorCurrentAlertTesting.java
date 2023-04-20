@@ -45,10 +45,6 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
         tel = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         tel.addData("Starting Current Alert", testing_M.getCurrentAlert(CurrentUnit.MILLIAMPS));
 
-        frontArmServo = hardwareMap.get(Servo.class, "frontArm");
-        frontArm = new ContinuousServo(hardwareMap, tel, frontArmServo, 0);
-        frontArm.setPosition(0);
-
         tel.update();
     }
 
@@ -62,11 +58,14 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
             disabled = true;
         }
 
-        if (g.x_pressed) {
-            frontArm.setPosition(0);
+        if (g.dpad_up_pressed) {
+            testing_M.setTargetPosition(500);
         }
-        if (g.y_pressed) {
-            frontArm.setPosition(1);
+        if (g.dpad_down_pressed) {
+            testing_M.setTargetPosition(0);
+        }
+        if (g.dpad_right_pressed) {
+            testing_M.setTargetPosition(-500);
         }
 
         if (overCurrent)
@@ -92,13 +91,17 @@ public class MotorCurrentAlertTesting extends RobotOpMode {
         }
 
         testing_M.setCurrentAlert(SlideConstants.CURRENT_ALERT, CurrentUnit.MILLIAMPS);
-        if (!disabled)
+        if (!disabled && Math.abs(gamepad1.left_stick_y) > 0.1) {
+            testing_M.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             testing_M.setPower(-gamepad1.left_stick_y);
+        }
 
         //tel.addData("Distance (cm)", distanceSensor.getDistance(DistanceUnit.CM));
         tel.addData("testing_M Current (mA)", testing_M.getCurrent(CurrentUnit.MILLIAMPS));
         tel.addData("testing_M Over Current", testing_M.isOverCurrent());
         tel.addData("testing_M Current Alert", testing_M.getCurrentAlert(CurrentUnit.MILLIAMPS));
+        tel.addData("testing_M target position", testing_M.getTargetPosition());
+        tel.addData("testing_M actual pos", testing_M.getCurrentPosition());
         g.update();
         tel.update();
     }
