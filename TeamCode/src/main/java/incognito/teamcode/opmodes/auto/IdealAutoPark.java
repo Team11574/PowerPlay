@@ -48,7 +48,7 @@ public class IdealAutoPark extends RobotLinearOpMode {
                         Math.toRadians(90)
                 )
                 .splineToSplineHeading(
-                        new Pose2d(16, -50, Math.toRadians(180)),
+                        new Pose2d(15, -50, Math.toRadians(180)),
                         Math.toRadians(180)
                 )
                 .build();
@@ -56,14 +56,21 @@ public class IdealAutoPark extends RobotLinearOpMode {
         TrajectorySequence spot2 = drivetrain.trajectorySequenceBuilder(startPos)
                 .setTangent(Math.toRadians(90))
                 .splineToConstantHeading(
-                        new Vector2d(35.5, -50),
+                        new Vector2d(31, -42),
                         Math.toRadians(90)
                 )
                 .build();
 
         TrajectorySequence spot3 = drivetrain.trajectorySequenceBuilder(startPos)
-                .turn(-90)
-                .forward(20)
+                .setTangent(Math.toRadians(90))
+                .splineToConstantHeading(
+                        new Vector2d(35.5, -53),
+                        Math.toRadians(90)
+                )
+                .splineToSplineHeading(
+                        new Pose2d(56, -45, Math.toRadians(0)),
+                        Math.toRadians(0)
+                )
                 .build();
 
 
