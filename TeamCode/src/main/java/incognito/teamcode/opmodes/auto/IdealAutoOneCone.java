@@ -1,13 +1,7 @@
 package incognito.teamcode.opmodes.auto;
 
-import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_DROP_SPEED;
-import static incognito.teamcode.config.WorldSlideConstants.HS_CLAW_GRAB_SPEED;
 import static incognito.teamcode.config.WorldSlideConstants.HS_DS_CONE_SUPER_DISTANCE_CM;
-import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
-import static incognito.teamcode.config.WorldSlideConstants.HS_SLIDE_AUTO_OUT_POSITION;
-import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_HANDOFF_SPEED;
-
-import androidx.core.view.TintableBackgroundView;
+import static incognito.teamcode.config.WorldSlideConstants.HS_SLIDE_MAX;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -23,11 +17,9 @@ import incognito.cog.actions.Action;
 import incognito.cog.actions.ActionManager;
 import incognito.cog.opmodes.RobotLinearOpMode;
 import incognito.cog.trajectory.TrajectorySequence;
-import incognito.cog.trajectory.TrajectorySequenceBuilder;
 import incognito.teamcode.robot.WorldRobot;
 import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
-import incognito.teamcode.robot.component.servoImplementations.Lever;
 
 @Autonomous(name = "Ideal Auto One Cone", group = "auto")
 public class IdealAutoOneCone extends RobotLinearOpMode {
@@ -190,7 +182,7 @@ public class IdealAutoOneCone extends RobotLinearOpMode {
         if (isStopRequested() || !opModeIsActive()) {
             terminateOpModeNow();
         }
-        if (robot.horizontalArm.slide.getPosition() <= HS_MAX_ENCODER - 10) {
+        if (robot.horizontalArm.slide.getPosition() <= HS_SLIDE_MAX - 10) {
             return;
         }
         if (robot.horizontalArm.getDistance() > HS_DS_CONE_SUPER_DISTANCE_CM + 1) {

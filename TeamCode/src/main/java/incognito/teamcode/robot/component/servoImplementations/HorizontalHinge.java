@@ -20,6 +20,7 @@ public class HorizontalHinge extends ContinuousServo {
         SECOND,
         OUT,
         GROUND,
+        UP_LOW,
         MIN,
         MAX,
     }

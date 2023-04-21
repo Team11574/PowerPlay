@@ -117,6 +117,7 @@ public class IdealTele extends RobotOpMode {
                 .then(() -> robot.horizontalArm.goToPosition(HorizontalArm.Position.UP))
                 .delay(VS_CLAW_HANDOFF_SPEED)
                 .then(robot.verticalArm::closeClaw)
+                .then(robot.horizontalArm::closeClaw)
                 .globalize();
         vertical_arm_to_intake = new Action()
                 .until(robot.verticalArm.claw::isOpened)
@@ -156,12 +157,16 @@ public class IdealTele extends RobotOpMode {
                         () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_CLOSED)
                 .globalize();
         horizontal_hinge_down = new Action()
-                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.MIN),
+                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.UP_LOW),
                     () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_GROUND)
+                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.OUT),
+                        () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.GROUND)
                 .globalize();
         horizontal_hinge_up = new Action()
                 .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.MID),
                         () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.UP_GROUND)
+                .doIf(() -> robot.horizontalArm.hinge.goToSetPosition(HorizontalHinge.Position.GROUND),
+                        () -> robot.horizontalArm.getPosition() == HorizontalArm.Position.GROUND)
                 .globalize();
     }
 
@@ -217,6 +222,8 @@ public class IdealTele extends RobotOpMode {
             targetLocking = false;
             robot.horizontalArm.slide.enable();
             robot.verticalArm.slide.enable();
+        });
+        pad2.left_stick_button.onRise(() -> {
             robot.horizontalArm.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.horizontalArm.slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         });

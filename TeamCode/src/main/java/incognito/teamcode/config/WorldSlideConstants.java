@@ -115,8 +115,8 @@ public class WorldSlideConstants {
 
     public static final double HS_TICKS_PER_IN = HS_TICKS_PER_REV * HS_GEAR_RATIO / HS_PULLEY_CIRCUMFERENCE;
 
-    public static double HS_MIN_ENCODER = 0;
-    public static double HS_MAX_ENCODER = 2000;
+    public static double HS_SLIDE_MIN = 0;
+    public static double HS_SLIDE_MAX = 2000;
 
     public static double HS_LEVER_WAIT_TIME = 100; //500; // ms
     public static double HS_HINGE_WAIT_TIME = 100; //150; // ms
@@ -141,6 +141,7 @@ public class WorldSlideConstants {
     public static double HS_HINGE_FOURTH = 0.45;
     public static double HS_HINGE_FIFTH = 0.36; // 0.28;
     public static double HS_HINGE_MID = 0.47; //0.455;
+    public static double HS_HINGE_UP_LOW = 0.2;
     public static double HS_HINGE_MAX = 0.765;
     public static double HS_HINGE_MIN = 0.125;
 

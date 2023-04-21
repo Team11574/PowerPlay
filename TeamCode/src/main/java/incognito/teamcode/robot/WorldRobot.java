@@ -12,6 +12,7 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_MIN;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_OUT;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_SECOND;
 import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_THIRD;
+import static incognito.teamcode.config.WorldSlideConstants.HS_HINGE_UP_LOW;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_END;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FIFTH;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_FOURTH;
@@ -19,8 +20,8 @@ import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_MID;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_SECOND;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_START;
 import static incognito.teamcode.config.WorldSlideConstants.HS_LEVER_THIRD;
-import static incognito.teamcode.config.WorldSlideConstants.HS_MAX_ENCODER;
-import static incognito.teamcode.config.WorldSlideConstants.HS_MIN_ENCODER;
+import static incognito.teamcode.config.WorldSlideConstants.HS_SLIDE_MAX;
+import static incognito.teamcode.config.WorldSlideConstants.HS_SLIDE_MIN;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_CLOSED;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_OPEN;
 import static incognito.teamcode.config.WorldSlideConstants.VS_CLAW_WIDE;
@@ -55,7 +56,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import incognito.cog.actions.Scheduler;
 import incognito.cog.hardware.component.drive.Drivetrain;
 import incognito.cog.robot.RobotCog;
-import incognito.teamcode.robot.component.arm.Arm;
 import incognito.teamcode.robot.component.arm.HorizontalArm;
 import incognito.teamcode.robot.component.arm.VerticalArm;
 import incognito.teamcode.robot.component.camera.AutoCamera;
@@ -177,6 +177,7 @@ public class WorldRobot extends RobotCog {
                         HS_HINGE_SECOND,
                         HS_HINGE_OUT,
                         HS_HINGE_GROUND,
+                        HS_HINGE_UP_LOW,
                         HS_HINGE_MIN,
                         HS_HINGE_MAX
                 }, HS_HINGE_MIN, HS_HINGE_MAX);
@@ -202,7 +203,7 @@ public class WorldRobot extends RobotCog {
 
     private void configureHorizontalSlide() {
         DcMotorEx HS_slide_M = hardwareMap.get(DcMotorEx.class, "HS_slide_M");
-        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, HS_MIN_ENCODER, HS_MAX_ENCODER);
+        horizontalSlide = new HorizontalSlide(hardwareMap, telemetry, HS_slide_M, HS_SLIDE_MIN, HS_SLIDE_MAX);
         horizontalSlide.goToSetPosition(HorizontalSlide.Position.IN);
     }
 
