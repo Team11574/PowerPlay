@@ -173,8 +173,7 @@ public class IdealTele extends RobotOpMode {
     public void initializeControls() {
         pad2.b.onRise(super_intake);
         pad2.a.onRise(() -> {
-            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT
-                    || robot.horizontalArm.getPosition() == HorizontalArm.Position.MANUAL) {
+            if (robot.horizontalArm.getPosition() == HorizontalArm.Position.CLAW_OUT) {
                 if (pad2.left_trigger_active()) {
                     robot.horizontalArm.goToPosition(HorizontalArm.Position.SUPER_OUT);
                 } else {
