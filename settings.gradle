@@ -1,3 +1,5 @@
 include ':FtcRobotController'
 include ':TeamCode'
+include ':DashboardCore'
+include ':FtcDashboard'
 include ':MeepMeepTesting'
