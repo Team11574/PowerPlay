@@ -60,6 +60,7 @@ import org.firstinspires.ftc.robotserver.internal.webserver.MimeTypesUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -540,6 +541,11 @@ public class FtcDashboard implements OpModeManagerImpl.Notifications {
                     if (!altName.isEmpty()) {
                         name = altName;
                     }
+                    try {
+                        // Try to create trajectories if a static function called createTrajectories exists
+                        configClass.getMethod("createTrajectories").invoke(null);
+                    } catch (NoSuchMethodException | NoSuchMethodError | IllegalAccessException |
+                             InvocationTargetException ignored) {}
 
                     customVariable.putVariable(name, ReflectionConfig.createVariableFromClass(configClass));
                 } catch (ClassNotFoundException | NoClassDefFoundError ignored) {

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.variable.CustomVariable;
 import com.acmerobotics.dashboard.config.variable.VariableType;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 public class ReflectionConfig {
@@ -19,6 +20,17 @@ public class ReflectionConfig {
                     || Modifier.isFinal(field.getModifiers())) {
                 continue;
             }
+            try {
+                Object value = field.get(null);
+                // Try getting CTSC variable
+                CustomVariable trajectories = (CustomVariable) (value
+                                .getClass()
+                                .getMethod("getConfigurableTrajectorySequenceContainerVariable")
+                                .invoke(value));
+                customVariable.putVariable("Trajectories", trajectories);
+                continue;
+            } catch (IllegalAccessException | NoSuchMethodException |
+                     InvocationTargetException ignored) {}
             customVariable.putVariable(field.getName(), createVariableFromField(field, null));
         }
 
